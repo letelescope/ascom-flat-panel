@@ -22,6 +22,8 @@ constexpr auto COMMAND_COVER_CLOSE = "COVER_CLOSE";
 constexpr auto COMMAND_COVER_CALIBRATION_RUN = "COVER_CALIBRATION_RUN";
 constexpr auto COMMAND_COVER_CALIBRATION_GET = "COVER_CALIBRATION_GET";
 
+constexpr auto COMMAND_UNKNOWN = "UNKNOWN";
+
 constexpr auto ERROR_NOT_IMPLEMENTED = "UNSOPPORTEF_COMMAND@Not implemented";
 constexpr auto ERROR_INVALID_INCOMING_MESSAGE = "INVALID_INCOMING_MESSAGE@Allowed messages are TYPE:COMMAND[@PARAMETER]";
 constexpr auto ERROR_INVALID_INCOMING_MESSAGE_TYPE = "INVALID_INCOMING_MESSAGE_TYPE@Allowed types COMMAND";
@@ -44,7 +46,7 @@ typedef struct command {
   cmd_handler_t handle;
 };
 
-constexpr command commands[] = {{COMMAND_PING,&cmd_ping}, 
+constexpr command allowed_cmds[] = {{COMMAND_PING,&cmd_ping}, 
                                       {COMMAND_INFO,&cmd_info},
                                       {COMMAND_BRIGHTNESS_GET,&cmd_brigthness_get}, 
                                       {COMMAND_BRIGHTNESS_SET,&cmd_brightness_set}, 
@@ -62,7 +64,11 @@ constexpr uint32_t PWM_FREQ = 20000;
 
 constexpr auto LEDSTRIP_PIN = 8;
 
-uint32_t brightness = 0;
+typedef struct panel_state_t {
+  uint32_t brightness;
+};
+
+panel_state_t panel_state {0};
 
 void setup() {
   // start serial port at 9600 bps:
@@ -91,11 +97,11 @@ void loop() {
 
     bool error = false;
     
-    auto cmd_payload = get_command(message, &error);
+    auto cmd_payload = get_cmd_payload(message, &error);
     if (error) { return; }
     
-    auto handler = get_handler_from_payload(cmd_payload);
-    handler(cmd_payload.args);
+    auto command =  get_command_from_payload(cmd_payload);
+    command.handle(cmd_payload.args);
   }
 }
 
@@ -118,7 +124,7 @@ void cmd_info(const String args) {
 // Get Brightness
 // Answers Birghtness value
 void cmd_brigthness_get(const String args){
-  serialize_result(COMMAND_BRIGHTNESS_GET, String (brightness));
+  serialize_result(COMMAND_BRIGHTNESS_GET, String (panel_state.brightness));
 }
 
 // Set Brightness value
@@ -144,18 +150,19 @@ void cmd_brightness_set(const String args){
     return;
   }
 
-  brightness = (uint32_t) wanted_brightness;
+  panel_state.brightness = (uint32_t) wanted_brightness;
   set_brightness();
 
-  serialize_result(COMMAND_BRIGHTNESS_SET, String (brightness));
+  serialize_result(COMMAND_BRIGHTNESS_SET, String (panel_state.brightness));
 }
 
 // Reset Brightness value
 // Answers with reset brightness value
 void cmd_brightness_reset(const String args){
-  brightness = 0;
+  panel_state.brightness = 0;
   set_brightness();
-  serialize_result(COMMAND_BRIGHTNESS_RESET, String (brightness));
+
+  serialize_result(COMMAND_BRIGHTNESS_RESET, String (panel_state.brightness));
 }
 
 void cmd_cover_get_state(const String args) { serialize_error(ERROR_INVALID_COMMAND); }
@@ -175,17 +182,17 @@ void cmd_unknown(const String args) {
 
 // Returns the Enum value corresponding to the input string.
 // Could be implemented as a Map if O(1) lookup is needed. 
-cmd_handler_t get_handler_from_payload(const msg_cmd_payload input){
+command get_command_from_payload(const msg_cmd_payload input){
   
-  for(auto cmd : commands) {
+  for(auto cmd : allowed_cmds) {
     if(input.name.equalsConstantTime(cmd.name)) {
-      return cmd.handle;
+      return command{cmd.name, cmd.handle};
     }
   }
-	return &cmd_unknown;
+	return command {COMMAND_UNKNOWN,&cmd_unknown};
 }
 
-msg_cmd_payload get_command(const String message, bool *error) {
+msg_cmd_payload get_cmd_payload(const String message, bool *error) {
     auto type_cmd_sep_idx = message.indexOf(TYPE_COMMAND_SEPARATOR);
     auto cmd_args_sep_idx = message.indexOf(COMMAND_ARGS_SEPARATOR);
     auto message_end_idx = message.length();
@@ -261,5 +268,5 @@ void set_brightness() {
     // No need to map anymore our bightness, it laredy a number between 0 and 1023 see BRIGHTNESS_SET command
     // int value = map(brightness, MIN_BRIGHTNESS, MAX_BRIGHTNESS, 0, 1023);
     //pwm(ledPin, PWM_FREQ, value);
-    pwm(LEDSTRIP_PIN, PWM_FREQ, brightness);
+    pwm(LEDSTRIP_PIN, PWM_FREQ, panel_state.brightness);
 }
