@@ -31,39 +31,30 @@ constexpr auto ERROR_WANTED_BRIGHTNESS_NAN_MSG_END = "} is not a number.";
 constexpr auto ERROR_WANTED_BRIGHTNESS_NEGATIVE_MSG_END = "} is negative.";
 constexpr auto ERROR_WANTED_BRIGHTNESS_TOO_BIG_MSG_END = "} is bigger than max allowed value 1023";
 
-
-typedef struct command {
+typedef struct msg_cmd_payload {
   String name;
   String args;
 };
 
 //Keeps the record of knwom commands index
-enum COMMAND_HANDLER {
-  PING,
-  INFO,
-  BRIGHTNESS_GET,
-  BRIGTHNESS_SET,
-  BRIGHTNESS_RESET,
-  COVER_GET_STATE,
-  COVER_OPEN, 
-  COVER_CLOSE,
-  COVER_CALIBRATION_RUN,
-  COVER_CALIBRATION_GET, 
-  UNKONW,
+typedef void (*cmd_handler_t)(String);
+
+typedef struct command {
+  const char * name;
+  cmd_handler_t handle;
 };
 
-typedef void (*command_t)(String);
-constexpr command_t cmd_handlers[] = {&cmd_ping, 
-                                      &cmd_info,
-                                      &cmd_brigthness_get, 
-                                      &cmd_brightness_set, 
-                                      &cmd_brightness_reset,
-                                      &cmd_cover_get_state,
-                                      &cmd_cover_open,
-                                      &cmd_cover_close,
-                                      &cmd_cover_calibration_run,
-                                      &cmd_cover_calibration_get,
-                                      &cmd_unknown};
+constexpr command commands[] = {{COMMAND_PING,&cmd_ping}, 
+                                      {COMMAND_INFO,&cmd_info},
+                                      {COMMAND_BRIGHTNESS_GET,&cmd_brigthness_get}, 
+                                      {COMMAND_BRIGHTNESS_SET,&cmd_brightness_set}, 
+                                      {COMMAND_BRIGHTNESS_RESET,&cmd_brightness_reset},
+                                      {COMMAND_COVER_GET_STATE,&cmd_cover_get_state},
+                                      {COMMAND_COVER_OPEN,&cmd_cover_open},
+                                      {COMMAND_COVER_CLOSE,&cmd_cover_close},
+                                      {COMMAND_COVER_CALIBRATION_RUN,&cmd_cover_calibration_run},
+                                      {COMMAND_COVER_CALIBRATION_GET,&cmd_cover_calibration_get},
+};
 
 constexpr uint32_t MIN_BRIGHTNESS = 0;
 constexpr uint32_t MAX_BRIGHTNESS = 1023;
@@ -100,11 +91,11 @@ void loop() {
 
     bool error = false;
     
-    auto cmd = get_command(message, &error);
+    auto cmd_payload = get_command(message, &error);
     if (error) { return; }
     
-    auto cmd_idx = handler_index(cmd.name);
-    cmd_handlers[cmd_idx](cmd.args);
+    auto handler = get_handler_from_payload(cmd_payload);
+    handler(cmd_payload.args);
   }
 }
 
@@ -184,21 +175,17 @@ void cmd_unknown(const String args) {
 
 // Returns the Enum value corresponding to the input string.
 // Could be implemented as a Map if O(1) lookup is needed. 
-byte handler_index(const String input){
-  if ( input.equalsConstantTime(COMMAND_PING)) return COMMAND_HANDLER::PING;
-	if ( input.equalsConstantTime(COMMAND_INFO)) return COMMAND_HANDLER::INFO;
-  if ( input.equalsConstantTime(COMMAND_BRIGHTNESS_GET)) return COMMAND_HANDLER::BRIGHTNESS_GET;
-  if ( input.equalsConstantTime(COMMAND_BRIGHTNESS_SET)) return COMMAND_HANDLER::BRIGTHNESS_SET;
-  if ( input.equalsConstantTime(COMMAND_BRIGHTNESS_RESET)) return COMMAND_HANDLER::BRIGHTNESS_RESET;
-  if ( input.equalsConstantTime(COMMAND_COVER_GET_STATE)) return COMMAND_HANDLER::COVER_GET_STATE;
-  if ( input.equalsConstantTime(COMMAND_COVER_OPEN)) return COMMAND_HANDLER::COVER_OPEN;
-  if ( input.equalsConstantTime(COMMAND_COVER_CLOSE)) return COMMAND_HANDLER::COVER_CLOSE;
-  if ( input.equalsConstantTime(COMMAND_COVER_CALIBRATION_RUN)) return COMMAND_HANDLER::COVER_CALIBRATION_RUN;
-  if ( input.equalsConstantTime(COMMAND_COVER_CALIBRATION_GET)) return COMMAND_HANDLER::COVER_CALIBRATION_GET;
-	return COMMAND_HANDLER::UNKONW;
+cmd_handler_t get_handler_from_payload(const msg_cmd_payload input){
+  
+  for(auto cmd : commands) {
+    if(input.name.equalsConstantTime(cmd.name)) {
+      return cmd.handle;
+    }
+  }
+	return &cmd_unknown;
 }
 
-command get_command(const String message, bool *error) {
+msg_cmd_payload get_command(const String message, bool *error) {
     auto type_cmd_sep_idx = message.indexOf(TYPE_COMMAND_SEPARATOR);
     auto cmd_args_sep_idx = message.indexOf(COMMAND_ARGS_SEPARATOR);
     auto message_end_idx = message.length();
@@ -219,7 +206,7 @@ command get_command(const String message, bool *error) {
     if ( !valid_separators) { 
       serialize_error(ERROR_INVALID_INCOMING_MESSAGE_TYPE); 
       *error = true; 
-      return command {"",""}; 
+      return msg_cmd_payload {}; 
     }
     
     String type = message.substring(0,type_cmd_sep_idx);
@@ -227,13 +214,13 @@ command get_command(const String message, bool *error) {
     if (type != COMMAND_MSG_TYPE) { 
       serialize_error(ERROR_INVALID_INCOMING_MESSAGE_TYPE); 
       *error = true;
-      return command {"",""};
+      return msg_cmd_payload {};
     } 
 
     String cmd_name = (has_arg_sep) ? message.substring(type_cmd_sep_idx+1, cmd_args_sep_idx) : message.substring(type_cmd_sep_idx+1, message_end_idx);
     String cmd_args = (has_arg_sep) ? message.substring(cmd_args_sep_idx + 1, message_end_idx) : "";
 
-    return command {cmd_name, cmd_args};
+    return msg_cmd_payload {cmd_name, cmd_args};
 }
 
 void serialize_result(String command, String message) {
