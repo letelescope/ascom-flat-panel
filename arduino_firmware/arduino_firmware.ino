@@ -10,21 +10,30 @@ constexpr auto COMMAND_PING = "PING";
 constexpr auto RESULT_PING = "PONG";
 
 constexpr auto COMMAND_INFO = "INFO";
-constexpr auto RESULT_INFO = "Le Telescope Flat Panel Firmware v1.0";
+constexpr auto RESULT_INFO = "Le Telescope - Ivry Flat Panel Firmware v1.0";
 
 constexpr auto COMMAND_BRIGHTNESS_GET = "BRIGHTNESS_GET";
 constexpr auto COMMAND_BRIGHTNESS_SET = "BRIGHTNESS_SET";
 constexpr auto COMMAND_BRIGHTNESS_RESET = "BRIGHTNESS_RESET";
 
 constexpr auto COMMAND_COVER_GET_STATE = "COVER_GET_STATE";
+constexpr auto RESULT_COVER_GET_STATE_OPEN = "OPEN";
+constexpr auto RESULT_COVER_GET_STATE_OPENING = "OPENING";
+constexpr auto RESULT_COVER_GET_STATE_CLOSED = "CLOSED";
+constexpr auto RESULT_COVER_GET_STATE_CLOSING = "CLOSING";
+
 constexpr auto COMMAND_COVER_OPEN = "COVER_OPEN";
+constexpr auto RESULT_COVER_OPEN = "OK";
+constexpr auto ERROR_COVER_OPEN = "COVER_OPEN_IMPOSSIBLE@Cover is not closed nor closing.";
 constexpr auto COMMAND_COVER_CLOSE = "COVER_CLOSE";
+constexpr auto RESULT_COVER_CLOSE = "OK";
+constexpr auto ERROR_COVER_CLOSE = "COVER_CLOSE_IMPOSSIBLE@Cover is not open nor opening.";
 constexpr auto COMMAND_COVER_CALIBRATION_RUN = "COVER_CALIBRATION_RUN";
 constexpr auto COMMAND_COVER_CALIBRATION_GET = "COVER_CALIBRATION_GET";
 
 constexpr auto COMMAND_UNKNOWN = "UNKNOWN";
 
-constexpr auto ERROR_NOT_IMPLEMENTED = "UNSOPPORTEF_COMMAND@Not implemented";
+constexpr auto ERROR_NOT_IMPLEMENTED = "UNSOPPORTED_COMMAND@Not implemented";
 constexpr auto ERROR_INVALID_INCOMING_MESSAGE = "INVALID_INCOMING_MESSAGE@Allowed messages are TYPE:COMMAND[@PARAMETER]";
 constexpr auto ERROR_INVALID_INCOMING_MESSAGE_TYPE = "INVALID_INCOMING_MESSAGE_TYPE@Allowed types COMMAND";
 constexpr auto ERROR_INVALID_COMMAND = "INVALID_COMMAND@Allowed commands PING, INFO, BRIGHTNESS_GET, BRIGHTNESS_SET, BRIGHTNESS_RESET";
@@ -64,11 +73,19 @@ constexpr uint32_t PWM_FREQ = 20000;
 
 constexpr auto LEDSTRIP_PIN = 8;
 
-typedef struct panel_state_t {
-  uint32_t brightness;
+typedef enum cover_state_t {
+  OPENING,
+  OPEN,
+  CLOSING,
+  CLOSED,
 };
 
-panel_state_t panel_state {0};
+typedef struct panel_state_t {
+  uint32_t brightness;
+  cover_state_t cover;
+};
+
+panel_state_t panel_state;
 
 void setup() {
   // start serial port at 9600 bps:
@@ -89,6 +106,9 @@ void setup() {
 
     // Setup LED pin as output
     pinMode(LEDSTRIP_PIN, OUTPUT);
+
+    panel_state = panel_state_t {0, CLOSED};
+
 }
 
 void loop() {
@@ -165,9 +185,43 @@ void cmd_brightness_reset(const String args){
   serialize_result(COMMAND_BRIGHTNESS_RESET, String (panel_state.brightness));
 }
 
-void cmd_cover_get_state(const String args) { serialize_error(ERROR_INVALID_COMMAND); }
-void cmd_cover_open(const String args) { serialize_error(ERROR_INVALID_COMMAND); }
-void cmd_cover_close(const String args) { serialize_error(ERROR_INVALID_COMMAND); }
+void cmd_cover_get_state(const String args) { 
+  switch (panel_state.cover) {
+    case OPENING:
+      serialize_result(COMMAND_COVER_GET_STATE, RESULT_COVER_GET_STATE_OPENING);
+      break;
+    case OPEN:
+      serialize_result(COMMAND_COVER_GET_STATE, RESULT_COVER_GET_STATE_OPEN);
+      break;
+    case CLOSING:
+      serialize_result(COMMAND_COVER_GET_STATE, RESULT_COVER_GET_STATE_CLOSING);
+      break;
+    case CLOSED:
+      serialize_result(COMMAND_COVER_GET_STATE, RESULT_COVER_GET_STATE_CLOSED);
+      break;
+  }
+ }
+void cmd_cover_open(const String args) { 
+
+  if (!(panel_state.cover == CLOSED || panel_state.cover == CLOSING)) {
+    serialize_error(ERROR_COVER_OPEN); 
+    return;
+  }  
+
+  panel_state.cover = OPENING;
+
+  serialize_result(COMMAND_COVER_OPEN, RESULT_COVER_OPEN);
+}
+void cmd_cover_close(const String args) { 
+  
+  if (!(panel_state.cover == OPEN || panel_state.cover == OPENING)) {
+    serialize_error(ERROR_COVER_CLOSE); 
+    return;
+  }  
+
+  panel_state.cover = CLOSING;
+  serialize_result(COMMAND_COVER_CLOSE, RESULT_COVER_CLOSE);
+}
 void cmd_cover_calibration_run(const String args) { serialize_error(ERROR_INVALID_COMMAND); }
 void cmd_cover_calibration_get(const String args) { serialize_error(ERROR_INVALID_COMMAND); }
 
