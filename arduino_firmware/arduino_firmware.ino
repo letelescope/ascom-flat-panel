@@ -200,7 +200,8 @@ void cmd_cover_get_state(const String args) {
       serialize_result(COMMAND_COVER_GET_STATE, RESULT_COVER_GET_STATE_CLOSED);
       break;
   }
- }
+}
+
 void cmd_cover_open(const String args) { 
 
   if (!(panel_state.cover == CLOSED || panel_state.cover == CLOSING)) {
@@ -212,6 +213,7 @@ void cmd_cover_open(const String args) {
 
   serialize_result(COMMAND_COVER_OPEN, RESULT_COVER_OPEN);
 }
+
 void cmd_cover_close(const String args) { 
   
   if (!(panel_state.cover == OPEN || panel_state.cover == OPENING)) {
@@ -222,8 +224,9 @@ void cmd_cover_close(const String args) {
   panel_state.cover = CLOSING;
   serialize_result(COMMAND_COVER_CLOSE, RESULT_COVER_CLOSE);
 }
-void cmd_cover_calibration_run(const String args) { serialize_error(ERROR_INVALID_COMMAND); }
-void cmd_cover_calibration_get(const String args) { serialize_error(ERROR_INVALID_COMMAND); }
+
+void cmd_cover_calibration_run(const String args) { serialize_error(ERROR_NOT_IMPLEMENTED; }
+void cmd_cover_calibration_get(const String args) { serialize_error(ERROR_NOT_IMPLEMENTED); }
 
 // Handles unknown commands
 // Send error message stating command is unknow
