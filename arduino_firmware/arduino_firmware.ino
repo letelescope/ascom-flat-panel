@@ -1,3 +1,6 @@
+#include <Servo.h>
+#include <FlashStorage.h>
+
 constexpr auto MESSAGE_END_DELIMITER = "\n";
 constexpr auto TYPE_COMMAND_SEPARATOR = ":";
 constexpr auto COMMAND_ARGS_SEPARATOR = "@";
@@ -29,11 +32,12 @@ constexpr auto COMMAND_COVER_CLOSE = "COVER_CLOSE";
 constexpr auto RESULT_COVER_CLOSE = "OK";
 constexpr auto ERROR_COVER_CLOSE = "COVER_CLOSE_IMPOSSIBLE@Cover is not open nor opening.";
 constexpr auto COMMAND_COVER_CALIBRATION_RUN = "COVER_CALIBRATION_RUN";
+constexpr auto RESULT_COVER_CALIBRATION_RUN = "0K";
 constexpr auto COMMAND_COVER_CALIBRATION_GET = "COVER_CALIBRATION_GET";
 
 constexpr auto COMMAND_UNKNOWN = "UNKNOWN";
 
-constexpr auto ERROR_NOT_IMPLEMENTED = "UNSOPPORTED_COMMAND@Not implemented";
+constexpr auto ERROR_NOT_IMPLEMENTED = "UNSUPPORTED_COMMAND@Not implemented";
 constexpr auto ERROR_INVALID_INCOMING_MESSAGE = "INVALID_INCOMING_MESSAGE@Allowed messages are TYPE:COMMAND[@PARAMETER]";
 constexpr auto ERROR_INVALID_INCOMING_MESSAGE_TYPE = "INVALID_INCOMING_MESSAGE_TYPE@Allowed types COMMAND";
 constexpr auto ERROR_INVALID_COMMAND = "INVALID_COMMAND@Allowed commands PING, INFO, BRIGHTNESS_GET, BRIGHTNESS_SET, BRIGHTNESS_RESET";
@@ -41,6 +45,27 @@ constexpr auto ERROR_WANTED_BRIGHTNESS_MSG_START = "INVALID_BRIGHTNESS@Wanted br
 constexpr auto ERROR_WANTED_BRIGHTNESS_NAN_MSG_END = "} is not a number.";
 constexpr auto ERROR_WANTED_BRIGHTNESS_NEGATIVE_MSG_END = "} is negative.";
 constexpr auto ERROR_WANTED_BRIGHTNESS_TOO_BIG_MSG_END = "} is bigger than max allowed value 1023";
+constexpr auto ERROR_SERVO_NOT_CALIBRATED = "SERVO_NO_CALIBRATED@Run command COVER_CALIBRATION_RUN first";
+
+constexpr uint32_t MIN_BRIGHTNESS = 0;
+constexpr uint32_t MAX_BRIGHTNESS = 1023;
+constexpr uint32_t PWM_FREQ = 20000;
+
+// Value used to determine whether the NVM (Non-Volatile Memory) was written,
+// or we are just reading garbage...
+constexpr unsigned int NVM_MAGIC_NUMBER = 0x12345678;
+
+// Pins assignment. Change these depending on your exact wiring!
+// There is conflict yet between LEDSTRIP pin and SERVO_FEEDBACK
+constexpr unsigned int LEDSTRIP_PIN = 8;
+
+constexpr unsigned int CALIBRATOR_SWITCH_PIN = 6;
+constexpr unsigned int SERVO_SWITCH_PIN = 7;
+constexpr unsigned int SERVO_FEEDBACK_PIN = 8;
+constexpr unsigned int SERVO_CONTROL_PIN = 9;
+
+// How long do we wait between each step in order to achieve the desired speed?
+constexpr unsigned long STEP_DELAY_MICROSEC = 30L * 1000; // 30 msec
 
 typedef struct msg_cmd_payload {
   String name;
@@ -48,44 +73,52 @@ typedef struct msg_cmd_payload {
 };
 
 //Keeps the record of knwom commands index
-typedef void (*cmd_handler_t)(String);
+typedef void (*cmd_handler_ptr)(String);
 
-typedef struct command {
-  const char * name;
-  cmd_handler_t handle;
+typedef struct command_t {
+  const char *name;
+  cmd_handler_ptr handle;
 };
 
-constexpr command allowed_cmds[] = {{COMMAND_PING,&cmd_ping}, 
-                                      {COMMAND_INFO,&cmd_info},
-                                      {COMMAND_BRIGHTNESS_GET,&cmd_brigthness_get}, 
-                                      {COMMAND_BRIGHTNESS_SET,&cmd_brightness_set}, 
-                                      {COMMAND_BRIGHTNESS_RESET,&cmd_brightness_reset},
-                                      {COMMAND_COVER_GET_STATE,&cmd_cover_get_state},
-                                      {COMMAND_COVER_OPEN,&cmd_cover_open},
-                                      {COMMAND_COVER_CLOSE,&cmd_cover_close},
-                                      {COMMAND_COVER_CALIBRATION_RUN,&cmd_cover_calibration_run},
-                                      {COMMAND_COVER_CALIBRATION_GET,&cmd_cover_calibration_get},
-};
+#define NB_COMMANDS 10
+constexpr command_t allowed_cmds[NB_COMMANDS] = {{ COMMAND_PING, &cmd_ping },
+                                      { COMMAND_INFO, &cmd_info },
+                                      { COMMAND_BRIGHTNESS_GET, &cmd_brigthness_get },
+                                      { COMMAND_BRIGHTNESS_SET, &cmd_brightness_set },
+                                      { COMMAND_BRIGHTNESS_RESET, &cmd_brightness_reset },
+                                      { COMMAND_COVER_GET_STATE, &cmd_cover_get_state },
+                                      { COMMAND_COVER_OPEN, &cmd_cover_open },
+                                      { COMMAND_COVER_CLOSE, &cmd_cover_close },
+                                      { COMMAND_COVER_CALIBRATION_RUN, &cmd_cover_calibration_run },
+                                      { COMMAND_COVER_CALIBRATION_GET, &cmd_cover_calibration_get }};
 
-constexpr uint32_t MIN_BRIGHTNESS = 0;
-constexpr uint32_t MAX_BRIGHTNESS = 1023;
-constexpr uint32_t PWM_FREQ = 20000;
-
-constexpr auto LEDSTRIP_PIN = 8;
-
-typedef enum cover_state_t {
+typedef enum {
   OPENING,
   OPEN,
   CLOSING,
   CLOSED,
-};
+} cover_state_t;
 
-typedef struct panel_state_t {
+typedef struct {
+  unsigned int magic_number;
+  double slope;
+  double intercept;
+} servo_cal_state_t;
+
+// Panel strucutre Holds the panel(led and cover) state
+// Could ben restructured but this would bring layers of inderiction and less readability
+struct panel_state_t {
   uint32_t brightness;
+  int servo_position;
+  unsigned long last_step_time;
   cover_state_t cover;
-};
+  servo_cal_state_t calibration;
+} panel;
 
-panel_state_t panel_state;
+
+FlashStorage(nvm_store, servo_cal_state_t);
+
+Servo servo;
 
 void setup() {
   // start serial port at 9600 bps:
@@ -95,33 +128,113 @@ void setup() {
   }
   Serial.flush();
 
-      // Make sure the RX, TX, and built-in LEDs don't turn on, they are very bright!
-    // Even though the board is inside an enclosure, the light can be seen shining
-    // through the small opening for the USB connector! Unfortunately, it is not
-    // possible to turn off the power LED (green) in code...
-    pinMode(PIN_LED_TXL, INPUT);
-    pinMode(PIN_LED_RXL, INPUT);
-    pinMode(LED_BUILTIN, OUTPUT);
-    digitalWrite(LED_BUILTIN, HIGH);
+  // Make sure the RX, TX, and built-in LEDs don't turn on, they are very bright!
+  // Even though the board is inside an enclosure, the light can be seen shining
+  // through the small opening for the USB connector! Unfortunately, it is not
+  // possible to turn off the power LED (green) in code...
+  pinMode(PIN_LED_TXL, INPUT);
+  pinMode(PIN_LED_RXL, INPUT);
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, HIGH);
+  
+  // Setup LED pin as output
+  pinMode(LEDSTRIP_PIN, OUTPUT);
 
-    // Setup LED pin as output
-    pinMode(LEDSTRIP_PIN, OUTPUT);
+  // Setup Servo related pins
+  pinMode(SERVO_SWITCH_PIN, OUTPUT);
+  pinMode(SERVO_FEEDBACK_PIN, INPUT);
+  pinMode(SERVO_CONTROL_PIN, OUTPUT);
 
-    panel_state = panel_state_t {0, CLOSED};
+  // initializing panel
+  panel.brightness = 0;
+  panel.servo_position = 0;
+  panel.last_step_time = 0L;
 
+  // Read servo calibration data oin Flash storage:
+  panel.calibration = nvm_store.read();
+
+  // When there is no calibration data yet, we have to assume that the cover is closed...
+  if (!is_panel_calibrated()) {
+      panel.cover = CLOSED;
+  } else {
+    // Close the cover, in case it is not completely closed.
+    // To make sure that `closeCover` does not have an undefined behavior,
+    // we initialize the `coverState` variable to `open`, just in case.
+    // That variable will be updated in the `closeCover` function,
+    // and then again once the cover has completely closed.
+    panel.cover = OPEN;
+    bool verbose = false;
+    _close_cover(verbose);
+  }
 }
 
 void loop() {
+  // First we seek for commands
+  receive_commands();
+
+  // Then we check if calibration if needed
+  check_for_calibration();
+
+  // Then we update panel cover position if needed
+  update_panel_cover();
+}
+
+
+void receive_commands() {
   if (Serial.available() > 0) {
     String message = Serial.readStringUntil('\n');
 
     bool error = false;
-    
+
     auto cmd_payload = get_cmd_payload(message, &error);
     if (error) { return; }
-    
-    auto command =  get_command_from_payload(cmd_payload);
+
+    auto command = get_command_from_payload(cmd_payload);
     command.handle(cmd_payload.args);
+  }
+}
+
+void check_for_calibration() {
+
+  // Make Builtin led blink to tell the user to calibrate
+  if (!is_panel_calibrated()) {
+    digitalWrite(LED_BUILTIN, HIGH);
+    delay(500);
+    digitalWrite(LED_BUILTIN, LOW);
+    delay(500);
+  }
+}
+
+void update_panel_cover() {
+  // We do not move we are not calibrated
+  if (!is_panel_calibrated()) return;
+  // We do not move we we are yet either OPEN or CLOSED
+  if (panel.cover == OPEN || panel.cover == CLOSED) return;
+
+  unsigned long now = micros();
+  // We do not move it is too early
+  if (now - panel.last_step_time < STEP_DELAY_MICROSEC) return;
+
+  panel.last_step_time = now;
+
+  if (panel.cover == OPENING) {
+    panel.servo_position++;
+    if (panel.servo_position >= 180) {
+      panel.servo_position = 180;
+      panel.cover = OPEN;
+    }
+  } else if (panel.cover == CLOSING) {
+    panel.servo_position--;
+    if (panel.servo_position <= 0) {
+      panel.servo_position = 0;
+      panel.cover = CLOSED;
+    }
+  }
+
+  servo.write(panel.servo_position);
+
+  if (panel.cover == OPEN || panel.cover == CLOSED) {
+        powerDownServo();
   }
 }
 
@@ -143,50 +256,50 @@ void cmd_info(const String args) {
 
 // Get Brightness
 // Answers Birghtness value
-void cmd_brigthness_get(const String args){
-  serialize_result(COMMAND_BRIGHTNESS_GET, String (panel_state.brightness));
+void cmd_brigthness_get(const String args) {
+  serialize_result(COMMAND_BRIGHTNESS_GET, String(panel.brightness));
 }
 
 // Set Brightness value
 // Answers with set brightness value
-void cmd_brightness_set(const String args){
+void cmd_brightness_set(const String args) {
   auto wanted_brightness = args.toInt();
 
-  if (wanted_brightness == 0 && ! has_only_zeros(args)) {
+  if (wanted_brightness == 0 && !has_only_zeros(args)) {
     auto message = ERROR_WANTED_BRIGHTNESS_MSG_START + args + ERROR_WANTED_BRIGHTNESS_NAN_MSG_END;
-    serialize_error(message); 
-    return;  
+    serialize_error(message);
+    return;
   }
-  
-  if (wanted_brightness < 0 ) {
+
+  if (wanted_brightness < 0) {
     auto message = ERROR_WANTED_BRIGHTNESS_MSG_START + args + ERROR_WANTED_BRIGHTNESS_NEGATIVE_MSG_END;
-    serialize_error(message); 
-    return;  
+    serialize_error(message);
+    return;
   }
-  
+
   if (wanted_brightness > MAX_BRIGHTNESS) {
     auto message = ERROR_WANTED_BRIGHTNESS_MSG_START + args + ERROR_WANTED_BRIGHTNESS_TOO_BIG_MSG_END;
     serialize_error(message);
     return;
   }
 
-  panel_state.brightness = (uint32_t) wanted_brightness;
+  panel.brightness = (uint32_t)wanted_brightness;
   set_brightness();
 
-  serialize_result(COMMAND_BRIGHTNESS_SET, String (panel_state.brightness));
+  serialize_result(COMMAND_BRIGHTNESS_SET, String(panel.brightness));
 }
 
 // Reset Brightness value
 // Answers with reset brightness value
-void cmd_brightness_reset(const String args){
-  panel_state.brightness = 0;
+void cmd_brightness_reset(const String args) {
+  panel.brightness = 0;
   set_brightness();
 
-  serialize_result(COMMAND_BRIGHTNESS_RESET, String (panel_state.brightness));
+  serialize_result(COMMAND_BRIGHTNESS_RESET, String(panel.brightness));
 }
 
-void cmd_cover_get_state(const String args) { 
-  switch (panel_state.cover) {
+void cmd_cover_get_state(const String args) {
+  switch (panel.cover) {
     case OPENING:
       serialize_result(COMMAND_COVER_GET_STATE, RESULT_COVER_GET_STATE_OPENING);
       break;
@@ -202,109 +315,175 @@ void cmd_cover_get_state(const String args) {
   }
 }
 
-void cmd_cover_open(const String args) { 
-
-  if (!(panel_state.cover == CLOSED || panel_state.cover == CLOSING)) {
-    serialize_error(ERROR_COVER_OPEN); 
-    return;
-  }  
-
-  panel_state.cover = OPENING;
-
-  serialize_result(COMMAND_COVER_OPEN, RESULT_COVER_OPEN);
+void cmd_cover_open(const String args) {
+  bool verbose = true;
+  _open_cover(verbose);
 }
 
-void cmd_cover_close(const String args) { 
+void _open_cover(bool verbose) {
+  if (!is_panel_calibrated()) {
+    cond_serialize_error(ERROR_COVER_OPEN, verbose);
+    return;
+  }
+  if (!(panel.cover == CLOSED || panel.cover == CLOSING)) {
+    cond_serialize_error(ERROR_COVER_OPEN, verbose);
+    return;
+  }
+
+  panel.cover = OPENING;
+  panel.servo_position = powerUpServo();
+
+  cond_serialize_result(COMMAND_COVER_OPEN, RESULT_COVER_OPEN, verbose);
+}
+
+void cmd_cover_close(const String args) {
+  bool verbose = true;
+  _close_cover(verbose);
+}
+
+void _close_cover(bool verbose) {
+  if (!is_panel_calibrated()) {
+    cond_serialize_error(ERROR_COVER_OPEN, verbose);
+    return;
+  }
+
+  if (!(panel.cover == OPEN || panel.cover == OPENING)) {
+    cond_serialize_error(ERROR_COVER_CLOSE, verbose);
+    return;
+  }
+
+  panel.cover = CLOSING;
+  panel.servo_position = powerUpServo();
+
+  cond_serialize_result(COMMAND_COVER_CLOSE, RESULT_COVER_CLOSE, verbose);
+}
+
+void cmd_cover_calibration_run(const String args) {
   
-  if (!(panel_state.cover == OPEN || panel_state.cover == OPENING)) {
-    serialize_error(ERROR_COVER_CLOSE); 
-    return;
-  }  
+  powerUpServo();
 
-  panel_state.cover = CLOSING;
-  serialize_result(COMMAND_COVER_CLOSE, RESULT_COVER_CLOSE);
+  int step = 10;
+  int n_data_points = 1 + 180 / step;
+
+  double x[n_data_points] = { 0 };
+  double y[n_data_points] = { 0 };
+
+  for (int i = 0, pos = 0; pos <= 180; i++, pos = i * step) {
+    servo.write(pos);
+    delay(1000);
+    int feedbackValue = analogRead(SERVO_FEEDBACK_PIN);
+    x[i] = pos;
+    y[i] = feedbackValue;
+  }
+
+  linear_regression(x, y, n_data_points, &panel.calibration.slope, &panel.calibration.intercept);
+  panel.calibration.magic_number = NVM_MAGIC_NUMBER;
+  nvm_store.write(panel.calibration);
+
+  panel.cover = OPEN;
+
+  bool silent = true;
+  _close_cover(silent);
+
+  serialize_result(COMMAND_COVER_CALIBRATION_RUN, RESULT_COVER_CALIBRATION_RUN);
 }
 
-void cmd_cover_calibration_run(const String args) { serialize_error(ERROR_NOT_IMPLEMENTED; }
-void cmd_cover_calibration_get(const String args) { serialize_error(ERROR_NOT_IMPLEMENTED); }
+void cmd_cover_calibration_get(const String args) {
+  serialize_error(ERROR_NOT_IMPLEMENTED);
+}
 
 // Handles unknown commands
 // Send error message stating command is unknow
 void cmd_unknown(const String args) {
-    serialize_error(ERROR_INVALID_COMMAND);
+  serialize_error(ERROR_INVALID_COMMAND);
 }
 // ---------------------
 // Helpers
-// ---------------------- 
+// ----------------------
 
 // Returns the Enum value corresponding to the input string.
-// Could be implemented as a Map if O(1) lookup is needed. 
-command get_command_from_payload(const msg_cmd_payload input){
-  
-  for(auto cmd : allowed_cmds) {
-    if(input.name.equalsConstantTime(cmd.name)) {
-      return command{cmd.name, cmd.handle};
+// Could be implemented as a Map if O(1) lookup is needed.
+command_t get_command_from_payload(const msg_cmd_payload input) {
+
+  for (int i = 0; i < NB_COMMANDS; i++) {
+    auto cmd = allowed_cmds[i];
+    if (input.name.equalsConstantTime(cmd.name)) {
+      return command_t{ cmd.name, cmd.handle };
     }
   }
-	return command {COMMAND_UNKNOWN,&cmd_unknown};
+  return command_t{ COMMAND_UNKNOWN, &cmd_unknown };
 }
 
 msg_cmd_payload get_cmd_payload(const String message, bool *error) {
-    auto type_cmd_sep_idx = message.indexOf(TYPE_COMMAND_SEPARATOR);
-    auto cmd_args_sep_idx = message.indexOf(COMMAND_ARGS_SEPARATOR);
-    auto message_end_idx = message.length();
+  auto type_cmd_sep_idx = message.indexOf(TYPE_COMMAND_SEPARATOR);
+  auto cmd_args_sep_idx = message.indexOf(COMMAND_ARGS_SEPARATOR);
+  auto message_end_idx = message.length();
 
-    bool has_type_cmd_sep = type_cmd_sep_idx > 0;
-    bool is_type_sep_at_beginnig = type_cmd_sep_idx == 0;
-    bool is_type_sep_before_end = type_cmd_sep_idx < (message_end_idx -1); 
-    bool has_arg_sep = cmd_args_sep_idx > 0;
-    bool is_type_sep_before_arg_sep = type_cmd_sep_idx < cmd_args_sep_idx;
-    bool is_arg_sep_before_end = cmd_args_sep_idx < (message_end_idx -1);
+  bool has_type_cmd_sep = type_cmd_sep_idx > 0;
+  bool is_type_sep_at_beginnig = type_cmd_sep_idx == 0;
+  bool is_type_sep_before_end = type_cmd_sep_idx < (message_end_idx - 1);
+  bool has_arg_sep = cmd_args_sep_idx > 0;
+  bool is_type_sep_before_arg_sep = type_cmd_sep_idx < cmd_args_sep_idx;
+  bool is_arg_sep_before_end = cmd_args_sep_idx < (message_end_idx - 1);
 
-    bool valid_separators = has_type_cmd_sep 
-                            && !is_type_sep_at_beginnig 
-                            && is_type_sep_before_end
-                            && (has_arg_sep && is_type_sep_before_arg_sep)
-                            && (has_arg_sep && is_arg_sep_before_end);
+  bool valid_separators = has_type_cmd_sep
+                          && !is_type_sep_at_beginnig
+                          && is_type_sep_before_end
+                          && (has_arg_sep && is_type_sep_before_arg_sep)
+                          && (has_arg_sep && is_arg_sep_before_end);
 
-    if ( !valid_separators) { 
-      serialize_error(ERROR_INVALID_INCOMING_MESSAGE_TYPE); 
-      *error = true; 
-      return msg_cmd_payload {}; 
-    }
-    
-    String type = message.substring(0,type_cmd_sep_idx);
+  if (!valid_separators) {
+    serialize_error(ERROR_INVALID_INCOMING_MESSAGE_TYPE);
+    *error = true;
+    return msg_cmd_payload{};
+  }
 
-    if (type != COMMAND_MSG_TYPE) { 
-      serialize_error(ERROR_INVALID_INCOMING_MESSAGE_TYPE); 
-      *error = true;
-      return msg_cmd_payload {};
-    } 
+  String type = message.substring(0, type_cmd_sep_idx);
 
-    String cmd_name = (has_arg_sep) ? message.substring(type_cmd_sep_idx+1, cmd_args_sep_idx) : message.substring(type_cmd_sep_idx+1, message_end_idx);
-    String cmd_args = (has_arg_sep) ? message.substring(cmd_args_sep_idx + 1, message_end_idx) : "";
+  if (type != COMMAND_MSG_TYPE) {
+    serialize_error(ERROR_INVALID_INCOMING_MESSAGE_TYPE);
+    *error = true;
+    return msg_cmd_payload{};
+  }
 
-    return msg_cmd_payload {cmd_name, cmd_args};
+  String cmd_name = (has_arg_sep) ? message.substring(type_cmd_sep_idx + 1, cmd_args_sep_idx) : message.substring(type_cmd_sep_idx + 1, message_end_idx);
+  String cmd_args = (has_arg_sep) ? message.substring(cmd_args_sep_idx + 1, message_end_idx) : "";
+
+  return msg_cmd_payload{ cmd_name, cmd_args };
 }
 
 void serialize_result(String command, String message) {
-  Serial.print(RESULT_MSG_TYPE);
-  Serial.print(TYPE_COMMAND_SEPARATOR);
-  Serial.print(command);
-  Serial.print(COMMAND_ARGS_SEPARATOR);
-  Serial.println(message);
+  bool verbose = true;
+  cond_serialize_result(command, message, verbose);
+}
+
+void cond_serialize_result(String command, String message, bool verbose) {
+  if (verbose) {
+    Serial.print(RESULT_MSG_TYPE);
+    Serial.print(TYPE_COMMAND_SEPARATOR);
+    Serial.print(command);
+    Serial.print(COMMAND_ARGS_SEPARATOR);
+    Serial.println(message);
+  }
 }
 
 void serialize_error(String error) {
-  Serial.print(ERROR_MSG_TYPE);
-  Serial.print(TYPE_COMMAND_SEPARATOR);
-  Serial.println(error);
+  bool verbose = true;
+  cond_serialize_error(error, true);
+}
+
+void cond_serialize_error(String error, bool verbose) {
+  if (verbose) {
+    Serial.print(ERROR_MSG_TYPE);
+    Serial.print(TYPE_COMMAND_SEPARATOR);
+    Serial.println(error);
+  }
 }
 
 bool has_only_zeros(String num) {
   bool only_zeros = num.length() > 0;
   for (auto c : num) {
-    only_zeros = only_zeros && c =='0';
+    only_zeros = only_zeros && c == '0';
     if (!only_zeros) { return only_zeros; }
   }
 
@@ -312,18 +491,90 @@ bool has_only_zeros(String num) {
 }
 
 void set_brightness() {
-    // This is ripped as is from https://github.com/jlecomte/ascom-flat-panel all credits to him. 
-    // This only works on Seeeduino Xiao.
-    // The `pwm` function is defined in the following file:
-    // %localappdata%\Arduino15\packages\Seeeduino\hardware\samd\1.8.2\cores\arduino\wiring_pwm.cpp
-    // For other Arduino-compatible boards, consider using:
-    //   analogWrite(ledPin, brightness);
-    // The nice thing about the `pwm` function is that we can set the frequency
-    // to a much higher value (I use 20kHz) This does not work on all pins!
-    // For example, it does not work on pin 7 of the Xiao, but it works on pin 8.
-    // 
-    // No need to map anymore our bightness, it laredy a number between 0 and 1023 see BRIGHTNESS_SET command
-    // int value = map(brightness, MIN_BRIGHTNESS, MAX_BRIGHTNESS, 0, 1023);
-    //pwm(ledPin, PWM_FREQ, value);
-    pwm(LEDSTRIP_PIN, PWM_FREQ, panel_state.brightness);
+  // This is ripped as is from https://github.com/jlecomte/ascom-flat-panel all credits to him.
+  // This only works on Seeeduino Xiao.
+  // The `pwm` function is defined in the following file:
+  // %localappdata%\Arduino15\packages\Seeeduino\hardware\samd\1.8.2\cores\arduino\wiring_pwm.cpp
+  // For other Arduino-compatible boards, consider using:
+  //   analogWrite(ledPin, brightness);
+  // The nice thing about the `pwm` function is that we can set the frequency
+  // to a much higher value (I use 20kHz) This does not work on all pins!
+  // For example, it does not work on pin 7 of the Xiao, but it works on pin 8.
+  //
+  // No need to map anymore our bightness, it laredy a number between 0 and 1023 see BRIGHTNESS_SET command
+  // int value = map(brightness, MIN_BRIGHTNESS, MAX_BRIGHTNESS, 0, 1023);
+  //pwm(ledPin, PWM_FREQ, value);
+  pwm(LEDSTRIP_PIN, PWM_FREQ, panel.brightness);
+}
+
+
+// Energize and attach servo.
+int powerUpServo() {
+  digitalWrite(SERVO_SWITCH_PIN, HIGH);
+
+  // Default position (closed), which will be used only once,
+  // before we have successfully calibrated the servo.
+  int current_pos = panel.servo_position;
+
+  if (is_panel_calibrated()) {
+    // Short delay, so that the servo has been fully initialized.
+    // Not 100% sure this is necessary, but it won't hurt.
+    delay(100);
+
+    int feedbackValue = analogRead(SERVO_FEEDBACK_PIN);
+    current_pos = (int)((feedbackValue - panel.calibration.intercept) / panel.calibration.slope);
+
+    // Deal with slight errors in the calibration process...
+    if (current_pos < 0) {
+      current_pos = 0;
+    } else if (current_pos > 180) {
+      current_pos = 180;
+    }
+  }
+
+  // This step is critical! Without it, the servo does not know its position when it is attached below,
+  // and the first write command will make it jerk to that position, which is what we want to avoid...
+  servo.write(current_pos);
+  panel.servo_position = current_pos;
+
+  // The optional min and max pulse width parameters are actually quite important
+  // and depend on the exact servo you are using. Without specifying them, you may
+  // not be able to use the full range of motion (270 degrees for this project)
+  servo.attach(SERVO_CONTROL_PIN, 500, 2500);
+
+  return current_pos;
+}
+
+// Detach and de-energize servo to eliminate any possible sources of vibrations.
+// Magnets will keep the cover in position, whether it is open or closed.
+void powerDownServo() {
+  servo.detach();
+  digitalWrite(SERVO_SWITCH_PIN, LOW);
+}
+
+bool is_panel_calibrated() {
+  return panel.calibration.magic_number == NVM_MAGIC_NUMBER;
+}
+
+// Function to calculate the mean of an array.
+double mean(double arr[], int n) {
+    double sum = 0.0;
+    for (int i = 0; i < n; i++) {
+        sum += arr[i];
+    }
+    return sum / n;
+}
+
+// Function to calculate the slope and intercept of a linear regression line.
+void linear_regression(double x[], double y[], int n, double *slope, double *intercept) {
+    double x_mean = mean(x, n);
+    double y_mean = mean(y, n);
+    double numerator = 0.0;
+    double denominator = 0.0;
+    for (int i = 0; i < n; i++) {
+        numerator += (x[i] - x_mean) * (y[i] - y_mean);
+        denominator += (x[i] - x_mean) * (x[i] - x_mean);
+    }
+    *slope = numerator / denominator;
+    *intercept = y_mean - (*slope * x_mean);
 }
