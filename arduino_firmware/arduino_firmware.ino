@@ -1,10 +1,91 @@
+/*
+ * arduino_firmware.ino
+ * Copyright (C) 2025 - Present, Le Télescope - Ivry sur Seine - All Rights Reserved
+ * Licensed under the MIT License. See the accompanying LICENSE file for terms.
+ *
+ * Description: Arduino firware for an ASCOM driven automated and motorised flat panel
+ * 
+ * Authors:
+ * - Florian Thibaud
+ * - Florian Gautier 
+ *
+ * Principle: 
+ */
+
 #include <Servo.h>
 #include <FlashStorage.h>
 
+/************************************************
+ *     Types, Objects, and data structures      *
+ ***********************************************/
+
+/*
+ * Messages/Protocol related types 
+ */
+
+//Represents a command message payload right after parsing, before decoding.
+typedef struct msg_cmd_payload {
+  String name;
+  String args;
+};
+
+//Defines the behavior of a command.
+typedef void (*cmd_handler_ptr)(String);
+
+//Main command data structure. A command has a name, and holds a pointer to a function that will perform the action. 
+typedef struct command_t {
+  const char *name;
+  cmd_handler_ptr handle;
+};
+
+/*
+ * Flat panel state related types/data structures 
+ */
+
+// Represents the state of the flat panel cover. The cover is either open, opening, closing or closed. 
+typedef enum {
+  OPENING,
+  OPEN,
+  CLOSING,
+  CLOSED,
+} cover_state_t;
+
+// Represents the state of the flat panel servo configuration. 
+//
+// This configuration will be stored/retreived from flash memory. Hence de magic number, to check if the retrieved
+// configuration is garbage or actual configuraton that was correctly stored previously.
+typedef struct {
+  // Magic
+  unsigned int magic_number;
+  double slope;
+  double intercept;
+} servo_cal_state_t;
+
+// Represents the panel(led and cover) state.
+// Could ben restructured but this would bring layers of inderiction and less readability
+typedef struct {
+  uint32_t brightness;
+  int servo_position;
+  unsigned long last_step_time;
+  cover_state_t cover;
+  servo_cal_state_t calibration;
+} panel_state_t;
+
+
+/************************************************
+ *                  Constants                   *
+ ***********************************************/
+
+/*
+ * Messages parser related constants
+ */
 constexpr auto MESSAGE_END_DELIMITER = "\n";
 constexpr auto TYPE_COMMAND_SEPARATOR = ":";
 constexpr auto COMMAND_ARGS_SEPARATOR = "@";
 
+/*
+ * Available commands (names), custom results, and errors 
+ */
 constexpr auto COMMAND_MSG_TYPE = "COMMAND";
 constexpr auto RESULT_MSG_TYPE = "RESULT";
 constexpr auto ERROR_MSG_TYPE = "ERROR";
@@ -47,40 +128,8 @@ constexpr auto ERROR_WANTED_BRIGHTNESS_NEGATIVE_MSG_END = "} is negative.";
 constexpr auto ERROR_WANTED_BRIGHTNESS_TOO_BIG_MSG_END = "} is bigger than max allowed value 1023";
 constexpr auto ERROR_SERVO_NOT_CALIBRATED = "SERVO_NO_CALIBRATED@Run command COVER_CALIBRATION_RUN first";
 
-constexpr uint32_t MIN_BRIGHTNESS = 0;
-constexpr uint32_t MAX_BRIGHTNESS = 1023;
-constexpr uint32_t PWM_FREQ = 20000;
-
-// Value used to determine whether the NVM (Non-Volatile Memory) was written,
-// or we are just reading garbage...
-constexpr unsigned int NVM_MAGIC_NUMBER = 0x12345678;
-
-// Pins assignment. Change these depending on your exact wiring!
-// There is conflict yet between LEDSTRIP pin and SERVO_FEEDBACK
-constexpr unsigned int LEDSTRIP_PIN = 8;
-
-constexpr unsigned int CALIBRATOR_SWITCH_PIN = 6;
-constexpr unsigned int SERVO_SWITCH_PIN = 7;
-constexpr unsigned int SERVO_FEEDBACK_PIN = 8;
-constexpr unsigned int SERVO_CONTROL_PIN = 9;
-
-// How long do we wait between each step in order to achieve the desired speed?
-constexpr unsigned long STEP_DELAY_MICROSEC = 30L * 1000; // 30 msec
-
-typedef struct msg_cmd_payload {
-  String name;
-  String args;
-};
-
-//Keeps the record of knwom commands index
-typedef void (*cmd_handler_ptr)(String);
-
-typedef struct command_t {
-  const char *name;
-  cmd_handler_ptr handle;
-};
-
 #define NB_COMMANDS 10
+//Keeps the record of allowed/known commands
 constexpr command_t allowed_cmds[NB_COMMANDS] = {{ COMMAND_PING, &cmd_ping },
                                       { COMMAND_INFO, &cmd_info },
                                       { COMMAND_BRIGHTNESS_GET, &cmd_brigthness_get },
@@ -92,37 +141,64 @@ constexpr command_t allowed_cmds[NB_COMMANDS] = {{ COMMAND_PING, &cmd_ping },
                                       { COMMAND_COVER_CALIBRATION_RUN, &cmd_cover_calibration_run },
                                       { COMMAND_COVER_CALIBRATION_GET, &cmd_cover_calibration_get }};
 
-typedef enum {
-  OPENING,
-  OPEN,
-  CLOSING,
-  CLOSED,
-} cover_state_t;
+/*
+ * Light panel related constants
+ */
+constexpr uint32_t MIN_BRIGHTNESS = 0;
+constexpr uint32_t MAX_BRIGHTNESS = 1023;
+constexpr uint32_t PWM_FREQ = 20000;
 
-typedef struct {
-  unsigned int magic_number;
-  double slope;
-  double intercept;
-} servo_cal_state_t;
+/*
+ * Pins assignment. Must be set according to the exact actual wiring
+ */
+// There is conflict yet between LEDSTRIP pin and SERVO_FEEDBACK
+constexpr unsigned int LEDSTRIP_PIN = 8;
 
-// Panel strucutre Holds the panel(led and cover) state
-// Could ben restructured but this would bring layers of inderiction and less readability
-struct panel_state_t {
-  uint32_t brightness;
-  int servo_position;
-  unsigned long last_step_time;
-  cover_state_t cover;
-  servo_cal_state_t calibration;
-} panel;
+constexpr unsigned int CALIBRATOR_SWITCH_PIN = 6;
+constexpr unsigned int SERVO_SWITCH_PIN = 7;
+constexpr unsigned int SERVO_FEEDBACK_PIN = 8;
+constexpr unsigned int SERVO_CONTROL_PIN = 9;
 
+/*
+ * Misc.
+ */
+// Value used to determine whether the NVM (Non-Volatile Memory) was written, or we are just reading garbage...
+constexpr unsigned int NVM_MAGIC_NUMBER = 0x12345678;
 
-FlashStorage(nvm_store, servo_cal_state_t);
+// How long do we wait between each step (loop) in order to achieve the desired speed?
+constexpr unsigned long STEP_DELAY_MICROSEC = 30L * 1000; // 30 msec
 
+/************************************************
+ *             Global/State variables           *
+ ***********************************************/
+
+// Holds the panel(led and cover) state.
+panel_state_t panel;
+
+// Client used to interact with the servo motor.
 Servo servo;
 
+// Defines "nvm_store", the actual Flash sotrage where the calibration data will be stored/retrieved
+FlashStorage(nvm_store, servo_cal_state_t);
+
+/************************************************
+ *              Arduino entrypoints             *
+ ***********************************************/
+
+/*
+ * Called once at boot. Used to setup the state. In our case :
+ *
+ * - Initialize the serial port I/O (over USB)
+ * - Setup pins layout
+ * - Retrieve stored calibration data and initialize panel state
+ *   + Brightness to 0 (ie led turned off)
+ *   + Panel last step time to 0
+ *   + If panel IS NOT calibrated, the cover is ASSUMED CLOSED and servo position set to 0. Hence close it first !
+ *   + If panel IS calibrated, cover wil be instructed to close and servo position will be retrieved from the feedback pin (corrected by calibration data).  
+ */
 void setup() {
-  // start serial port at 9600 bps:
-  Serial.begin(9600);
+  // start serial port at 57600 bps:
+  Serial.begin(57600);
   while (!Serial) {
     ;  // wait for serial port to connect. Needed for native USB port only
   }
@@ -168,6 +244,15 @@ void setup() {
   }
 }
 
+/*
+ * Main arduino handle that loops until the end of times of till the Seeduino is shut down. 
+ *
+ * In our case, each loop will sequentially
+ *
+ * - Handles incoming serial messages and fires the according commands 
+ * - check if panel is calibrated and notify (by blinking buil-in led) the users to do so
+ * - Update the servo position, if need be, according to the OPENING or CLOSING state of the cover
+ */
 void loop() {
   // First we seek for commands
   receive_commands();
@@ -179,7 +264,21 @@ void loop() {
   update_panel_cover();
 }
 
-
+/*
+ * Collect incoming serial messages and fires the according commands.
+ * 
+ * If data has arrived through the serial port
+ *
+ * - Reads a full line, i.e a string that ends with \n
+ * - Parse the message and get the command payload
+ *    + "Serials" the error message ERROR_INVALID_INCOMING_MESSAGE
+ *      if message does not comply with the message structure defined in the protocol TYPE:BODY
+ *    + "Serials" the error message ERROR_INVALID_INCOMING_MESSAGE_TYPE) if message is not a command, 
+ *      i.e, TYPE is not COMMAND
+ * - Fires the correct command.
+ *   + Each command will serial their own results/errors
+ *   + If no matching command is found, the "UNKNOWN" command is fired that "serials" the error message ERROR_INVALID_COMMAND
+ */
 void receive_commands() {
   if (Serial.available() > 0) {
     String message = Serial.readStringUntil('\n');
@@ -194,9 +293,11 @@ void receive_commands() {
   }
 }
 
+/*
+ * Checks if panel is calibrated and notify (by blinking buil-in led) the users to do so
+ */
 void check_for_calibration() {
 
-  // Make Builtin led blink to tell the user to calibrate
   if (!is_panel_calibrated()) {
     digitalWrite(LED_BUILTIN, HIGH);
     delay(500);
@@ -205,6 +306,21 @@ void check_for_calibration() {
   }
 }
 
+/*
+ * Updates the servo position, if need be, according to the OPENING or CLOSING state of the cover
+ *
+ * - If the Panel cover is "OPENING", increments the servo position
+ *   +  If it reaches 180, marks the cover as OPEN
+ * - If the Panel cover is "CLOSING", decrements the servo position 
+ *   +  If it reaches 0, marks the cover as OPEN
+ * - Updates the "physical" servo postion with the calculated one
+ * - Power down the servo il Panel is OPEN or CLOSED
+ *
+ * Will do nothing if
+ * - Panel is not calibrated
+ * - Panel is OPEN
+ * - Panel is CLOSED
+ */
 void update_panel_cover() {
   // We do not move we are not calibrated
   if (!is_panel_calibrated()) return;
@@ -238,18 +354,32 @@ void update_panel_cover() {
   }
 }
 
-//
-// Commands
-//
+/************************************************
+ *                   Commands                   *
+ ***********************************************/
 
-// Ping
-// Answers PONG
+/*
+ * Ping command handler. 
+ * 
+ * Dummy command that answers PONG to a COMMAND:PING message.
+ *
+ * Incoming message:  COMMAND:PING 
+ * Args :             Ignored
+ * Serial response:   RESULT:PING@PONG
+ */
 void cmd_ping(const String args) {
   serialize_result(COMMAND_PING, RESULT_PING);
 }
 
-// Info
-// Answers Firware version info
+/*
+ * Info command handler. 
+ * 
+ * This command answers with the version info of the firmware to a COMMAND:INFO message.
+ *
+ * Incoming message:  COMMAND:INFO 
+ * Args :             Ignored
+ * Serial response:   RESULT:INFO@{RESULT_INFO}, where {RESULT_INFO} is the value of the same constant.
+ */
 void cmd_info(const String args) {
   serialize_result(COMMAND_INFO, RESULT_INFO);
 }
@@ -433,7 +563,7 @@ msg_cmd_payload get_cmd_payload(const String message, bool *error) {
                           && (has_arg_sep && is_arg_sep_before_end);
 
   if (!valid_separators) {
-    serialize_error(ERROR_INVALID_INCOMING_MESSAGE_TYPE);
+    serialize_error(ERROR_INVALID_INCOMING_MESSAGE);
     *error = true;
     return msg_cmd_payload{};
   }
