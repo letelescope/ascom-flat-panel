@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SettingsForm));
             okBtn = new Button();
             portTitleLbl = new Label();
             abortBtn = new Button();
@@ -51,7 +50,7 @@
             okBtn.TabIndex = 2;
             okBtn.Text = "OK";
             okBtn.UseVisualStyleBackColor = true;
-            okBtn.Click += okBtn_Click;
+            okBtn.Click += OkBtn_Click;
             // 
             // portTitleLbl
             // 
@@ -71,7 +70,7 @@
             abortBtn.TabIndex = 3;
             abortBtn.Text = "Annuler";
             abortBtn.UseVisualStyleBackColor = true;
-            abortBtn.Click += abortBtn_Click;
+            abortBtn.Click += AbortBtn_Click;
             // 
             // portCb
             // 
@@ -146,7 +145,6 @@
             Controls.Add(controlsPanel);
             Font = new Font("Noto Sans", 10.2F, FontStyle.Regular, GraphicsUnit.Point, 0);
             FormBorderStyle = FormBorderStyle.FixedSingle;
-            Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             Name = "SettingsForm";
             SizeGripStyle = SizeGripStyle.Hide;

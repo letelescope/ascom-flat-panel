@@ -9,16 +9,17 @@ namespace ASCOM_driver
 
         private void SettingsForm_Load(object sender, EventArgs e)
         {
-
+            portCb.Items.Clear();
+            portCb.Items.AddRange(System.IO.Ports.SerialPort.GetPortNames());
         }
 
-        private void okBtn_Click(object sender, EventArgs e)
+        private void OkBtn_Click(object sender, EventArgs e)
         {
             Application.Exit();
         }
 
 
-        private void abortBtn_Click(object sender, EventArgs e)
+        private void AbortBtn_Click(object sender, EventArgs e)
         {
             Application.Exit();
         }
