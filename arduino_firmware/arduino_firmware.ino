@@ -3,7 +3,7 @@
  * Copyright (C) 2025 - Present, Le Télescope - Ivry sur Seine - All Rights Reserved
  * Licensed under the MIT License. See the accompanying LICENSE file for terms.
  *
- * Description: Arduino firware for an ASCOM driven automated and motorised flat panel
+ * Description: Arduino firmware for an ASCOM driven automated and motorised flat panel
  * 
  * Authors:
  * - Florian Thibaud
@@ -136,7 +136,7 @@ constexpr auto COMMAND_PING = "PING";
 constexpr auto RESULT_PING = "PONG";
 
 constexpr auto COMMAND_INFO = "INFO";
-constexpr auto RESULT_INFO = "Le Telescope - Ivry Flat Panel Firmware v1.0";
+constexpr auto RESULT_INFO = "Le Télescope - Ivry sur Seine - Flat Panel Firmware v1.0";
 
 constexpr auto COMMAND_BRIGHTNESS_GET = "BRIGHTNESS_GET";
 constexpr auto COMMAND_BRIGHTNESS_SET = "BRIGHTNESS_SET";
@@ -292,7 +292,7 @@ void setup() {
 }
 
 /*
- * Main arduino entrypoint. It is called in and end less loop until the end of times or till the Seeduino is shut down. 
+ * Main arduino entrypoint. It is called in an endless loop until the end of times or till the Seeduino is shut down. 
  *
  * In our case, each loop will sequentially
  *
