@@ -194,9 +194,11 @@ constexpr uint32_t PWM_FREQ = 20000;
  * Pins assignment. Must be set according to the exact actual wiring
  */
 // There is conflict yet between LEDSTRIP pin and SERVO_FEEDBACK
+// High frequency PWM seems to work on PIN 8 according
+// Maybe we should test if high freq works on pin 6 in order to have a spatial sepation of pins between leds and servo
+// Or we should set the servo pins to 4,5,6 and let led pin to 8 still in order to have a spatial sepation of pins between leds and servo
 constexpr unsigned int LEDSTRIP_PIN = 8;
 
-constexpr unsigned int CALIBRATOR_SWITCH_PIN = 6;
 constexpr unsigned int SERVO_SWITCH_PIN = 7;
 constexpr unsigned int SERVO_FEEDBACK_PIN = 8;
 constexpr unsigned int SERVO_CONTROL_PIN = 9;
