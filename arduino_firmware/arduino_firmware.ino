@@ -230,7 +230,7 @@ FlashStorage(nvm_store, servo_cal_state_t);
  ***********************************************/
 
 /*
- * Called once at boot. Used to setup the state. In our case :
+ * Called once at boot, used to setup the state. In our case :
  *
  * - Initialize the serial port I/O (over USB)
  * - Setup pins layout
@@ -292,7 +292,7 @@ void setup() {
 }
 
 /*
- * Main arduino handle that loops until the end of times of till the Seeduino is shut down. 
+ * Main arduino entrypoint. It is called in and end less loop until the end of times or till the Seeduino is shut down. 
  *
  * In our case, each loop will sequentially
  *
@@ -354,7 +354,7 @@ void check_for_calibration() {
 }
 
 /*
- * Updates the servo position, if need be, according to the OPENING or CLOSING state of the cover
+ * Updates the servo/cover physical position, if need be, according to the OPENING or CLOSING state of the cover
  *
  * - If the Panel cover is "OPENING", increments the servo position
  *   +  If it reaches 180, marks the cover as OPEN
@@ -697,7 +697,7 @@ void cmd_unknown(const String args) {
 }
 
 /************************************************
- *                   Commands                   *
+ *                   Helpers                    *
  ***********************************************/
 
 /*
