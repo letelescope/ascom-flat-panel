@@ -9,7 +9,47 @@
  * - Florian Thibaud
  * - Florian Gautier 
  *
- * Principle: 
+ * Principle: In this scenario a flat panel is made of two things
+ * - A light panel with variable brightness
+ * - A motorized cover
+ *
+ * The firware updates the state of the flat panel upon instructions of the ASCOM driver. The communication protocol 
+ * is serial based. The serial connection is established via USB. Here is a a summary of the protocol 
+ *  - Both the driver and the flat panel (and hence this firmware) exchange single line messages.
+ *  - A message is structured as TYPE:MESSAGE, where TYPE is in "COMMAND, RESULT, ERROR" and MESSAGE is alaphanumerical with spaces and "@"
+ *
+ * This firware only handles incoming "COMMAND" messages. This kind of message is stuctured as 
+ *  
+ * COMMAND:NAME[@ARGS]
+ *
+ * where NAME is [A-Z_]+ and ARGS are optional and their nature may depend on the command. For instance for a COMMAND:BRIGHTNESS_SET@ARGS message the ARGS
+ * are mandatory and should consists of a single "int"
+ *
+ * This firware reponse with 
+ * - either a RESULT:CMD_NAME}@MSG   if operation succeeded
+ * - or an ERROR:ERR_MESSAGE@DETAILS if anything went wrong
+
+ * In a nutshell
+ *  --------------                           ------------
+ * |              |                         |            |
+ * |              | COMMAND:CMD_NAME[@ARGS] | Flat Panel |
+ * | ASCOM driver | --------------------->  | (firmware) |
+ * |              | <---------------------  |            |
+ * ---------------  RESULT:CMD_NAME@MSG      ------------
+ *                          or
+ *                 ERROR:ERR_MESSAGE@DETAILS
+ *
+ * Allowed commands are:
+ * - COMMAND:PING
+ * - COMMAND:INFO
+ * - COMMAND:BRIGHTNESS_GET
+ * - COMMAND:BRIGHTNESS_SET@{(int) DESIRE_VALUE}
+ * - COMMAND:BRIGHTNESS_RESET
+ * - COMMAND:COVER_GET
+ * - COMMAND:COVER_OPEN
+ * - COMMAND:COVER_CLOSE
+ * - COMMAND:CALIBRATION_RUN
+ * - COMMAND:CALIBRATION_GET
  */
 
 #include <Servo.h>
@@ -29,7 +69,9 @@ typedef struct msg_cmd_payload {
   String args;
 };
 
-//Defines the behavior of a command.
+//Defines the behavior of a command. Each command 
+// - may perform an action that will modify the flat panel firware state
+// - may be given args as a String. It is the responsability of the command to check the correctness of the given input
 typedef void (*cmd_handler_ptr)(String);
 
 //Main command data structure. A command has a name, and holds a pointer to a function that will perform the action. 
@@ -234,10 +276,13 @@ void setup() {
       panel.cover = CLOSED;
   } else {
     // Close the cover, in case it is not completely closed.
-    // To make sure that `closeCover` does not have an undefined behavior,
-    // we initialize the `coverState` variable to `open`, just in case.
-    // That variable will be updated in the `closeCover` function,
+    // To make sure that `_closeçcover` does not have an undefined behavior,
+    // we initialize the `panel.state` variable to `OPEN`, just in case.
+    // That variable will be updated in the `_close_cover` function,
     // and then again once the cover has completely closed.
+    // 
+    // Similarly the panel.servo_position variable will be updated with the corrected servo
+    // feedback_pin value in the "_close_cover" funcion.
     panel.cover = OPEN;
     bool verbose = false;
     _close_cover(verbose);
@@ -363,9 +408,10 @@ void update_panel_cover() {
  * 
  * Dummy command that answers PONG to a COMMAND:PING message.
  *
- * Incoming message:  COMMAND:PING 
- * Args :             Ignored
- * Serial response:   RESULT:PING@PONG
+ * Incoming message :  COMMAND:PING 
+ * Args             :             Ignored
+ * Serial response  :   RESULT:PING@PONG
+ * Serial error     : Never 
  */
 void cmd_ping(const String args) {
   serialize_result(COMMAND_PING, RESULT_PING);
@@ -376,22 +422,44 @@ void cmd_ping(const String args) {
  * 
  * This command answers with the version info of the firmware to a COMMAND:INFO message.
  *
- * Incoming message:  COMMAND:INFO 
- * Args :             Ignored
- * Serial response:   RESULT:INFO@{RESULT_INFO}, where {RESULT_INFO} is the value of the same constant.
+ * Incoming message : COMMAND:INFO 
+ * Args             : Ignored
+ * Serial response  : RESULT:INFO@{RESULT_INFO}, where {RESULT_INFO} is the value of the same constant.
+ * Serial error     : Never 
  */
 void cmd_info(const String args) {
   serialize_result(COMMAND_INFO, RESULT_INFO);
 }
 
-// Get Brightness
-// Answers Birghtness value
+/*
+ * "Get Brightness" command handler. 
+ * 
+ * This command answers with the current brightness value to a COMMAND:BRIGHTNESS_GET message.
+ *
+ * Incoming message : COMMAND:BRIGHTNESS_GET 
+ * Args             : Ignored
+ * Serial response  : RESULT:BRIGHTNESS_GET@{panel.brightness}, where {panel.brightness} is the 
+ *                    current value of the  brightness member of the panle "panle_state_t" struct.
+ * Serial error     : Never
+ */
 void cmd_brigthness_get(const String args) {
   serialize_result(COMMAND_BRIGHTNESS_GET, String(panel.brightness));
 }
 
-// Set Brightness value
-// Answers with set brightness value
+/*
+ * "Set Brightness" command handler. 
+ * 
+ * This command sets the current brigthess value according to COMMAND:BRIGHTNESS_SET message parameter value.
+ *
+ * Incoming message : COMMAND:BRIGHTNESS_SET@{desired_value}
+ * Args             : (uint) desired_value
+ * Serial response  : RESULT:BRIGHTNESS_SET@{panel.brightness}, where {panel.brightness} is the 
+ *                    current value of the  brightness member after being set.
+ * Serial error     : Errors in three cases
+ *                    - {desired_value} not parsable as int => "INVALID_BRIGHTNESS@Wanted brightness {desired_value} is not a number"
+ *                    - {desired_value} <0                  => "INVALID_BRIGHTNESS@Wanted brightness {desired_value} is negative"
+ *                    - {desired_value} >  MAX_BRIGHTNESS   => "INVALID_BRIGHTNESS@Wanted brightness {desired_value} is bigger than max allowed value 1023"
+ */
 void cmd_brightness_set(const String args) {
   auto wanted_brightness = args.toInt();
 
@@ -419,8 +487,16 @@ void cmd_brightness_set(const String args) {
   serialize_result(COMMAND_BRIGHTNESS_SET, String(panel.brightness));
 }
 
-// Reset Brightness value
-// Answers with reset brightness value
+/*
+ * "Reset Brightness" command handler. 
+ * 
+ * This command resets the current brigthess to 0 when a COMMAND:BRIGHTNESS_RESET message is streamed.
+ *
+ * Incoming message : COMMAND:BRIGHTNESS_RESET
+ * Args             : Ignored
+ * Serial response  : RESULT:BRIGHTNESS_RESET@{0}
+ * Serial error     : Never
+ */
 void cmd_brightness_reset(const String args) {
   panel.brightness = 0;
   set_brightness();
@@ -428,6 +504,16 @@ void cmd_brightness_reset(const String args) {
   serialize_result(COMMAND_BRIGHTNESS_RESET, String(panel.brightness));
 }
 
+/*
+ * "Get cover state" command handler. 
+ * 
+ * This commands gives the current cover state (OPEN, OPENING, CLOSING, CLOSED) in response to a COMMAND:COVER_GET message.
+ *
+ * Incoming message : COMMAND:COVER_GET
+ * Args             : Ignored
+ * Serial response  : RESULT:COVER_GET@{panel.cover}, where panel.cover is string human readable translation of the current cover state
+ * Serial error     : Never
+ */
 void cmd_cover_get_state(const String args) {
   switch (panel.cover) {
     case OPENING:
@@ -445,14 +531,32 @@ void cmd_cover_get_state(const String args) {
   }
 }
 
+/*
+ * "Open cover" command handler. 
+ * 
+ * This commands tells the cover to open in response to a COMMAND:COVER_OPEN message.
+ * 
+ * - Powers up the servo 
+ * - Sets the current "panel.servo_position" according to the (corrected) feedback_pin value
+ * - Sets the panel.cover state to OPENING
+ *
+ * Incoming message : COMMAND:COVER_OPEN
+ * Args             : Ignored
+ * Serial response  : RESULT:COVER_OPEN@OK
+ * Serial error     : Errors in two cases
+ *                    - panel is not calibrated              => "SERVO_NO_CALIBRATED@Run command COVER_CALIBRATION_RUN first"
+ *                    - panel is neither CLOSING nor CLOSING => "COVER_OPEN_IMPOSSIBLE@Cover is not closed nor closing.""
+ */
 void cmd_cover_open(const String args) {
   bool verbose = true;
   _open_cover(verbose);
 }
 
+// Inner logic funtion of the cmd_cover_open command handler
+// Serialization or not of errors and results is parametrised so that the logic can be used in other places (setup for instance)
 void _open_cover(bool verbose) {
   if (!is_panel_calibrated()) {
-    cond_serialize_error(ERROR_COVER_OPEN, verbose);
+    cond_serialize_error(ERROR_SERVO_NOT_CALIBRATED, verbose);
     return;
   }
   if (!(panel.cover == CLOSED || panel.cover == CLOSING)) {
@@ -466,14 +570,32 @@ void _open_cover(bool verbose) {
   cond_serialize_result(COMMAND_COVER_OPEN, RESULT_COVER_OPEN, verbose);
 }
 
+/*
+ * "Close cover" command handler. 
+ * 
+ * This commands tells the cover to close in response to a COMMAND:COVER_CLOSE message.
+ * 
+ * - Powers up the servo 
+ * - Sets the current "panel.servo_position" according to the (corrected) feedback_pin value
+ * - Sets the panel.cover state to CLOSINGs
+ *
+ * Incoming message : COMMAND:COVER_CLOSE
+ * Args             : Ignored
+ * Serial response  : RESULT:COVER_OPEN@OK
+ * Serial error     : Errors in two cases
+ *                    - panel is not calibrated              => "SERVO_NO_CALIBRATED@Run command COVER_CALIBRATION_RUN first"
+ *                    - panel is neither OPEN nor OPENING    => "COVER_CLOSE_IMPOSSIBLE@Cover is not open nor opening."
+ */
 void cmd_cover_close(const String args) {
   bool verbose = true;
   _close_cover(verbose);
 }
 
+// Inner logic funtion of the cmd_cover_close command handler
+// Serialization or not of errors and results is parametrised so that the logic can be used in other places (calibration for instance)
 void _close_cover(bool verbose) {
   if (!is_panel_calibrated()) {
-    cond_serialize_error(ERROR_COVER_OPEN, verbose);
+    cond_serialize_error(ERROR_SERVO_NOT_CALIBRATED, verbose);
     return;
   }
 
@@ -488,6 +610,25 @@ void _close_cover(bool verbose) {
   cond_serialize_result(COMMAND_COVER_CLOSE, RESULT_COVER_CLOSE, verbose);
 }
 
+/*
+ * "Run calibration" command handler. 
+ * 
+ * This commands calibrates the servo in response to a COMMAND:CALIBRATION_RUN message.
+ * 
+ * WARNING: Disconect the right arm from the servo before runing the calibration
+ * 
+ * - Powers up the servo 
+ * - Use linear regression to calibrate the servo feedback pin response
+ * - Sets the NVM flag to a known constant value
+ * - Stores the calibration data (and NVM flag) in the flash memory
+ *
+ * This has to be done only once after the firmware has been uploaded.
+ *
+ * Incoming message : COMMAND:CALIBRATION_RUN
+ * Args             : Ignored
+ * Serial response  : RESULT:CALIBRATION_RUN@OK
+ * Serial error     : Never
+ */
 void cmd_cover_calibration_run(const String args) {
   
   powerUpServo();
@@ -518,32 +659,63 @@ void cmd_cover_calibration_run(const String args) {
   serialize_result(COMMAND_COVER_CALIBRATION_RUN, RESULT_COVER_CALIBRATION_RUN);
 }
 
+/*
+ * "Get calibration" command handler. 
+ * 
+ * This commands gives the calibration data in response to a COMMAND:CALIBRATION_RUN message.
+ *
+ * Incoming message : COMMAND:CALIBRATION_GET
+ * Args             : Ignored
+ * Serial response  : RESULT:CALIBRATION_GET@slope={panel.calibration.slope} - intercept={panel.calibration.intercept}
+ * Serial error     : if panel is not calibrated => "SERVO_NO_CALIBRATED@Run command COVER_CALIBRATION_RUN first"
+ */
 void cmd_cover_calibration_get(const String args) {
-  serialize_error(ERROR_NOT_IMPLEMENTED);
+  if (!is_panel_calibrated()) {
+      serialize_error(ERROR_NOT_IMPLEMENTED);
+      return;
+  }
+
+  String message = String("slope=") + panel.calibration.slope + " - "+ "intercept=" + panel.calibration.intercept;
+  serialize_result(COMMAND_COVER_CALIBRATION_GET, message);
 }
 
-// Handles unknown commands
-// Send error message stating command is unknow
+/*
+ * Special "unknown" command handler. 
+ * 
+ * This commands always answers with an error message.
+ * Used when no matching command has been found according to the given "command" message. 
+ *
+ * Incoming message : Any
+ * Args             : Ignored
+ * Serial response  : Never
+ * Serial error     : ERROR_INVALID_COMMAND (always)
+ */
 void cmd_unknown(const String args) {
   serialize_error(ERROR_INVALID_COMMAND);
 }
-// ---------------------
-// Helpers
-// ----------------------
 
-// Returns the Enum value corresponding to the input string.
-// Could be implemented as a Map if O(1) lookup is needed.
-command_t get_command_from_payload(const msg_cmd_payload input) {
+/************************************************
+ *                   Commands                   *
+ ***********************************************/
 
-  for (int i = 0; i < NB_COMMANDS; i++) {
-    auto cmd = allowed_cmds[i];
-    if (input.name.equalsConstantTime(cmd.name)) {
-      return command_t{ cmd.name, cmd.handle };
-    }
-  }
-  return command_t{ COMMAND_UNKNOWN, &cmd_unknown };
-}
-
+/*
+ * Very simple command message parser. It simply check for position of the various delimiters 
+ * and cut the incoming message accordingly. 
+ *
+ * As this firware only handles "COMMANDS", this methods expect messages formated as TYPE:COMMAND[@ARGS] with:
+ * - TYPE == "COMMAND"
+ * - COMMAND is [A-Z_]+
+ * - ARGS is optional and [:alnum:_\s]+
+ *
+ * Basically it splits the the message into three part
+ * - Considers what is before ":" as TYPE
+ * - Considers what is between ":" and "@" (if present) as COMMAND
+ * - Considers what is after "@" (if present) as ARGS
+ *
+ *
+ * returns                            : Parsed message as  msg _cmd_payload
+ * Serials errors and stop treatment  : ERROR_INVALID_INCOMING_MESSAGE If separators are ill placed
+ */
 msg_cmd_payload get_cmd_payload(const String message, bool *error) {
   auto type_cmd_sep_idx = message.indexOf(TYPE_COMMAND_SEPARATOR);
   auto cmd_args_sep_idx = message.indexOf(COMMAND_ARGS_SEPARATOR);
@@ -582,11 +754,27 @@ msg_cmd_payload get_cmd_payload(const String message, bool *error) {
   return msg_cmd_payload{ cmd_name, cmd_args };
 }
 
+// Returns the Enum value corresponding to the input string.
+// Could be implemented as a Map if O(1) lookup is needed.
+command_t get_command_from_payload(const msg_cmd_payload input) {
+
+  for (int i = 0; i < NB_COMMANDS; i++) {
+    auto cmd = allowed_cmds[i];
+    if (input.name.equalsConstantTime(cmd.name)) {
+      return command_t{ cmd.name, cmd.handle };
+    }
+  }
+  return command_t{ COMMAND_UNKNOWN, &cmd_unknown };
+}
+
+// The serial message will be
+// RESULT:{command}@{message}
 void serialize_result(String command, String message) {
   bool verbose = true;
   cond_serialize_result(command, message, verbose);
 }
 
+// Serialize a result if verbose
 void cond_serialize_result(String command, String message, bool verbose) {
   if (verbose) {
     Serial.print(RESULT_MSG_TYPE);
@@ -621,7 +809,7 @@ bool has_only_zeros(String num) {
 }
 
 void set_brightness() {
-  // This is ripped as is from https://github.com/jlecomte/ascom-flat-panel all credits to him.
+  // This is ripped almost as is from https://github.com/jlecomte/ascom-flat-panel all credits to him.
   // This only works on Seeeduino Xiao.
   // The `pwm` function is defined in the following file:
   // %localappdata%\Arduino15\packages\Seeeduino\hardware\samd\1.8.2\cores\arduino\wiring_pwm.cpp
@@ -639,6 +827,7 @@ void set_brightness() {
 
 
 // Energize and attach servo.
+// This is ripped almost as is from https://github.com/jlecomte/ascom-telescope-cover-v2 all credits to him.
 int powerUpServo() {
   digitalWrite(SERVO_SWITCH_PIN, HIGH);
 
@@ -687,6 +876,7 @@ bool is_panel_calibrated() {
 }
 
 // Function to calculate the mean of an array.
+// This is ripped almost as is from https://github.com/jlecomte/ascom-telescope-cover-v2 all credits to him.
 double mean(double arr[], int n) {
     double sum = 0.0;
     for (int i = 0; i < n; i++) {
@@ -696,6 +886,7 @@ double mean(double arr[], int n) {
 }
 
 // Function to calculate the slope and intercept of a linear regression line.
+// This is ripped almost as is from https://github.com/jlecomte/ascom-telescope-cover-v2 all credits to him.
 void linear_regression(double x[], double y[], int n, double *slope, double *intercept) {
     double x_mean = mean(x, n);
     double y_mean = mean(y, n);
