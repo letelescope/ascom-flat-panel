@@ -49,7 +49,7 @@ namespace ASCOM.LocalServer
             this.Controls.Add(this.label1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "frmMain";
-            this.Text = "ASCOM.LeTelescopeFF_FP_001.CoverCalibrator Driver Server";
+            this.Text = "ASCOM.LeTelescopeFFFPV1.CoverCalibrator Driver Server";
             this.ResumeLayout(false);
 
         }

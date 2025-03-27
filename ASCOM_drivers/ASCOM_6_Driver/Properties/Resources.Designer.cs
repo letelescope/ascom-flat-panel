@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace ASCOM_driver.Properties {
+namespace ASCOM.LeTelescopeFFFPV1.LocalServer.Server.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace ASCOM_driver.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("ASCOM_driver.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("ASCOM.LeTelescopeFFFPV1.LocalServer.Server.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -57,16 +57,6 @@ namespace ASCOM_driver.Properties {
             }
             set {
                 resourceCulture = value;
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une ressource localisée de type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap LogoLetelescope_222px_png_150x150 {
-            get {
-                object obj = ResourceManager.GetObject("LogoLetelescope_222px-png-150x150", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
             }
         }
     }

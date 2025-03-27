@@ -7,12 +7,12 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 //
 // TODO - Add your authorship information here
-[assembly: AssemblyTitle("ASCOM.LeTelescopeFF-FP-001.CoverCalibrator")]
-[assembly: AssemblyDescription("ASCOM Local Server CoverCalibrator driver for LeTelescopeFF-FP-001")]
+[assembly: AssemblyTitle("ASCOM.LeTelescopeFFFPV1.CoverCalibrator")]
+[assembly: AssemblyDescription("ASCOM Local Server CoverCalibrator driver for LeTelescopeFFFPV1")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("The ASCOM Initiative")]
-[assembly: AssemblyProduct("ASCOM Local Server CoverCalibrator driver for LeTelescopeFF-FP-001")]
-[assembly: AssemblyCopyright("Copyright © 2025 The ASCOM Initiative")]
+[assembly: AssemblyCompany("Le Telescope")]
+[assembly: AssemblyProduct("ASCOM Local Server CoverCalibrator driver for LeTelescopeFFFPV1")]
+[assembly: AssemblyCopyright("Copyright © 2025 - Present Le Telescope Ivry sur Seine")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -30,5 +30,6 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 
-[assembly: AssemblyVersion("6.6.0.0")]
-[assembly: AssemblyFileVersion("6.6.0.0")]
+[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: Guid("4f6076e9-1f9d-4f07-b8f0-c558eeda5821")]

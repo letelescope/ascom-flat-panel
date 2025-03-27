@@ -1,5 +1,5 @@
 //
-// ASCOM.LeTelescopeFF_FP_001.CoverCalibrator Local COM Server
+// ASCOM.LeTelescopeFFFPV1.CoverCalibrator Local COM Server
 //
 // This is the core of a managed COM Local Server, capable of serving
 // multiple instances of multiple interfaces, within a single
@@ -38,7 +38,7 @@ namespace ASCOM.LocalServer
         private static int serverLockCount; // Keeps a lock count on this application.
         private static ArrayList driverTypes; // Served COM object types
         private static ArrayList classFactories; // Served COM object class factories
-        private static string localServerAppId = "{be9e4f14-feb0-4f5a-ba88-a7e23e30697c}"; // Our AppId
+        private static string localServerAppId = "{ede0c9ba-b50b-4ac6-bb70-438982637108}"; // Our AppId
         private static readonly Object lockObject = new object(); // Counter lock object
         private static TraceLogger TL; // TraceLogger for the local server (not the served driver, which has its own) - primarily to help debug local server issues
         private static Task GCTask; // The garbage collection task
@@ -56,7 +56,7 @@ namespace ASCOM.LocalServer
         static void Main(string[] args)
         {
             // Create a trace logger for the local server.
-            TL = new TraceLogger("", "LeTelescopeFF-FP-001.LocalServer")
+            TL = new TraceLogger("", "LeTelescopeFFFPV1.LocalServer")
             {
                 Enabled = true // Enable to debug local server operation (not usually required). Drivers have their own independent trace loggers.
             };
@@ -75,7 +75,7 @@ namespace ASCOM.LocalServer
             driversInUseCount = 0;
             serverLockCount = 0;
             mainThreadId = GetCurrentThreadId();
-            Thread.CurrentThread.Name = "LeTelescopeFF-FP-001 Local Server Thread";
+            Thread.CurrentThread.Name = "LeTelescopeFFFPV1 Local Server Thread";
 
             // Create and configure the local server host form that runs the Windows message loop required to support driver operation
             TL.LogMessage("Main", $"Creating host form");
@@ -385,7 +385,7 @@ namespace ASCOM.LocalServer
             catch (Exception ex)
             {
                 TL.LogMessageCrLf("RegisterObjects", $"Setting AppID exception: {ex}");
-                MessageBox.Show("Error while registering the server:\n" + ex.ToString(), "ASCOM.LeTelescopeFF_FP_001.CoverCalibrator", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                MessageBox.Show("Error while registering the server:\n" + ex.ToString(), "ASCOM.LeTelescopeFFFPV1.CoverCalibrator", MessageBoxButtons.OK, MessageBoxIcon.Stop);
                 return;
             }
 
@@ -447,7 +447,7 @@ namespace ASCOM.LocalServer
                 catch (Exception ex)
                 {
                     TL.LogMessageCrLf("RegisterObjects", $"Driver registration exception: {ex}");
-                    MessageBox.Show("Error while registering the server:\n" + ex.ToString(), "ASCOM.LeTelescopeFF_FP_001.CoverCalibrator", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                    MessageBox.Show("Error while registering the server:\n" + ex.ToString(), "ASCOM.LeTelescopeFFFPV1.CoverCalibrator", MessageBoxButtons.OK, MessageBoxIcon.Stop);
                     bFail = true;
                 }
 
@@ -545,13 +545,13 @@ namespace ASCOM.LocalServer
             }
             catch (System.ComponentModel.Win32Exception)
             {
-                TL.LogMessage("IsAdministrator", $"The ASCOM.LeTelescopeFF_FP_001.CoverCalibrator was not " + (argument == "/register" ? "registered" : "unregistered because you did not allow it."));
-                MessageBox.Show("The ASCOM.LeTelescopeFF_FP_001.CoverCalibrator was not " + (argument == "/register" ? "registered" : "unregistered because you did not allow it.", "ASCOM.LeTelescopeFF_FP_001.CoverCalibrator", MessageBoxButtons.OK, MessageBoxIcon.Warning));
+                TL.LogMessage("IsAdministrator", $"The ASCOM.LeTelescopeFFFPV1.CoverCalibrator was not " + (argument == "/register" ? "registered" : "unregistered because you did not allow it."));
+                MessageBox.Show("The ASCOM.LeTelescopeFFFPV1.CoverCalibrator was not " + (argument == "/register" ? "registered" : "unregistered because you did not allow it.", "ASCOM.LeTelescopeFFFPV1.CoverCalibrator", MessageBoxButtons.OK, MessageBoxIcon.Warning));
             }
             catch (Exception ex)
             {
                 TL.LogMessageCrLf("IsAdministrator", $"Exception: {ex}");
-                MessageBox.Show(ex.ToString(), "ASCOM.LeTelescopeFF_FP_001.CoverCalibrator", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                MessageBox.Show(ex.ToString(), "ASCOM.LeTelescopeFFFPV1.CoverCalibrator", MessageBoxButtons.OK, MessageBoxIcon.Stop);
             }
             return;
         }
@@ -579,7 +579,7 @@ namespace ASCOM.LocalServer
                 if (!factory.RegisterClassObject())
                 {
                     TL.LogMessage("RegisterClassFactories", $"  Failed to register class factory for " + driverType.Name);
-                    MessageBox.Show("Failed to register class factory for " + driverType.Name, "ASCOM.LeTelescopeFF_FP_001.CoverCalibrator", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                    MessageBox.Show("Failed to register class factory for " + driverType.Name, "ASCOM.LeTelescopeFFFPV1.CoverCalibrator", MessageBoxButtons.OK, MessageBoxIcon.Stop);
                     return false;
                 }
                 TL.LogMessage("RegisterClassFactories", $"  Registered class factory OK for: {driverType.Name}");
@@ -649,7 +649,7 @@ namespace ASCOM.LocalServer
 
                     default:
                         TL.LogMessage("ProcessArguments", $"Unknown argument: {args[0]}");
-                        MessageBox.Show("Unknown argument: " + args[0] + "\nValid are : -register, -unregister and -embedding", "ASCOM.LeTelescopeFF_FP_001.CoverCalibrator", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                        MessageBox.Show("Unknown argument: " + args[0] + "\nValid are : -register, -unregister and -embedding", "ASCOM.LeTelescopeFFFPV1.CoverCalibrator", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                         break;
                 }
             }
