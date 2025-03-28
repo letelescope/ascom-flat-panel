@@ -392,6 +392,13 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
 
         #region ICoverCalibrator Implementation
 
+        // Constants related to message structure as per our protocol
+        // A Message is TYPE:MESSAGE
+        // This driver will
+        // - emit Command messages : COMMAND:CMD_NAME[@ARGS] where ARGS are optional and command dependent
+        // - receive either
+        //   + result messages : RESULT:CMD_NAME@RSLT
+        //   + error message   : ERROR:ERR_NAME@DETAILS
         private const string TYPE_COMMAND_SEPARATOR = ":";
         private const string COMMAND_ARGS_SEPARATOR = "@";
         private const string MESSAGE_TERMINATOR = "\n";
