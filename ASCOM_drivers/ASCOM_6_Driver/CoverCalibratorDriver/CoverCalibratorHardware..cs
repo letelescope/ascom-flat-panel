@@ -421,7 +421,8 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         {
             get
             {
-                CheckConnected("CoverState Get");
+                var identifier = "CoverState Get";
+                CheckConnected($"{identifier}: Flat panel not connected");
                 string response = SendCommand(identifier: "CoverState Get", command: CMD_COVER_GET);
                 LogMessage("CoverState Get", "Cover is {response}");
                 switch (response) 
@@ -447,7 +448,7 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         {
             var identifier = "OpenCover";
 
-            CheckConnected(identifier);
+            CheckConnected($"{identifier}: Flat panel not connected");
             string response = SendCommand(identifier: identifier, command: CMD_COVER_OPEN);
             LogMessage(identifier, $"{response}");
 
@@ -467,7 +468,7 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         {
             var identifier = "CloseCover";
 
-            CheckConnected(identifier);
+            CheckConnected($"{identifier}: Flat panel not connected");
             string response = SendCommand(identifier: identifier, command: CMD_COVER_CLOSE);
             LogMessage(identifier, $"{response}");
 
@@ -484,7 +485,7 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         internal static void HaltCover()
         {
             var identifier = "HaltCover";
-            CheckConnected(identifier);
+            CheckConnected($"{identifier}: Flat panel not connected");
             LogMessage(identifier, "Not implemented");
             throw new MethodNotImplementedException(identifier);
         }
@@ -499,7 +500,7 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
 
                 var identifier = "CalibratorState Get";
 
-                CheckConnected(identifier);
+                CheckConnected($"{identifier}: Flat panel not connected");
                 LogMessage(identifier, "Calibrator is ready");
                 return CalibratorStatus.Ready;
             }
@@ -515,7 +516,7 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
 
                 var identifier = "Brightness Get";
 
-                CheckConnected(identifier);
+                CheckConnected($"{identifier}: Flat panel not connected");
                 string response = SendCommand(identifier: identifier, command: CMD_BRIGHTNESS_GET);
                 LogMessage(identifier, $"{response}");
 
@@ -548,7 +549,7 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
             get
             {
                 var identifier = "MaxBrightness Get";
-                CheckConnected(identifier);
+                CheckConnected($"{identifier}: Flat panel not connected");
                 LogMessage("MaxBrightness Get", $"{MAX_BRIGHTNESS}");
                 return MAX_BRIGHTNESS;
             }
@@ -562,7 +563,7 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         {
             var identifier = "CalibratorOn";
 
-            CheckConnected(identifier);
+            CheckConnected($"{identifier}: Flat panel not connected");
 
             if (Brightness < MIN_BRIGNTESS && Brightness > MAX_BRIGHTNESS) 
             {
@@ -599,7 +600,7 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         {
             var identifier = "CalibratorOff";
 
-            CheckConnected(identifier);
+            CheckConnected($"{identifier}: Flat panel not connected");
             string response = SendCommand(identifier: identifier, command: CMD_BRIGHTNESS_RESET);
 
             int device_brightness = -1;
