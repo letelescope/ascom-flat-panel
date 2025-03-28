@@ -291,16 +291,10 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
                 {
                     LogMessage("Connected Set", $"Connecting to port {comPort}");
 
-                    try
-                    {
-                        serial = ConnectToDevice("Connected Set", comPort);
-                        connectedState = true;
-                    }
-                    catch
-                    {
-                        LogMessage("Connected", $"Could not set {value}. Connected is set to false");
-                        connectedState = false;
-                    }
+                    // We do not catch the value to fail fast
+                    serial = ConnectToDevice("Connected Set", comPort);
+                    connectedState = true;
+                    
                 }
                 else
                 {
