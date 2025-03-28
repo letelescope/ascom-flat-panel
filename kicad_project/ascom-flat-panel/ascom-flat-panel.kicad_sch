@@ -1781,36 +1781,30 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Seeeduino XIAO:SeeeduinoXIAO"
-			(pin_numbers
-				(hide yes)
-			)
+		(symbol "Seeeduino:XIAO-SAMD21-DIP"
 			(pin_names
 				(offset 1.016)
 			)
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
-			(property "Reference" "U1"
-				(at 4.7341 -21.59 0)
+			(property "Reference" "U"
+				(at -18.542 22.86 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(justify left)
-					(hide yes)
 				)
 			)
-			(property "Value" "SeeeduinoXIAO"
-				(at -18.542 -20.828 0)
+			(property "Value" "XIAO-SAMD21-DIP"
+				(at -10.16 21.082 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(justify left)
 				)
 			)
-			(property "Footprint" "Seeeduino XIAO:Seeeduino XIAO-MOUDLE14P-2.54-21X17.8MM"
+			(property "Footprint" ""
 				(at -8.89 5.08 0)
 				(effects
 					(font
@@ -1837,21 +1831,21 @@
 					(hide yes)
 				)
 			)
-			(symbol "SeeeduinoXIAO_0_1"
+			(symbol "XIAO-SAMD21-DIP_0_1"
 				(rectangle
 					(start -19.05 20.32)
 					(end 17.78 -19.05)
 					(stroke
 						(width 0)
-						(type solid)
+						(type default)
 					)
 					(fill
 						(type none)
 					)
 				)
 			)
-			(symbol "SeeeduinoXIAO_1_1"
-				(pin unspecified line
+			(symbol "XIAO-SAMD21-DIP_1_1"
+				(pin passive line
 					(at -21.59 11.43 0)
 					(length 2.54)
 					(name "PA02_A0_D0"
@@ -1869,7 +1863,7 @@
 						)
 					)
 				)
-				(pin unspecified line
+				(pin passive line
 					(at -21.59 7.62 0)
 					(length 2.54)
 					(name "PA4_A1_D1"
@@ -1887,7 +1881,7 @@
 						)
 					)
 				)
-				(pin unspecified line
+				(pin passive line
 					(at -21.59 3.81 0)
 					(length 2.54)
 					(name "PA10_A2_D2"
@@ -1905,7 +1899,7 @@
 						)
 					)
 				)
-				(pin unspecified line
+				(pin passive line
 					(at -21.59 0 0)
 					(length 2.54)
 					(name "PA11_A3_D3"
@@ -1923,7 +1917,7 @@
 						)
 					)
 				)
-				(pin unspecified line
+				(pin passive line
 					(at -21.59 -3.81 0)
 					(length 2.54)
 					(name "PA8_A4_D4_SDA"
@@ -1941,7 +1935,7 @@
 						)
 					)
 				)
-				(pin unspecified line
+				(pin passive line
 					(at -21.59 -7.62 0)
 					(length 2.54)
 					(name "PA9_A5_D5_SCL"
@@ -1959,7 +1953,7 @@
 						)
 					)
 				)
-				(pin unspecified line
+				(pin passive line
 					(at -21.59 -11.43 0)
 					(length 2.54)
 					(name "PB08_A6_D6_TX"
@@ -1977,115 +1971,7 @@
 						)
 					)
 				)
-				(pin input line
-					(at -5.08 22.86 270)
-					(length 2.54)
-					(name "PA31_SWDIO"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "17"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin input line
-					(at -2.54 -21.59 90)
-					(length 2.54)
-					(name "5V"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "15"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin input line
-					(at -1.27 22.86 270)
-					(length 2.54)
-					(name "PA30_SWCLK"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "18"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin input line
-					(at 2.54 22.86 270)
-					(length 2.54)
-					(name "RESET"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "19"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin input line
-					(at 2.54 -21.59 90)
-					(length 2.54)
-					(name "GND"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "16"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin input line
-					(at 6.35 22.86 270)
-					(length 2.54)
-					(name "GND"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "20"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin unspecified line
+				(pin passive line
 					(at 20.32 11.43 180)
 					(length 2.54)
 					(name "5V"
@@ -2103,7 +1989,7 @@
 						)
 					)
 				)
-				(pin unspecified line
+				(pin passive line
 					(at 20.32 7.62 180)
 					(length 2.54)
 					(name "GND"
@@ -2121,7 +2007,7 @@
 						)
 					)
 				)
-				(pin unspecified line
+				(pin passive line
 					(at 20.32 3.81 180)
 					(length 2.54)
 					(name "3V3"
@@ -2139,7 +2025,7 @@
 						)
 					)
 				)
-				(pin unspecified line
+				(pin passive line
 					(at 20.32 0 180)
 					(length 2.54)
 					(name "PA6_A10_D10_MOSI"
@@ -2157,7 +2043,7 @@
 						)
 					)
 				)
-				(pin unspecified line
+				(pin passive line
 					(at 20.32 -3.81 180)
 					(length 2.54)
 					(name "PA5_A9_D9_MISO"
@@ -2175,7 +2061,7 @@
 						)
 					)
 				)
-				(pin unspecified line
+				(pin passive line
 					(at 20.32 -7.62 180)
 					(length 2.54)
 					(name "PA7_A8_D8_SCK"
@@ -2193,7 +2079,7 @@
 						)
 					)
 				)
-				(pin unspecified line
+				(pin passive line
 					(at 20.32 -11.43 180)
 					(length 2.54)
 					(name "PB09_A7_D7_RX"
@@ -2630,7 +2516,7 @@
 	)
 	(wire
 		(pts
-			(xy 78.74 127) (xy 78.74 134.62)
+			(xy 78.74 127) (xy 78.74 130.81)
 		)
 		(stroke
 			(width 0)
@@ -3322,7 +3208,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 76.962 119.38 90)
 			(effects
 				(font
@@ -3836,129 +3722,6 @@
 		)
 	)
 	(symbol
-		(lib_id "Seeeduino XIAO:SeeeduinoXIAO")
-		(at 85.09 55.88 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "550095e2-7b6e-4de1-abfc-36748be72894")
-		(property "Reference" "U1"
-			(at 89.8241 77.47 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Value" "SeeeduinoXIAO"
-			(at 66.548 76.708 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Seeeduino XIAO:Seeeduino XIAO-MOUDLE14P-2.54-21X17.8MM"
-			(at 76.2 50.8 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 76.2 50.8 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 85.09 55.88 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "12"
-			(uuid "8803c099-994b-4b51-b6d6-bc7808f89f59")
-		)
-		(pin "10"
-			(uuid "0d44c4c2-299a-43f7-9298-9382d9afc869")
-		)
-		(pin "16"
-			(uuid "bff75209-68a8-4773-be85-16840aceda84")
-		)
-		(pin "15"
-			(uuid "efa6e5da-7ff3-4110-ac7b-51e4d2438206")
-		)
-		(pin "2"
-			(uuid "ff1a49b1-6b57-44b6-ae7e-25cb9b06a0f7")
-		)
-		(pin "17"
-			(uuid "df2e87d1-845c-4cf7-8c08-a090b55ca771")
-		)
-		(pin "3"
-			(uuid "dc85948e-611e-4c14-83f9-f8b51a84506a")
-		)
-		(pin "4"
-			(uuid "0ca938d5-71a4-44a5-a710-ecd4aa403c0e")
-		)
-		(pin "5"
-			(uuid "6915c21a-25c8-4a90-bd27-abb9a23b736b")
-		)
-		(pin "19"
-			(uuid "8d44910f-0060-4416-9aed-27217b6d0965")
-		)
-		(pin "18"
-			(uuid "9cf1b442-38ef-4fcb-a182-94c8110c702d")
-		)
-		(pin "20"
-			(uuid "e28c0f84-4beb-4201-b9c2-8e8e7531f373")
-		)
-		(pin "8"
-			(uuid "bcae6bfe-a654-4810-9185-181d6b04a551")
-		)
-		(pin "9"
-			(uuid "2e84a352-ee7c-424f-adc8-ff8852806cfb")
-		)
-		(pin "6"
-			(uuid "31c86a0f-d00c-46b5-8e9e-99e821921fee")
-		)
-		(pin "7"
-			(uuid "1a4f2912-8613-407f-af07-19a0cd306cc5")
-		)
-		(pin "14"
-			(uuid "62ace742-70c9-479c-a9c2-859b225e9413")
-		)
-		(pin "13"
-			(uuid "01b16ac2-1959-4a6b-beb5-3d69a83e4645")
-		)
-		(pin "11"
-			(uuid "9f8a1813-eb59-4f46-b72c-2e79ce47585e")
-		)
-		(pin "1"
-			(uuid "ee75787f-900c-4b14-b04f-736a855675d0")
-		)
-		(instances
-			(project "TelescopeCoverV2-Simple"
-				(path "/c93103f3-9ac9-4319-baa6-df31525a6c92"
-					(reference "U1")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "DarkSkyGeek_KiCad_Symbol_Library:FQP30N06L")
 		(at 182.88 111.76 0)
 		(unit 1)
@@ -3985,7 +3748,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "MyFootprints:FQP30N06L"
+		(property "Footprint" "Package_TO_SOT_THT:TO-220-3_Vertical"
 			(at 182.88 99.06 0)
 			(effects
 				(font
@@ -4518,7 +4281,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 71.12 113.538 90)
 			(effects
 				(font
@@ -4755,6 +4518,110 @@
 		)
 	)
 	(symbol
+		(lib_id "Seeeduino:XIAO-SAMD21-DIP")
+		(at 85.09 55.88 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "a620a577-c459-4a59-9e90-716e47dc72cc")
+		(property "Reference" "U1"
+			(at 84.455 30.48 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "XIAO-SAMD21-DIP"
+			(at 84.455 33.02 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Seeeduino XIAO:XIAO-SAMD21-DIP"
+			(at 76.2 50.8 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 76.2 50.8 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 85.09 55.88 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "3"
+			(uuid "0fb74553-9e80-4773-a2f3-69f2a6c973a8")
+		)
+		(pin "2"
+			(uuid "e9a574ef-1e47-4b5c-9205-f3c1cdbb641d")
+		)
+		(pin "5"
+			(uuid "df570e32-c2ef-4d71-bdaa-ac18599b171a")
+		)
+		(pin "1"
+			(uuid "7cfa2ac6-5ce4-4f3a-b1e9-a28a85fa436b")
+		)
+		(pin "14"
+			(uuid "24e976b5-5761-44e8-b6d9-3cf893b9667e")
+		)
+		(pin "4"
+			(uuid "a2922b7c-47ba-4520-b0bc-75f5e00c9e94")
+		)
+		(pin "6"
+			(uuid "c5f8446b-340f-4142-b1b5-417fb91a48df")
+		)
+		(pin "13"
+			(uuid "56ec33c2-3fc0-48d1-b260-bbfe1b630026")
+		)
+		(pin "12"
+			(uuid "ca28ad94-1044-4cbc-a4b0-32dde247ca12")
+		)
+		(pin "11"
+			(uuid "179d90bb-9a45-47aa-9af2-fcd953d846d2")
+		)
+		(pin "10"
+			(uuid "33d4e473-d128-4e29-99b2-b3dcfddc3b4c")
+		)
+		(pin "9"
+			(uuid "49b1b931-01e2-4bfb-b3f0-05dfbe6d3d72")
+		)
+		(pin "8"
+			(uuid "0ec0b4b9-d197-421d-826e-ecc41597d58c")
+		)
+		(pin "7"
+			(uuid "185f38c6-a433-464f-9663-2433b877805b")
+		)
+		(instances
+			(project ""
+				(path "/c93103f3-9ac9-4319-baa6-df31525a6c92"
+					(reference "U1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Diode:1N4001")
 		(at 193.04 53.34 270)
 		(unit 1)
@@ -4936,7 +4803,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "MyFootprints:FQP30N06L"
+		(property "Footprint" "Package_TO_SOT_THT:TO-220-3_Vertical"
 			(at 78.74 99.06 0)
 			(effects
 				(font
@@ -5315,7 +5182,7 @@
 	(symbol
 		(lib_name "GND_1")
 		(lib_id "power:GND")
-		(at 78.74 134.62 0)
+		(at 78.74 130.81 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -5324,7 +5191,7 @@
 		(fields_autoplaced yes)
 		(uuid "cd91edc8-f1d8-4471-a9f0-d6612d5747ab")
 		(property "Reference" "#PWR09"
-			(at 78.74 140.97 0)
+			(at 78.74 137.16 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5333,7 +5200,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 78.74 139.7 0)
+			(at 78.74 135.89 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5341,7 +5208,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 78.74 134.62 0)
+			(at 78.74 130.81 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5350,7 +5217,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 78.74 134.62 0)
+			(at 78.74 130.81 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5359,7 +5226,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 78.74 134.62 0)
+			(at 78.74 130.81 0)
 			(effects
 				(font
 					(size 1.27 1.27)
