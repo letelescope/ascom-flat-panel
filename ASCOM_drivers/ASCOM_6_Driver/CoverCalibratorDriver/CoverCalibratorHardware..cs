@@ -706,7 +706,8 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         {
             get
             {
-                // TODO check that the driver hardware connection exists and is connected to the hardware
+                if (serial == null) return false;
+
                 return connectedState;
             }
         }
