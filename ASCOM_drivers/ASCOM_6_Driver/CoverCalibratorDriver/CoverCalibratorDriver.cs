@@ -4,8 +4,9 @@
 //
 // Description:	 <To be completed by driver developer>
 //
-// Implements:	ASCOM CoverCalibrator interface version: <To be completed by driver developer>
-// Author:		(XXX) Your N. Here <your@email.here>
+// Implements:	ASCOM CoverCalibrator interface version: 1
+// Authors:	    Florian Thibaud	
+//              Florian Gautier
 //
 
 using System;

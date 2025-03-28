@@ -116,6 +116,9 @@
   <ItemGroup>
     <Content Include="ASCOM.ico" />
     <Content Include="ASCOM.png" />
+    <Content Include="LogoGithub.png" />
+    <Content Include="LogoLetelescope.ico" />
+    <Content Include="LogoLetelescope.png" />
     <Content Include="ReadMe.htm" />
   </ItemGroup>
   <ItemGroup>

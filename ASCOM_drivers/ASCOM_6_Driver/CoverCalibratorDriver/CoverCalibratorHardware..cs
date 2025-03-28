@@ -10,6 +10,7 @@
 
 using System;
 using System.Collections;
+using System.Net.NetworkInformation;
 using System.Windows.Forms;
 using ASCOM;
 using ASCOM.Astrometry.AstroUtils;
@@ -42,6 +43,10 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         internal static Util utilities; // ASCOM Utilities object for use as required
         internal static AstroUtils astroUtilities; // ASCOM AstroUtilities object for use as required
         internal static TraceLogger tl; // Local server's trace logger object for diagnostic log with information that you specify
+
+        private static Serial flatPanelClient; // Serialclient that will handle the connection
+        private static readonly object lockObject = new object();// Object used to synchronize the serial communication;
+
 
         /// <summary>
         /// Initializes a new instance of the device Hardware class.
@@ -299,7 +304,6 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         /// <value>The description.</value>
         public static string Description
         {
-            // TODO customise this device description if required
             get
             {
                 LogMessage("Description Get", DriverDescription);
@@ -315,8 +319,7 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
             get
             {
                 Version version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
-                // TODO customise this driver description if required
-                string driverInfo = $"Information about the driver itself. Version: {version.Major}.{version.Minor}";
+                string driverInfo = $"Le Telescope FFFPV1 ASCOM CoverCalibrator driver . Version: {version.Major}.{version.Minor}";
                 LogMessage("DriverInfo Get", driverInfo);
                 return driverInfo;
             }
@@ -357,7 +360,7 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
             // TODO customise this device name as required
             get
             {
-                string name = "Short driver name - please customise";
+                string name = "Le Telescope FFFPV1 ASCOM driver";
                 LogMessage("Name Get", name);
                 return name;
             }
@@ -464,6 +467,14 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         #endregion
 
         #region Private properties and methods
+
+        private static String SendCommand(String command, String args) 
+        {
+
+
+            return "";
+        }
+
         // Useful methods that can be used as required to help with driver development
 
         /// <summary>

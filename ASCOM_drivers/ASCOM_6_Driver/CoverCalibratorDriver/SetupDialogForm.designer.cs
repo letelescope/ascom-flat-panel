@@ -103,7 +103,7 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
             this.label2.Location = new System.Drawing.Point(17, 104);
             this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(70, 13);
+            this.label2.Size = new System.Drawing.Size(79, 15);
             this.label2.TabIndex = 5;
             this.label2.Text = "Comm Port";
             // 
@@ -113,7 +113,7 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
             this.chkTrace.Location = new System.Drawing.Point(103, 136);
             this.chkTrace.Margin = new System.Windows.Forms.Padding(4);
             this.chkTrace.Name = "chkTrace";
-            this.chkTrace.Size = new System.Drawing.Size(82, 17);
+            this.chkTrace.Size = new System.Drawing.Size(93, 19);
             this.chkTrace.TabIndex = 6;
             this.chkTrace.Text = "Trace on";
             this.chkTrace.UseVisualStyleBackColor = true;
@@ -124,7 +124,7 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
             this.comboBoxComPort.Location = new System.Drawing.Point(103, 100);
             this.comboBoxComPort.Margin = new System.Windows.Forms.Padding(4);
             this.comboBoxComPort.Name = "comboBoxComPort";
-            this.comboBoxComPort.Size = new System.Drawing.Size(176, 19);
+            this.comboBoxComPort.Size = new System.Drawing.Size(176, 23);
             this.comboBoxComPort.TabIndex = 7;
             // 
             // leTelescopeLogoBox
@@ -167,7 +167,7 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
             // 
             // SetupDialogForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 11F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(386, 202);
@@ -181,6 +181,7 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
             this.Controls.Add(this.cmdOK);
             this.Font = new System.Drawing.Font("Noto Mono", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(4);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
