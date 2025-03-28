@@ -9,8 +9,10 @@
 //
 
 using System;
+using System.CodeDom;
 using System.Collections;
 using System.Net.NetworkInformation;
+using System.Runtime.CompilerServices;
 using System.Windows.Forms;
 using ASCOM;
 using ASCOM.Astrometry.AstroUtils;
@@ -44,7 +46,7 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         internal static AstroUtils astroUtilities; // ASCOM AstroUtilities object for use as required
         internal static TraceLogger tl; // Local server's trace logger object for diagnostic log with information that you specify
 
-        private static Serial flatPanelClient; // Serialclient that will handle the connection
+        private static Serial serial; // Serial client that will handle the connection
         private static readonly object lockObject = new object();// Object used to synchronize the serial communication;
 
 
@@ -357,7 +359,6 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         /// </summary>
         public static string Name
         {
-            // TODO customise this device name as required
             get
             {
                 string name = "Le Telescope FFFPV1 ASCOM driver";
@@ -370,6 +371,21 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
 
         #region ICoverCalibrator Implementation
 
+        private const string TYPE_COMMAND_SEPARATOR = ":";
+        private const string COMMAND_ARGS_SEPARATOR = "@";
+        private const string MESSAGE_TERMINATOR = "\n";
+        private const string COMMAND_TYPE = "COMMAND";
+        private const string RESULT_TYPE = "RESULT";
+        private const string EMPTY_ARGS = "";
+        private const string CMD_COVER_GET = "COVER_GET";
+        private const string CMD_COVER_OPEN = "COVER_OPEN";
+        private const string CMD_COVER_CLOSE = "COVER_CLOSE";
+        private const string CMD_BRIGHTNESS_GET = "BRIGHTNESS_GET";
+        private const string CMD_BRIGHTNESS_SET = "BRIGHTNESS_SET";
+        private const string CMD_BRIGHTNESS_RESET = "BRIGHTNESS_RESET";
+        private const string GENERIC_RSLT_OK = "OK";
+        private const int MAX_BRIGHTNESS = 1023; // Maybe could be given by the hardware for better flexibility
+        private const int MIN_BRIGNTESS = 0;
         /// <summary>
         /// Returns the state of the device cover, if present, otherwise returns "NotPresent"
         /// </summary>
@@ -377,8 +393,22 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         {
             get
             {
-                LogMessage("CoverState Get", "Not implemented");
-                throw new PropertyNotImplementedException("CoverState", false);
+                CheckConnected("CoverState Get");
+                string response = SendCommand(identifier: "CoverState Get", command: CMD_COVER_GET);
+                LogMessage("CoverState Get", "Cover is {response}");
+                switch (response) 
+                {
+                    case "OPEN":
+                        return CoverStatus.Open;
+                    case "OPENING":
+                    case "CLOSING":
+                        return CoverStatus.Moving;
+                    case "CLOSED":
+                        return CoverStatus.Closed;
+                    default:
+                        LogMessage("CoverState Get", "{response}: Unknown cover status");
+                        return CoverStatus.Unknown;
+                }
             }
         }
 
@@ -387,8 +417,19 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         /// </summary>
         internal static void OpenCover()
         {
-            LogMessage("OpenCover", "Not implemented");
-            throw new MethodNotImplementedException("OpenCover");
+            var identifier = "OpenCover";
+
+            CheckConnected(identifier);
+            string response = SendCommand(identifier: identifier, command: CMD_COVER_OPEN);
+            LogMessage(identifier, $"{response}");
+
+            if (response != GENERIC_RSLT_OK)
+            {
+                LogMessage(identifier, $"Invalid response {response} from device. Hardware may be in a weird state");
+                throw new InvalidOperationException($"Invalid response {response} from device. Hardware may be in a weird state");
+
+            }
+
         }
 
         /// <summary>
@@ -396,8 +437,17 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         /// </summary>
         internal static void CloseCover()
         {
-            LogMessage("CloseCover", "Not implemented");
-            throw new MethodNotImplementedException("CloseCover");
+            var identifier = "CloseCover";
+
+            CheckConnected(identifier);
+            string response = SendCommand(identifier: identifier, command: CMD_COVER_CLOSE);
+            LogMessage(identifier, $"{response}");
+
+            if (response != GENERIC_RSLT_OK)
+            {
+                LogMessage(identifier, $"Invalid response {response} from device. Hardware may be in a weird state");
+                throw new InvalidOperationException($"Invalid response {response} from device. Hardware may be in a weird state");
+            }
         }
 
         /// <summary>
@@ -405,8 +455,10 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         /// </summary>
         internal static void HaltCover()
         {
-            LogMessage("HaltCover", "Not implemented");
-            throw new MethodNotImplementedException("HaltCover");
+            var identifier = "HaltCover";
+            CheckConnected(identifier);
+            LogMessage(identifier, "Not implemented");
+            throw new MethodNotImplementedException(identifier);
         }
 
         /// <summary>
@@ -416,8 +468,12 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         {
             get
             {
-                LogMessage("CalibratorState Get", "Not implemented");
-                throw new PropertyNotImplementedException("CalibratorState", false);
+
+                var identifier = "CalibratorState Get";
+
+                CheckConnected(identifier);
+                LogMessage(identifier, "Calibrator is ready");
+                return CalibratorStatus.Ready;
             }
         }
 
@@ -428,8 +484,31 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         {
             get
             {
-                LogMessage("Brightness Get", "Not implemented");
-                throw new PropertyNotImplementedException("Brightness", false);
+
+                var identifier = "Brightness Get";
+
+                CheckConnected(identifier);
+                string response = SendCommand(identifier: identifier, command: CMD_BRIGHTNESS_GET);
+                LogMessage(identifier, $"{response}");
+
+                int brightness = -1;
+                try
+                {
+                    brightness = int.Parse(response);
+                }
+                catch (Exception e)
+                {
+                    LogMessage(identifier, $"Invalid response {response} from device. Hardware may be in a weird state");
+                    throw new InvalidOperationException($"Invalid response {response} from device. Hardware may be in a weird state");
+                }
+
+                if (brightness < MIN_BRIGNTESS)
+                {
+                    LogMessage(identifier, $"Invalid response {response} from device. Hardware may be in a weird state");
+                    throw new InvalidOperationException($"Invalid response {response} from device. Hardware may be in a weird state");
+                }
+
+                return brightness;
             }
         }
 
@@ -440,8 +519,10 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         {
             get
             {
-                LogMessage("MaxBrightness Get", "Not implemented");
-                throw new PropertyNotImplementedException("MaxBrightness", false);
+                var identifier = "MaxBrightness Get";
+                CheckConnected(identifier);
+                LogMessage("MaxBrightness Get", $"{MAX_BRIGHTNESS}");
+                return MAX_BRIGHTNESS;
             }
         }
 
@@ -451,8 +532,36 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         /// <param name="Brightness"></param>
         internal static void CalibratorOn(int Brightness)
         {
-            LogMessage("CalibratorOn", $"Not implemented. Value set: {Brightness}");
-            throw new MethodNotImplementedException("CalibratorOn");
+            var identifier = "CalibratorOn";
+
+            CheckConnected(identifier);
+
+            if (Brightness < MIN_BRIGNTESS && Brightness > MAX_BRIGHTNESS) 
+            {
+                LogMessage(identifier, $"Invalid brightness {Brightness}. Should be an int ranging from {MIN_BRIGNTESS} to {MAX_BRIGHTNESS}");
+                throw new InvalidOperationException($"Invalid brightness {Brightness}. Should be an int ranging from {MIN_BRIGNTESS} to {MAX_BRIGHTNESS}");
+
+            }
+            string response = SendCommand(identifier: identifier, command: CMD_BRIGHTNESS_SET, args: Brightness.ToString());
+
+            int device_brightness = -1;
+            try
+            {
+                device_brightness = int.Parse(response);
+            }
+            catch (Exception e)
+            {
+                LogMessage(identifier, $"Invalid response {response} from device. Hardware may be in a weird state");
+                throw new InvalidOperationException($"Invalid response {response} from device. Hardware may be in a weird state");
+            }
+
+            if (device_brightness != Brightness)
+            {
+                LogMessage(identifier, $"Invalid response {response} from device. Hardware may be in a weird state");
+                throw new InvalidOperationException($"Invalid response {response} from device. Hardware may be in a weird state");
+            }
+
+            LogMessage(identifier, $"On:{device_brightness}");
         }
 
         /// <summary>
@@ -460,19 +569,80 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         /// </summary>
         internal static void CalibratorOff()
         {
-            LogMessage("CalibratorOff", "Not implemented");
-            throw new MethodNotImplementedException("CalibratorOff");
+            var identifier = "CalibratorOff";
+
+            CheckConnected(identifier);
+            string response = SendCommand(identifier: identifier, command: CMD_BRIGHTNESS_RESET);
+
+            int device_brightness = -1;
+            try
+            {
+                device_brightness = int.Parse(response);
+
+            }
+            catch (Exception e)
+            {
+                LogMessage(identifier, $"Invalid response {response} from device. Hardware may be in a weird state");
+                throw new InvalidOperationException($"Invalid response {response} from device. Hardware may be in a weird state");
+            }
+
+            if (device_brightness != 0) {
+                LogMessage(identifier, $"Invalid response {response} from device. Hardware may be in a weird state");
+                throw new InvalidOperationException($"Invalid response {response} from device. Hardware may be in a weird state");
+            }
+
+            LogMessage(identifier, $"Off");
+
+
         }
 
         #endregion
 
         #region Private properties and methods
 
-        private static String SendCommand(String command, String args) 
+        private static string SendCommand(string identifier, string command, string args = EMPTY_ARGS) 
         {
+            string message = $"{COMMAND_TYPE}{TYPE_COMMAND_SEPARATOR}{command}";
+            message = string.IsNullOrWhiteSpace(args) ? message : $"{message}{COMMAND_ARGS_SEPARATOR}{args}";
+          
+            // Rethrow as is the error if it happens no added value to add comments here
+            string raw_cmd_result = SendRawLine(identifier, message);
 
+            string expected_prefix = $"{RESULT_TYPE}{TYPE_COMMAND_SEPARATOR}{command}{COMMAND_ARGS_SEPARATOR}";
+            if (!raw_cmd_result.StartsWith(expected_prefix))
+            {
+                LogMessage(identifier, $"Command '{command}' with args '{args}' failed to : {raw_cmd_result}");
+                throw new InvalidOperationException($"Command '{command}' with args '{args}' failed to : {raw_cmd_result}");
+            }
 
-            return "";
+            string cmd_result = raw_cmd_result.Replace(expected_prefix, string.Empty);
+            LogMessage(identifier, $"Command '{command}' with args '{args}' returned : {cmd_result}");
+
+            return cmd_result;
+        }
+
+        private static string SendRawLine(string identifier, string message) 
+        {
+            var raw_response = string.Empty;
+
+            lock (lockObject)
+            {
+                try
+                {
+                    var line_message = message.EndsWith(MESSAGE_TERMINATOR) ? message : message + MESSAGE_TERMINATOR;
+                    LogMessage(identifier, $"Transmitting: {line_message}");
+                    serial.Transmit(line_message);
+                    raw_response = serial.ReceiveTerminated(MESSAGE_TERMINATOR);
+                    LogMessage(identifier, $"Received: {raw_response}");
+                }
+                catch (Exception e)
+                {
+                    LogMessage(identifier, $"Connection issue with hardware: {e}");
+                    throw new NotConnectedException($"Connection issue with hardware: {e.Message}", e);
+                }       
+            }
+
+            return raw_response;
         }
 
         // Useful methods that can be used as required to help with driver development
