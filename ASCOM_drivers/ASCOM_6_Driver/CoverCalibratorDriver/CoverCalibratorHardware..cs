@@ -9,12 +9,9 @@
 //
 
 using System;
-using System.CodeDom;
 using System.Collections;
-using System.Net.NetworkInformation;
-using System.Runtime.CompilerServices;
+using System.Linq;
 using System.Windows.Forms;
-using ASCOM;
 using ASCOM.Astrometry.AstroUtils;
 using ASCOM.DeviceInterface;
 using ASCOM.Utilities;
@@ -261,6 +258,15 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
                 astroUtilities = null;
             }
             catch { }
+
+            if (serial != null)
+            {
+                try
+                {
+                    serial.Dispose();
+                    serial = null;
+                } catch { }
+            }
         }
 
         /// <summary>
@@ -285,15 +291,31 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
                 {
                     LogMessage("Connected Set", $"Connecting to port {comPort}");
 
-                    // TODO insert connect to the device code here
+                    try
+                    {
+                        serial = ConnectToDevice("Connected Set", comPort);
+                        connectedState = true;
+                    }
+                    catch (Exception e)
+                    {
+                        connectedState = false;
+                    }
 
-                    connectedState = true;
+                    
                 }
                 else
                 {
                     LogMessage("Connected Set", $"Disconnecting from port {comPort}");
 
-                    // TODO insert disconnect from the device code here
+                    if (serial != null) 
+                    {
+                        try
+                        {
+                            serial.Dispose();
+                            serial = null;
+                        }
+                        catch { }
+                    }
 
                     connectedState = false;
                 }
@@ -645,6 +667,36 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
             return raw_response;
         }
 
+        private static Serial ConnectToDevice(String idetifier, String comPort) 
+        {
+            if (System.IO.Ports.SerialPort.GetPortNames().Contains(comPort))
+            {
+                var message = $"No available COM Port {comPort}";
+                LogMessage(idetifier, message);
+                throw new InvalidValueException(message);
+            }
+
+            try
+            {
+                var serialPort = new Serial
+                {
+                    Speed = SerialSpeed.ps57600,
+                    PortName = comPort,
+                    Connected = true,
+                };
+
+                serial.ClearBuffers();
+
+                return serialPort;
+            }
+            catch (Exception e)
+            {
+                var message = $"Impossible to establish serial connection to COM Port {comPort}: {e.Message}";
+                LogMessage(idetifier, message);
+                throw new DriverException(message, e);
+            }
+
+        }
         // Useful methods that can be used as required to help with driver development
 
         /// <summary>
