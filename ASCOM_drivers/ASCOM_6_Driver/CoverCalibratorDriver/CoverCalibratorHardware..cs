@@ -293,7 +293,18 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
 
                     // We do not catch the value to fail fast
                     serial = ConnectToDevice("Connected Set", comPort);
+
+                    LogMessage("Connected Set", $"Connected to port {comPort}");
                     connectedState = true;
+
+                    LogMessage("Connected Set", $"Validating device on port {comPort}");
+                    var pong = SendCommand("Connected Set", "PING");
+                    if (pong != "PONG")
+                    {
+                        LogMessage("Connected Set", $"No valid device on {comPort}. Ping command failed");
+                        connectedState = false;
+                        throw new NotConnectedException($"No valid device on {comPort}. Ping command failed");
+                    }
                     
                 }
                 else
