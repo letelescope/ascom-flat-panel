@@ -1,3 +1,16 @@
+//
+// SetupDialogForm for LeTelescopeFFFPV1
+//
+// Copyright(C) 2025 - Present, Le Télescope - Ivry sur Seine - All Rights Reserved
+// Licensed under the MIT License. See the accompanying LICENSE file for terms.
+//
+// Description:	 Event handlers for the Setup Form of this driver. The base layout of
+// this class has been generated using the Visual Studio Code ASCOM 6 driver template.
+// 
+// Authors:
+//   - Florian Thibaud
+//   - Florian Gautier		
+//
 namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
 {
     partial class SetupDialogForm

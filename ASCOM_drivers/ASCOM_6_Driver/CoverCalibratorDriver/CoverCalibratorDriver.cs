@@ -414,15 +414,15 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
 
                     if (value)
                     {
-                        connectedState = true;
                         LogMessage("Connected Set", "Connecting to device");
                         CoverCalibratorHardware.Connected = true;
+                        connectedState = true;
                     }
                     else
                     {
-                        connectedState = false;
                         LogMessage("Connected Set", "Disconnecting from device");
                         CoverCalibratorHardware.Connected = false;
+                        connectedState = false;
                     }
                 }
                 catch (Exception ex)
