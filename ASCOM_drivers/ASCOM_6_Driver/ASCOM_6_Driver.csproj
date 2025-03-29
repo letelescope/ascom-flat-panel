@@ -76,7 +76,7 @@
   <ItemGroup>
     <Compile Include="ClassFactory.cs" />
     <Compile Include="CoverCalibratorDriver\CoverCalibratorDriver.cs" />
-    <Compile Include="CoverCalibratorDriver\CoverCalibratorHardware..cs" />
+    <Compile Include="CoverCalibratorDriver\CoverCalibratorHardware.cs" />
     <Compile Include="frmMain.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -13,7 +13,7 @@
  * - A light panel with variable brightness
  * - A motorized cover
  *
- * The firware updates the state of the flat panel upon instructions of the ASCOM driver. The communication protocol 
+ * The firmware updates the state of the flat panel upon instructions of the ASCOM driver. The communication protocol 
  * is serial based. The serial connection is established via USB. Here is a a summary of the protocol 
  *  - Both the driver and the flat panel (and hence this firmware) exchange single line messages.
  *  - A message is structured as TYPE:MESSAGE, where TYPE is in "COMMAND, RESULT, ERROR" and MESSAGE is alaphanumerical with spaces and "@"
@@ -28,7 +28,7 @@
  * This firware reponse with 
  * - either a RESULT:CMD_NAME}@MSG   if operation succeeded
  * - or an ERROR:ERR_MESSAGE@DETAILS if anything went wrong
-
+ *
  * In a nutshell
  *  --------------                           ------------
  * |              |                         |            |
@@ -50,6 +50,13 @@
  * - COMMAND:COVER_CLOSE
  * - COMMAND:CALIBRATION_RUN
  * - COMMAND:CALIBRATION_GET
+ *
+ * The protocol, the implementation of both the driver and the firmware, the electronics and the 3D models
+ * are heavily inspired by the the work  of Dark Sky Geek (https://github.com/jlecomte/) especially 
+ * - https://github.com/jlecomte/ascom-flat-panel
+ * - https://github.com/jlecomte/ascom-wireless-flat-panel
+ * - https://github.com/jlecomte/ascom-telescope-cover-v2
+ * 
  */
 
 #include <Servo.h>
@@ -583,7 +590,7 @@ void _open_cover(bool verbose) {
  *
  * Incoming message : COMMAND:COVER_CLOSE
  * Args             : Ignored
- * Serial response  : RESULT:COVER_OPEN@OK
+ * Serial response  : RESULT:COVER_CLOSE@OK
  * Serial error     : Errors in two cases
  *                    - panel is not calibrated              => "SERVO_NO_CALIBRATED@Run command COVER_CALIBRATION_RUN first"
  *                    - panel is neither OPEN nor OPENING    => "COVER_CLOSE_IMPOSSIBLE@Cover is not open nor opening."
