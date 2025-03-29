@@ -298,12 +298,14 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
                     connectedState = true;
 
                     LogMessage("Connected Set", $"Validating device on port {comPort}");
-                    var pong = SendCommand("Connected Set", "PING");
-                    if (pong != "PONG")
+                    var pong = SendCommand("Connected Set", CMD_PING);
+                    if (pong != PING_RSLT_PONG)
                     {
-                        LogMessage("Connected Set", $"No valid device on {comPort}. Ping command failed");
+                        string error_message = $"No valid device on {comPort}. Ping answered {pong} instead on {PING_RSLT_PONG}";
+
+                        LogMessage("Connected Set", error_message);
                         connectedState = false;
-                        throw new NotConnectedException($"No valid device on {comPort}. Ping command failed");
+                        throw new NotConnectedException(error_message);
                     }
                     
                 }
@@ -410,6 +412,7 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         private const string COMMAND_TYPE = "COMMAND";
         private const string RESULT_TYPE = "RESULT";
         private const string EMPTY_ARGS = "";
+        private const string CMD_PING = "PING";
         private const string CMD_COVER_GET = "COVER_GET";
         private const string CMD_COVER_OPEN = "COVER_OPEN";
         private const string CMD_COVER_CLOSE = "COVER_CLOSE";
@@ -417,6 +420,7 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         private const string CMD_BRIGHTNESS_SET = "BRIGHTNESS_SET";
         private const string CMD_BRIGHTNESS_RESET = "BRIGHTNESS_RESET";
         private const string GENERIC_RSLT_OK = "OK";
+        private const string PING_RSLT_PONG = "PONG";
         private const int MAX_BRIGHTNESS = 1023; // Maybe could be given by the hardware for better flexibility
         private const int MIN_BRIGNTESS = 0;
         /// <summary>
