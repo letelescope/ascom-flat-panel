@@ -70,6 +70,7 @@
 using System;
 using System.Collections;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using System.Windows.Forms;
 using ASCOM.Astrometry.AstroUtils;
 using ASCOM.DeviceInterface;
@@ -127,6 +128,7 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         internal static TraceLogger tl; // Local server's trace logger object for diagnostic log with information that you specify
 
         private static Serial serial; // Serial client that will handle the connection
+        private static int SerialConnectionCounter = 0;
         private static readonly object mutex = new object();// Object used to synchronize the state and serial communications;
 
 
@@ -182,6 +184,12 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
                 LogMessage("InitialiseHardware", "Completed basic initialisation");
 
                 // Add your own "one off" device initialisation here e.g. validating existence of hardware and setting up communications
+
+                serial = new Serial
+                {
+                    Speed = SerialSpeed.ps57600,
+                    Connected = false,
+                };
 
                 LogMessage("InitialiseHardware", $"One-off initialisation complete.");
                 runOnce = true; // Set the flag to ensure that this code is not run again
@@ -372,51 +380,51 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
                 {
                     LogMessage("Connected", $"Set {value}");
                     if (value == IsConnected)
+                    {
+                        if (value) SerialConnectionCounter++;
                         return;
+                    }
 
                     if (value)
                     {
-                        LogMessage("Connected Set", $"Connecting to port {comPort}");
+                        if (SerialConnectionCounter == 0) {
+                            LogMessage("Connected Set", $"Connecting to port {comPort}");
 
-                        // We do not catch the value to fail fast
-                        var wannabe_serial = ConnectToDevice("Connected Set", comPort);
+                            //string ping_rslt;
+                            //try
+                            //{
+                            //    serial.PortName = comPort;
+                            //    serial.Connected = true;
+                            //
+                            //    ping_rslt = SendCommand("Connected Set", CMD_PING);
+                            //}
+                            //catch (Exception e)
+                            //{
+                            //    throw new DriverException(e.Message,e);
+                            //}
+                            //
+                            //if (ping_rslt != PING_RSLT_PONG) 
+                            //{
+                            //    LogMessage("Connected Set", $"Not a valid FFFPV1 device. Ping cmd answered {comPort} instead of expected{PING_RSLT_PONG}");
+                            //    throw new DriverException($"Not a valid FFFPV1 device. Ping cmd answered {comPort} instead of expected{PING_RSLT_PONG}");
+                            //}
 
-                        // Safe Here we just got wannabe_serial 2 steps above. 
-                        var pong = UncheckedSendCommand(serial_client: wannabe_serial, identifier: "Connected Set", command: CMD_PING);
-                        if (pong != PING_RSLT_PONG)
-                        {
-                            string error_message = $"No valid device on {comPort}. Ping answered {pong} instead on {PING_RSLT_PONG}";
+                            FirmareConnectedState = true;
 
-                            LogMessage("Connected Set", error_message);
-                            try
-                            {
-                                wannabe_serial.Dispose();
-                                wannabe_serial = null;
-                            }
-                            catch { }
-
-                            connectedState = false;
-                            throw new NotConnectedException(error_message);
+                            LogMessage("Connected Set", $"Connected to port {comPort}");
                         }
-
-                        serial = wannabe_serial;
-                        connectedState = true;
-                        LogMessage("Connected Set", $"Connected to port {comPort}");
+                        SerialConnectionCounter++;
                     }
                     else
                     {
                         LogMessage("Connected Set", $"Disconnecting from port {comPort}");
-                        if (serial != null)
-                        {
-                            try
-                            {
-                                serial.Dispose();
-                                serial = null;
-                            }
-                            catch { }
+                        SerialConnectionCounter--;
+                        
+                        if (SerialConnectionCounter <= 0) {
+                            LogMessage("Connected Set", $"No more drivers sharing Serial disconnecting from port {comPort}");
+                            //serial.Connected = false;
+                            FirmareConnectedState = false;
                         }
-
-                        connectedState = false;
                     }
                 }
             }
@@ -493,6 +501,9 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
 
         #region ICoverCalibrator Implementation
 
+        private static string FirmwareCoverState = "CLOSED";
+        private static int FirmwareBrightness = 0;
+        private static bool FirmareConnectedState = false;
 
         /// <summary>
         /// Returns the state of the device cover, if present, otherwise returns "NotPresent"
@@ -504,14 +515,18 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
                 lock (mutex)
                 {
                     var identifier = "CoverState Get";
-                    string response = SendCommand(identifier: identifier, command: CMD_COVER_GET);
-                    LogMessage(identifier, "Cover is {response}");
+                    //string response = SendCommand(identifier: identifier, command: CMD_COVER_GET);
+                    string response = FirmwareCoverState; 
+                    LogMessage(identifier, $"Cover is {response}");
                     switch (response)
                     {
                         case "OPEN":
                             return CoverStatus.Open;
                         case "OPENING":
+                            FirmwareCoverState = "OPEN";
+                            return CoverStatus.Moving;
                         case "CLOSING":
+                            FirmwareCoverState = "CLOSED";
                             return CoverStatus.Moving;
                         case "CLOSED":
                             return CoverStatus.Closed;
@@ -532,7 +547,10 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
             {
                 var identifier = "OpenCover";
 
-                string response = SendCommand(identifier: identifier, command: CMD_COVER_OPEN);
+                //string response = SendCommand(identifier: identifier, command: CMD_COVER_OPEN);
+                string response = GENERIC_RSLT_OK;
+                FirmwareCoverState = "OPENING";
+
                 LogMessage(identifier, $"{response}");
                 if (response != GENERIC_RSLT_OK)
                 {
@@ -552,7 +570,10 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
             {
                 var identifier = "CloseCover";
 
-                string response = SendCommand(identifier: identifier, command: CMD_COVER_CLOSE);
+                //string response = SendCommand(identifier: identifier, command: CMD_COVER_CLOSE);
+                string response = GENERIC_RSLT_OK;
+                FirmwareCoverState = "CLOSING";
+
                 LogMessage(identifier, $"{response}");
 
                 if (response != GENERIC_RSLT_OK)
@@ -607,7 +628,9 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
                 {
                     var identifier = "Brightness Get";
 
-                    string response = SendCommand(identifier: identifier, command: CMD_BRIGHTNESS_GET);
+                    // string response = SendCommand(identifier: identifier, command: CMD_BRIGHTNESS_GET);
+                    string response = FirmwareBrightness.ToString();
+
                     LogMessage(identifier, $"{response}");
 
                     int brightness = -1;
@@ -662,7 +685,9 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
             lock (mutex)
             {
 
-                string response = SendCommand(identifier: identifier, command: CMD_BRIGHTNESS_SET, args: Brightness.ToString());
+                //string response = SendCommand(identifier: identifier, command: CMD_BRIGHTNESS_SET, args: Brightness.ToString());
+                FirmwareBrightness = Brightness;
+                string response = FirmwareBrightness.ToString();
 
                 if (response != Brightness.ToString())
                 {
@@ -683,8 +708,9 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
             {
                 var identifier = "CalibratorOff";
 
-                string response = SendCommand(identifier: identifier, command: CMD_BRIGHTNESS_RESET);
-
+                //string response = SendCommand(identifier: identifier, command: CMD_BRIGHTNESS_RESET);
+                FirmwareBrightness = 0;
+                string response = FirmwareBrightness.ToString();
 
                 if (response.Trim() != "0")
                 {
@@ -712,7 +738,7 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         {
 
             CheckConnected($"{identifier}: Flat panel not connected");
-            return UncheckedSendCommand(serial_client: serial, identifier: identifier, command: command, args: args);
+            return UncheckedSendCommand(identifier: identifier, command: command, args: args);
         }
 
 
@@ -726,13 +752,13 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         /// <param name="args">the argument of the command</param>
         /// <returns>the parsed result of the firware response </returns>
         /// <exception>May throw expection if something went wrong</exception>
-        private static string UncheckedSendCommand(Serial serial_client, string identifier, string command, string args = EMPTY_ARGS) {
+        private static string UncheckedSendCommand(string identifier, string command, string args = EMPTY_ARGS) {
 
             string message = $"{COMMAND_TYPE}{TYPE_COMMAND_SEPARATOR}{command}";
             message = string.IsNullOrWhiteSpace(args) ? message : $"{message}{COMMAND_ARGS_SEPARATOR}{args}";
 
             // Rethrow as is the error if it happens no added value to add comments here
-            string raw_cmd_result = SendRawLine(serial_client, identifier, message);
+            string raw_cmd_result = SendRawLine(identifier, message);
 
             string expected_prefix = $"{RESULT_TYPE}{TYPE_COMMAND_SEPARATOR}{command}{COMMAND_ARGS_SEPARATOR}";
             if (!raw_cmd_result.StartsWith(expected_prefix))
@@ -754,7 +780,7 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         /// <param name="message">the message</param>
         /// <returns>the raw response message</returns>
         /// <exception cref="NotConnectedException"></exception>
-        private static string SendRawLine(Serial serial_client, string identifier, string message) 
+        private static string SendRawLine(string identifier, string message) 
         {
             var raw_response = string.Empty;
 
@@ -762,8 +788,8 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
             {
                 var line_message = message.EndsWith(MESSAGE_TERMINATOR) ? message : message + MESSAGE_TERMINATOR;
                 LogMessage(identifier, $"Transmitting: {line_message}");
-                serial_client.Transmit(line_message);
-                raw_response = serial.ReceiveTerminated(MESSAGE_TERMINATOR);
+                //serial.Transmit(line_message);
+                //raw_response = serial.ReceiveTerminated(MESSAGE_TERMINATOR);
                 LogMessage(identifier, $"Received: {raw_response}");
             }
             catch (Exception e)
@@ -775,44 +801,6 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
             return raw_response;
         }
 
-        /// <summary>
-        /// Tries to connect to the firmware. Handles the serial client back at the end.
-        /// </summary>
-        /// <param name="idetifier">Where this connections originates from</param>
-        /// <param name="comPort">The targeted port</param>
-        /// <returns></returns>
-        /// <exception cref="InvalidValueException"></exception>
-        /// <exception cref="DriverException"></exception>
-        private static Serial ConnectToDevice(String idetifier, String comPort) 
-        {
-            if (System.IO.Ports.SerialPort.GetPortNames().Contains(comPort))
-            {
-                var message = $"No available COM Port {comPort}";
-                LogMessage(idetifier, message);
-                throw new InvalidValueException(message);
-            }
-
-            try
-            {
-                var serialPort = new Serial
-                {
-                    Speed = SerialSpeed.ps57600,
-                    PortName = comPort,
-                    Connected = true,
-                };
-
-                serial.ClearBuffers();
-
-                return serialPort;
-            }
-            catch (Exception e)
-            {
-                var message = $"Impossible to establish serial connection to COM Port {comPort}: {e.Message}";
-                LogMessage(idetifier, message);
-                throw new DriverException(message, e);
-            }
-
-        }
         // Useful methods that can be used as required to help with driver development
 
         /// <summary>
@@ -824,9 +812,8 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
             // a deadlock situation.
             get
             {
-                if (serial == null) return false;
-
-                return connectedState;
+                return FirmareConnectedState;
+                //return serial != null && serial.Connected;
             }
         }
 
