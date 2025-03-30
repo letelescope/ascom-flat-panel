@@ -121,7 +121,6 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         private static string DriverProgId = ""; // ASCOM DeviceID (COM ProgID) for this driver, the value is set by the driver's class initialiser.
         private static string DriverDescription = ""; // The value is set by the driver's class initialiser.
         internal static string comPort; // COM port name (if required)
-        private static bool connectedState; // Local server's connected state
         private static bool runOnce = false; // Flag to enable "one-off" activities only to run once.
         internal static Util utilities; // ASCOM Utilities object for use as required
         internal static AstroUtils astroUtilities; // ASCOM AstroUtilities object for use as required
@@ -177,7 +176,6 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
 
                 LogMessage("InitialiseHardware", $"ProgID: {DriverProgId}, Description: {DriverDescription}");
 
-                connectedState = false; // Initialise connected to false
                 utilities = new Util(); //Initialise ASCOM Utilities object
                 astroUtilities = new AstroUtils(); // Initialise ASCOM Astronomy Utilities object
 
@@ -390,27 +388,24 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
                         if (SerialConnectionCounter == 0) {
                             LogMessage("Connected Set", $"Connecting to port {comPort}");
 
-                            //string ping_rslt;
-                            //try
-                            //{
-                            //    serial.PortName = comPort;
-                            //    serial.Connected = true;
-                            //
-                            //    ping_rslt = SendCommand("Connected Set", CMD_PING);
-                            //}
-                            //catch (Exception e)
-                            //{
-                            //    throw new DriverException(e.Message,e);
-                            //}
-                            //
-                            //if (ping_rslt != PING_RSLT_PONG) 
-                            //{
-                            //    LogMessage("Connected Set", $"Not a valid FFFPV1 device. Ping cmd answered {comPort} instead of expected{PING_RSLT_PONG}");
-                            //    throw new DriverException($"Not a valid FFFPV1 device. Ping cmd answered {comPort} instead of expected{PING_RSLT_PONG}");
-                            //}
-
-                            FirmareConnectedState = true;
-
+                            string ping_rslt;
+                            try
+                            {
+                                serial.PortName = comPort;
+                                serial.Connected = true;
+                            
+                                ping_rslt = SendCommand("Connected Set", CMD_PING);
+                            }
+                            catch (Exception e)
+                            {
+                                throw new DriverException($"Connected Set: {e.Message}",e);
+                            }
+                            
+                            if (ping_rslt != PING_RSLT_PONG) 
+                            {
+                                LogMessage("Connected Set", $"Not a valid FFFPV1 device. Ping cmd answered {comPort} instead of expected{PING_RSLT_PONG}");
+                                throw new DriverException($"Not a valid FFFPV1 device. Ping cmd answered {comPort} instead of expected{PING_RSLT_PONG}");
+                            }
                             LogMessage("Connected Set", $"Connected to port {comPort}");
                         }
                         SerialConnectionCounter++;
@@ -422,8 +417,7 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
                         
                         if (SerialConnectionCounter <= 0) {
                             LogMessage("Connected Set", $"No more drivers sharing Serial disconnecting from port {comPort}");
-                            //serial.Connected = false;
-                            FirmareConnectedState = false;
+                            serial.Connected = false;
                         }
                     }
                 }
@@ -501,9 +495,6 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
 
         #region ICoverCalibrator Implementation
 
-        private static string FirmwareCoverState = "CLOSED";
-        private static int FirmwareBrightness = 0;
-        private static bool FirmareConnectedState = false;
 
         /// <summary>
         /// Returns the state of the device cover, if present, otherwise returns "NotPresent"
@@ -515,18 +506,15 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
                 lock (mutex)
                 {
                     var identifier = "CoverState Get";
-                    //string response = SendCommand(identifier: identifier, command: CMD_COVER_GET);
-                    string response = FirmwareCoverState; 
+                    string response = SendCommand(identifier: identifier, command: CMD_COVER_GET);
                     LogMessage(identifier, $"Cover is {response}");
                     switch (response)
                     {
                         case "OPEN":
                             return CoverStatus.Open;
                         case "OPENING":
-                            FirmwareCoverState = "OPEN";
                             return CoverStatus.Moving;
                         case "CLOSING":
-                            FirmwareCoverState = "CLOSED";
                             return CoverStatus.Moving;
                         case "CLOSED":
                             return CoverStatus.Closed;
@@ -547,9 +535,8 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
             {
                 var identifier = "OpenCover";
 
-                //string response = SendCommand(identifier: identifier, command: CMD_COVER_OPEN);
-                string response = GENERIC_RSLT_OK;
-                FirmwareCoverState = "OPENING";
+                string response = SendCommand(identifier: identifier, command: CMD_COVER_OPEN);
+
 
                 LogMessage(identifier, $"{response}");
                 if (response != GENERIC_RSLT_OK)
@@ -570,9 +557,7 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
             {
                 var identifier = "CloseCover";
 
-                //string response = SendCommand(identifier: identifier, command: CMD_COVER_CLOSE);
-                string response = GENERIC_RSLT_OK;
-                FirmwareCoverState = "CLOSING";
+                string response = SendCommand(identifier: identifier, command: CMD_COVER_CLOSE);
 
                 LogMessage(identifier, $"{response}");
 
@@ -628,8 +613,7 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
                 {
                     var identifier = "Brightness Get";
 
-                    // string response = SendCommand(identifier: identifier, command: CMD_BRIGHTNESS_GET);
-                    string response = FirmwareBrightness.ToString();
+                    string response = SendCommand(identifier: identifier, command: CMD_BRIGHTNESS_GET);
 
                     LogMessage(identifier, $"{response}");
 
@@ -685,9 +669,7 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
             lock (mutex)
             {
 
-                //string response = SendCommand(identifier: identifier, command: CMD_BRIGHTNESS_SET, args: Brightness.ToString());
-                FirmwareBrightness = Brightness;
-                string response = FirmwareBrightness.ToString();
+                string response = SendCommand(identifier: identifier, command: CMD_BRIGHTNESS_SET, args: Brightness.ToString());
 
                 if (response != Brightness.ToString())
                 {
@@ -708,9 +690,7 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
             {
                 var identifier = "CalibratorOff";
 
-                //string response = SendCommand(identifier: identifier, command: CMD_BRIGHTNESS_RESET);
-                FirmwareBrightness = 0;
-                string response = FirmwareBrightness.ToString();
+                string response = SendCommand(identifier: identifier, command: CMD_BRIGHTNESS_RESET);
 
                 if (response.Trim() != "0")
                 {
@@ -812,8 +792,7 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
             // a deadlock situation.
             get
             {
-                return FirmareConnectedState;
-                //return serial != null && serial.Connected;
+                return serial != null && serial.Connected;
             }
         }
 
