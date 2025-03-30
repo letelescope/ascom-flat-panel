@@ -2556,16 +2556,6 @@
 	)
 	(wire
 		(pts
-			(xy 105.41 67.31) (xy 115.57 67.31)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "242a395a-33a2-4d1d-a4f5-706a07d52ab2")
-	)
-	(wire
-		(pts
 			(xy 189.23 46.482) (xy 193.04 46.482)
 		)
 		(stroke
@@ -2716,6 +2706,26 @@
 	)
 	(wire
 		(pts
+			(xy 54.61 59.69) (xy 63.5 59.69)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "92f5832b-1490-42fe-92de-69c508403e13")
+	)
+	(wire
+		(pts
+			(xy 54.61 63.5) (xy 63.5 63.5)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "954ad051-2b04-41c8-8de5-e6716b5c6b9a")
+	)
+	(wire
+		(pts
 			(xy 182.88 111.76) (xy 185.42 111.76)
 		)
 		(stroke
@@ -2773,16 +2783,6 @@
 			(type default)
 		)
 		(uuid "b795de50-5f08-480e-af58-327e737fbf9c")
-	)
-	(wire
-		(pts
-			(xy 105.41 59.69) (xy 115.57 59.69)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "c2d1c23b-b7ec-48fc-9e15-130febef9f17")
 	)
 	(wire
 		(pts
@@ -2984,44 +2984,44 @@
 	)
 	(global_label "SERVO POWER CONTROL"
 		(shape input)
-		(at 115.57 67.31 0)
+		(at 54.61 59.69 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
-			(justify left)
+			(justify right)
 		)
 		(uuid "46e94454-c28e-447c-b802-723fc36b173a")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 141.5361 67.31 0)
+			(at 28.6439 59.69 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify left)
+				(justify right)
 				(hide yes)
 			)
 		)
 	)
 	(global_label "SERVO POSITION CONTROL"
 		(shape input)
-		(at 115.57 59.69 0)
+		(at 54.61 63.5 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
-			(justify left)
+			(justify right)
 		)
 		(uuid "54f53c8c-dafb-464b-ae41-cf50c20f15ec")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 143.7134 59.69 0)
+			(at 26.4666 63.5 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify left)
+				(justify right)
 				(hide yes)
 			)
 		)
