@@ -44,16 +44,8 @@
 // - https://github.com/jlecomte/ascom-flat-panel
 // - https://github.com/jlecomte/ascom-wireless-flat-panel
 // - https://github.com/jlecomte/ascom-telescope-cover-v2
-// 
-// Considering that
-// - in the protocol result and/or error messages should come right after commands 
-// - this hardware class is responsible for handling the connection (state)
-// - a single driver can "concurrently" send multiple instructions
-// - mutliple drivers could send concurrently several instructions
 //
-// this class syncrhonize, using locks, calls and acces to its state. To make it simple
-// - each command methods starts with acquiring a lock using the "mutex" variable
-// - the "set IsConnected" method also starts with acquiring a lock using the "mutex" variable
+// We delegate synchronisation to the SharedResources class that handles the shared serial client.
 //
 // This should prevent any race condition and dead locks. More involved patterns may be implemented but we
 // prefer to keep it simple stupid ragarding the fact that the load put by the softwares using this driver
@@ -69,11 +61,10 @@
 
 using System;
 using System.Collections;
-using System.Linq;
-using System.Runtime.Remoting.Messaging;
 using System.Windows.Forms;
 using ASCOM.Astrometry.AstroUtils;
 using ASCOM.DeviceInterface;
+using ASCOM.LocalServer;
 using ASCOM.Utilities;
 
 namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
@@ -122,14 +113,7 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         private static string DriverDescription = ""; // The value is set by the driver's class initialiser.
         internal static string comPort; // COM port name (if required)
         private static bool runOnce = false; // Flag to enable "one-off" activities only to run once.
-        internal static Util utilities; // ASCOM Utilities object for use as required
-        internal static AstroUtils astroUtilities; // ASCOM AstroUtilities object for use as required
         internal static TraceLogger tl; // Local server's trace logger object for diagnostic log with information that you specify
-
-        private static Serial serial; // Serial client that will handle the connection
-        private static int SerialConnectionCounter = 0;
-        private static readonly object mutex = new object();// Object used to synchronize the state and serial communications;
-
 
         /// <summary>
         /// Initializes a new instance of the device Hardware class.
@@ -176,18 +160,9 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
 
                 LogMessage("InitialiseHardware", $"ProgID: {DriverProgId}, Description: {DriverDescription}");
 
-                utilities = new Util(); //Initialise ASCOM Utilities object
-                astroUtilities = new AstroUtils(); // Initialise ASCOM Astronomy Utilities object
-
                 LogMessage("InitialiseHardware", "Completed basic initialisation");
 
                 // Add your own "one off" device initialisation here e.g. validating existence of hardware and setting up communications
-
-                serial = new Serial
-                {
-                    Speed = SerialSpeed.ps57600,
-                    Connected = false,
-                };
 
                 LogMessage("InitialiseHardware", $"One-off initialisation complete.");
                 runOnce = true; // Set the flag to ensure that this code is not run again
@@ -333,29 +308,6 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
                 tl = null;
             }
             catch { }
-
-            try
-            {
-                utilities.Dispose();
-                utilities = null;
-            }
-            catch { }
-
-            try
-            {
-                astroUtilities.Dispose();
-                astroUtilities = null;
-            }
-            catch { }
-
-            if (serial != null)
-            {
-                try
-                {
-                    serial.Dispose();
-                    serial = null;
-                } catch { }
-            }
         }
 
         /// <summary>
@@ -365,8 +317,6 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         /// <value><c>true</c> if connected to the hardware; otherwise, <c>false</c>.</value>
         public static bool Connected
         {
-            // DO NOT Synchronize the getter as it is used in syncrhonized function and we may end in 
-            // a deadlock situation.
             get
             {
                 LogMessage("Connected", $"Get {IsConnected}");
@@ -374,52 +324,28 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
             }
             set
             {
-                lock (mutex)
+                LogMessage("Connected", $"Set {value}");
+                if (value == IsConnected)
                 {
-                    LogMessage("Connected", $"Set {value}");
-                    if (value == IsConnected)
-                    {
-                        if (value) SerialConnectionCounter++;
-                        return;
-                    }
+                    return;
+                }
 
-                    if (value)
-                    {
-                        if (SerialConnectionCounter == 0) {
-                            LogMessage("Connected Set", $"Connecting to port {comPort}");
+                if (value)
+                {
+                    LogMessage("Connected Set", $"Connecting to port {comPort}");
 
-                            string ping_rslt;
-                            try
-                            {
-                                serial.PortName = comPort;
-                                serial.Connected = true;
-                            
-                                ping_rslt = SendCommand("Connected Set", CMD_PING);
-                            }
-                            catch (Exception e)
-                            {
-                                throw new DriverException($"Connected Set: {e.Message}",e);
-                            }
-                            
-                            if (ping_rslt != PING_RSLT_PONG) 
-                            {
-                                LogMessage("Connected Set", $"Not a valid FFFPV1 device. Ping cmd answered {comPort} instead of expected{PING_RSLT_PONG}");
-                                throw new DriverException($"Not a valid FFFPV1 device. Ping cmd answered {comPort} instead of expected{PING_RSLT_PONG}");
-                            }
-                            LogMessage("Connected Set", $"Connected to port {comPort}");
-                        }
-                        SerialConnectionCounter++;
-                    }
-                    else
-                    {
-                        LogMessage("Connected Set", $"Disconnecting from port {comPort}");
-                        SerialConnectionCounter--;
-                        
-                        if (SerialConnectionCounter <= 0) {
-                            LogMessage("Connected Set", $"No more drivers sharing Serial disconnecting from port {comPort}");
-                            serial.Connected = false;
-                        }
-                    }
+
+                    SharedResources.SerialPortName = comPort;
+                    SharedResources.SerialConnected = true;
+
+
+                    LogMessage("Connected Set", $"Connected to port {comPort}");
+
+                }
+                else
+                {
+                    LogMessage("Connected Set", $"Disconnecting from port {comPort}");
+                    SharedResources.SerialConnected = false;
                 }
             }
         }
@@ -503,25 +429,22 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         {
             get
             {
-                lock (mutex)
+                var identifier = "CoverState Get";
+                string response = SendCommand(identifier: identifier, command: CMD_COVER_GET);
+                LogMessage(identifier, $"Cover is {response}");
+                switch (response)
                 {
-                    var identifier = "CoverState Get";
-                    string response = SendCommand(identifier: identifier, command: CMD_COVER_GET);
-                    LogMessage(identifier, $"Cover is {response}");
-                    switch (response)
-                    {
-                        case "OPEN":
-                            return CoverStatus.Open;
-                        case "OPENING":
-                            return CoverStatus.Moving;
-                        case "CLOSING":
-                            return CoverStatus.Moving;
-                        case "CLOSED":
-                            return CoverStatus.Closed;
-                        default:
-                            LogMessage(identifier, "{response}: Unknown cover status");
-                            return CoverStatus.Unknown;
-                    }
+                    case "OPEN":
+                        return CoverStatus.Open;
+                    case "OPENING":
+                        return CoverStatus.Moving;
+                    case "CLOSING":
+                        return CoverStatus.Moving;
+                    case "CLOSED":
+                        return CoverStatus.Closed;
+                    default:
+                        LogMessage(identifier, "{response}: Unknown cover status");
+                        return CoverStatus.Unknown;
                 }
             }
         }
@@ -531,20 +454,17 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         /// </summary>
         internal static void OpenCover()
         {
-            lock (mutex)
+            var identifier = "OpenCover";
+
+            string response = SendCommand(identifier: identifier, command: CMD_COVER_OPEN);
+
+
+            LogMessage(identifier, $"{response}");
+            if (response != GENERIC_RSLT_OK)
             {
-                var identifier = "OpenCover";
+                LogMessage(identifier, $"Invalid response {response} from device. Hardware may be in a weird state");
+                throw new InvalidOperationException($"Invalid response {response} from device. Hardware may be in a weird state");
 
-                string response = SendCommand(identifier: identifier, command: CMD_COVER_OPEN);
-
-
-                LogMessage(identifier, $"{response}");
-                if (response != GENERIC_RSLT_OK)
-                {
-                    LogMessage(identifier, $"Invalid response {response} from device. Hardware may be in a weird state");
-                    throw new InvalidOperationException($"Invalid response {response} from device. Hardware may be in a weird state");
-
-                }
             }
         }
 
@@ -553,19 +473,16 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         /// </summary>
         internal static void CloseCover()
         {
-            lock (mutex)
+            var identifier = "CloseCover";
+
+            string response = SendCommand(identifier: identifier, command: CMD_COVER_CLOSE);
+
+            LogMessage(identifier, $"{response}");
+
+            if (response != GENERIC_RSLT_OK)
             {
-                var identifier = "CloseCover";
-
-                string response = SendCommand(identifier: identifier, command: CMD_COVER_CLOSE);
-
-                LogMessage(identifier, $"{response}");
-
-                if (response != GENERIC_RSLT_OK)
-                {
-                    LogMessage(identifier, $"Invalid response {response} from device. Hardware may be in a weird state");
-                    throw new InvalidOperationException($"Invalid response {response} from device. Hardware may be in a weird state");
-                }
+                LogMessage(identifier, $"Invalid response {response} from device. Hardware may be in a weird state");
+                throw new InvalidOperationException($"Invalid response {response} from device. Hardware may be in a weird state");
             }
         }
 
@@ -574,13 +491,10 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         /// </summary>
         internal static void HaltCover()
         {
-            lock (mutex)
-            {
-                var identifier = "HaltCover";
-                CheckConnected($"{identifier}: Flat panel not connected");
-                LogMessage(identifier, "Not implemented");
-                throw new MethodNotImplementedException(identifier);
-            }
+            var identifier = "HaltCover";
+            CheckConnected($"{identifier}: Flat panel not connected");
+            LogMessage(identifier, "Not implemented");
+            throw new MethodNotImplementedException(identifier);
         }
 
         /// <summary>
@@ -590,15 +504,11 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         {
             get
             {
-                lock (mutex)
-                {
-                    var identifier = "CalibratorState Get";
+                var identifier = "CalibratorState Get";
 
-                    CheckConnected($"{identifier}: Flat panel not connected");
-                    LogMessage(identifier, "Calibrator is ready");
-                    return CalibratorStatus.Ready;
-                }
-
+                CheckConnected($"{identifier}: Flat panel not connected");
+                LogMessage(identifier, "Calibrator is ready");
+                return CalibratorStatus.Ready;
             }
         }
 
@@ -609,33 +519,30 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         {
             get
             {
-                lock (mutex)
+                var identifier = "Brightness Get";
+
+                string response = SendCommand(identifier: identifier, command: CMD_BRIGHTNESS_GET);
+
+                LogMessage(identifier, $"{response}");
+
+                int brightness = -1;
+                try
                 {
-                    var identifier = "Brightness Get";
-
-                    string response = SendCommand(identifier: identifier, command: CMD_BRIGHTNESS_GET);
-
-                    LogMessage(identifier, $"{response}");
-
-                    int brightness = -1;
-                    try
-                    {
-                        brightness = int.Parse(response);
-                    }
-                    catch
-                    {
-                        LogMessage(identifier, $"Invalid response {response} from device. Hardware may be in a weird state");
-                        throw new InvalidOperationException($"Invalid response {response} from device. Hardware may be in a weird state");
-                    }
-
-                    if (brightness < MIN_BRIGNTESS || brightness > MAX_BRIGHTNESS)
-                    {
-                        LogMessage(identifier, $"Invalid response {response} from device. Hardware may be in a weird state");
-                        throw new InvalidOperationException($"Invalid response {response} from device. Hardware may be in a weird state");
-                    }
-
-                    return brightness;
+                    brightness = int.Parse(response);
                 }
+                catch
+                {
+                    LogMessage(identifier, $"Invalid response {response} from device. Hardware may be in a weird state");
+                    throw new InvalidOperationException($"Invalid response {response} from device. Hardware may be in a weird state");
+                }
+
+                if (brightness < MIN_BRIGNTESS || brightness > MAX_BRIGHTNESS)
+                {
+                    LogMessage(identifier, $"Invalid response {response} from device. Hardware may be in a weird state");
+                    throw new InvalidOperationException($"Invalid response {response} from device. Hardware may be in a weird state");
+                }
+
+                return brightness;
             }
         }
 
@@ -659,26 +566,22 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         {
             var identifier = "CalibratorOn";
 
-            if (Brightness < MIN_BRIGNTESS && Brightness > MAX_BRIGHTNESS) 
+            if (Brightness < MIN_BRIGNTESS && Brightness > MAX_BRIGHTNESS)
             {
                 LogMessage(identifier, $"Invalid brightness {Brightness}. Should be an int ranging from {MIN_BRIGNTESS} to {MAX_BRIGHTNESS}");
                 throw new InvalidOperationException($"Invalid brightness {Brightness}. Should be an int ranging from {MIN_BRIGNTESS} to {MAX_BRIGHTNESS}");
 
             }
 
-            lock (mutex)
+            string response = SendCommand(identifier: identifier, command: CMD_BRIGHTNESS_SET, args: Brightness.ToString());
+
+            if (response != Brightness.ToString())
             {
-
-                string response = SendCommand(identifier: identifier, command: CMD_BRIGHTNESS_SET, args: Brightness.ToString());
-
-                if (response != Brightness.ToString())
-                {
-                    LogMessage(identifier, $"Invalid response {response} from device. Hardware may be in a weird state");
-                    throw new InvalidOperationException($"Invalid response {response} from device. Hardware may be in a weird state");
-                }
-
-                LogMessage(identifier, $"On:{response}");
+                LogMessage(identifier, $"Invalid response {response} from device. Hardware may be in a weird state");
+                throw new InvalidOperationException($"Invalid response {response} from device. Hardware may be in a weird state");
             }
+
+            LogMessage(identifier, $"On:{response}");
         }
 
         /// <summary>
@@ -686,20 +589,17 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         /// </summary>
         internal static void CalibratorOff()
         {
-            lock (mutex)
+            var identifier = "CalibratorOff";
+
+            string response = SendCommand(identifier: identifier, command: CMD_BRIGHTNESS_RESET);
+
+            if (response.Trim() != "0")
             {
-                var identifier = "CalibratorOff";
-
-                string response = SendCommand(identifier: identifier, command: CMD_BRIGHTNESS_RESET);
-
-                if (response.Trim() != "0")
-                {
-                    LogMessage(identifier, $"Invalid response {response} from device. Hardware may be in a weird state");
-                    throw new InvalidOperationException($"Invalid response {response} from device. Hardware may be in a weird state");
-                }
-
-                LogMessage(identifier, $"Off");
+                LogMessage(identifier, $"Invalid response {response} from device. Hardware may be in a weird state");
+                throw new InvalidOperationException($"Invalid response {response} from device. Hardware may be in a weird state");
             }
+
+            LogMessage(identifier, $"Off");
         }
 
         #endregion
@@ -714,37 +614,21 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         /// <param name="args">the argument of the command</param>
         /// <returns>the parsed result of the firware response </returns>
         /// <exception>May throw expection if something went wrong</exception>
-        private static string SendCommand(string identifier, string command, string args = EMPTY_ARGS) 
+        private static string SendCommand(string identifier, string command, string args = EMPTY_ARGS)
         {
-
             CheckConnected($"{identifier}: Flat panel not connected");
-            return UncheckedSendCommand(identifier: identifier, command: command, args: args);
-        }
-
-
-        /// <summary>
-        /// Same as above but do not check if the client is legit
-        /// 
-        /// UNSAFE !!!
-        /// </summary>
-        /// <param name="identifier">Where this command originates from</param>
-        /// <param name="command">the command</param>
-        /// <param name="args">the argument of the command</param>
-        /// <returns>the parsed result of the firware response </returns>
-        /// <exception>May throw expection if something went wrong</exception>
-        private static string UncheckedSendCommand(string identifier, string command, string args = EMPTY_ARGS) {
 
             string message = $"{COMMAND_TYPE}{TYPE_COMMAND_SEPARATOR}{command}";
             message = string.IsNullOrWhiteSpace(args) ? message : $"{message}{COMMAND_ARGS_SEPARATOR}{args}";
 
             // Rethrow as is the error if it happens no added value to add comments here
-            string raw_cmd_result = SendRawLine(identifier, message);
+            string raw_cmd_result = SendMessage(identifier, message);
 
             string expected_prefix = $"{RESULT_TYPE}{TYPE_COMMAND_SEPARATOR}{command}{COMMAND_ARGS_SEPARATOR}";
             if (!raw_cmd_result.StartsWith(expected_prefix))
             {
                 LogMessage(identifier, $"Command '{command}' with args '{args}' failed to : {raw_cmd_result}");
-                throw new InvalidOperationException($"Command '{command}' with args '{args}' failed to : {raw_cmd_result}");
+                throw new InvalidOperationException($"Command '{command}' with args '{args}' failed: {raw_cmd_result}");
             }
 
             string cmd_result = raw_cmd_result.Replace(expected_prefix, string.Empty);
@@ -752,6 +636,7 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
 
             return cmd_result.Trim();
         }
+
         /// <summary>
         /// Sends a message and waits for the response
         /// </summary>
@@ -760,26 +645,22 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         /// <param name="message">the message</param>
         /// <returns>the raw response message</returns>
         /// <exception cref="NotConnectedException"></exception>
-        private static string SendRawLine(string identifier, string message) 
+        private static string SendMessage(string identifier, string message)
         {
-            var raw_response = string.Empty;
-
             try
             {
-                var line_message = message.EndsWith(MESSAGE_TERMINATOR) ? message : message + MESSAGE_TERMINATOR;
-                LogMessage(identifier, $"Transmitting: {line_message}");
-                //serial.Transmit(line_message);
-                //raw_response = serial.ReceiveTerminated(MESSAGE_TERMINATOR);
+                LogMessage(identifier, $"Transmitting: {message}");
+                var raw_response = SharedResources.SendMessage(message);
                 LogMessage(identifier, $"Received: {raw_response}");
+                return raw_response;
             }
             catch (Exception e)
             {
                 LogMessage(identifier, $"Connection issue with hardware: {e}");
                 throw new NotConnectedException($"Connection issue with hardware: {e.Message}", e);
             }
-
-            return raw_response;
         }
+
 
         // Useful methods that can be used as required to help with driver development
 
@@ -792,7 +673,7 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
             // a deadlock situation.
             get
             {
-                return serial != null && serial.Connected;
+                return SharedResources.SerialConnected;
             }
         }
 
@@ -820,6 +701,8 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
                 comPort = driverProfile.GetValue(DriverProgId, comPortProfileName, string.Empty, comPortDefault);
             }
         }
+
+        private static void validateValidDevice() { }
 
         /// <summary>
         /// Write the device configuration to the  ASCOM  Profile store
