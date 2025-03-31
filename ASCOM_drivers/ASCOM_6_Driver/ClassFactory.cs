@@ -213,7 +213,7 @@ namespace ASCOM.LocalServer
             }
             else if (riid == IID_IUnknown)
             {
-                ppvObject = Marshal.GetIUnknownForObject(Activator.CreateInstance(classType));
+                 ppvObject = Marshal.GetIUnknownForObject(Activator.CreateInstance(classType));
             }
             else
             {
