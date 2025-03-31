@@ -90,7 +90,6 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         //   + error message   : ERROR:ERR_NAME@DETAILS
         private const string TYPE_COMMAND_SEPARATOR = ":";
         private const string COMMAND_ARGS_SEPARATOR = "@";
-        private const string MESSAGE_TERMINATOR = "\n";
         private const string COMMAND_TYPE = "COMMAND";
         private const string RESULT_TYPE = "RESULT";
         private const string EMPTY_ARGS = "";
@@ -332,14 +331,22 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
 
                 if (value)
                 {
-                    LogMessage("Connected Set", $"Connecting to port {comPort}");
+                    LogMessage("Connected Set", $"Connecting to device on port {comPort}");
 
+                    try
+                    {
+                        SharedResources.SerialPortName = comPort;
+                        SharedResources.SerialConnected = true;
+                        SharedResources.ValidateDevice(CommandBuilder(CMD_PING), PING_RSLT_PONG);
 
-                    SharedResources.SerialPortName = comPort;
-                    SharedResources.SerialConnected = true;
+                    }
+                    catch (Exception e)
+                    {
+                        LogMessage("Connected Set", $"Connection to port {comPort} failed: {e.Message}");  
+                        throw new DriverException($"Connection to port {comPort} failed", e);
+                    }
 
-
-                    LogMessage("Connected Set", $"Connected to port {comPort}");
+                    LogMessage("Connected Set", $"Connected to device on port {comPort}");
 
                 }
                 else
@@ -618,8 +625,7 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         {
             CheckConnected($"{identifier}: Flat panel not connected");
 
-            string message = $"{COMMAND_TYPE}{TYPE_COMMAND_SEPARATOR}{command}";
-            message = string.IsNullOrWhiteSpace(args) ? message : $"{message}{COMMAND_ARGS_SEPARATOR}{args}";
+            string message = CommandBuilder(command, args);
 
             // Rethrow as is the error if it happens no added value to add comments here
             string raw_cmd_result = SendMessage(identifier, message);
@@ -635,6 +641,13 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
             LogMessage(identifier, $"Command '{command}' with args '{args}' returned : {cmd_result}");
 
             return cmd_result.Trim();
+        }
+
+        private static string CommandBuilder(string command, string args = EMPTY_ARGS)
+        {
+            string message = $"{COMMAND_TYPE}{TYPE_COMMAND_SEPARATOR}{command}";
+            message = string.IsNullOrWhiteSpace(args) ? message : $"{message}{COMMAND_ARGS_SEPARATOR}{args}";
+            return message;
         }
 
         /// <summary>
@@ -702,7 +715,16 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
             }
         }
 
-        private static void validateValidDevice() { }
+        private static void validateDevice(String identifier) {
+            LogMessage(identifier, $"Validate device using ping command");
+            string ping_rslt = SendCommand(identifier: identifier, command: CMD_PING);
+            if (ping_rslt != PING_RSLT_PONG) 
+            {
+                LogMessage(identifier, $"Incorrect devive: Ping answer: actual {ping_rslt} - expected {PING_RSLT_PONG}");
+                throw new DriverException($"Incorrect devive: Ping answer: actual {ping_rslt} - expected {PING_RSLT_PONG}");
+            }
+            LogMessage(identifier, $"Device OK");
+        }
 
         /// <summary>
         /// Write the device configuration to the  ASCOM  Profile store

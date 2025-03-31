@@ -11,6 +11,7 @@
 //	* ALL DECLARATIONS MUST BE STATIC HERE!! INSTANCES OF THIS CLASS MUST NEVER BE CREATED!
 
 using System;
+using System.Linq.Expressions;
 using ASCOM.Utilities;
 
 namespace ASCOM.LocalServer
@@ -181,6 +182,31 @@ namespace ASCOM.LocalServer
                         throw new DriverException($"Can't set serial to port {value}. Serial already connected on Port {SharedSerial.PortName}");
                     }
                 }
+            }
+        }
+
+        public static void ValidateDevice(string message, string expected_result)
+        {
+
+            if (!SerialConnected) {
+                throw new DriverException($"Validation impossible device not connected");
+            }
+
+            string actual_result;
+
+            try
+            {
+                actual_result = SendMessage(message);
+            } catch (Exception e)
+            {
+
+                throw new DriverException($"Sending validating message {message} failed", e);
+            }
+
+            if (actual_result != expected_result) 
+            {
+                try { SerialConnected = false; } catch { }
+                throw new DriverException($"Incorrect device. '{message}' : actual result {actual_result} - {expected_result}");
             }
         }
     }
