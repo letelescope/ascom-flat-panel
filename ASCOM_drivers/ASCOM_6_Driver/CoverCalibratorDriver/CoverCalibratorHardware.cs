@@ -336,7 +336,10 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
                     {
                         SharedResources.SerialPortName = comPort;
                         SharedResources.SerialConnected = true;
-                        SharedResources.ValidateDevice(CommandBuilder(CMD_PING), PING_RSLT_PONG);
+
+                        var ping_command_msg = CommandBuilder(CMD_PING);
+                        var ping_expected_result_msg = ExpectedResultPrefixBuilder(CMD_PING) + PING_RSLT_PONG;
+                        SharedResources.ValidateDevice(ping_command_msg,ping_expected_result_msg);
 
                     }
                     catch (Exception e)
@@ -628,8 +631,7 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
 
             // Rethrow as is the error if it happens no added value to add comments here
             string raw_cmd_result = SendMessage(identifier, message);
-
-            string expected_prefix = $"{RESULT_TYPE}{TYPE_COMMAND_SEPARATOR}{command}{COMMAND_ARGS_SEPARATOR}";
+            string expected_prefix = ExpectedResultPrefixBuilder(command);
             if (!raw_cmd_result.StartsWith(expected_prefix))
             {
                 LogMessage(identifier, $"Command '{command}' with args '{args}' failed to : {raw_cmd_result}");
@@ -640,6 +642,11 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
             LogMessage(identifier, $"Command '{command}' with args '{args}' returned : {cmd_result}");
 
             return cmd_result.Trim();
+        }
+
+        private static string ExpectedResultPrefixBuilder(string command)
+        {
+            return $"{RESULT_TYPE}{TYPE_COMMAND_SEPARATOR}{command}{COMMAND_ARGS_SEPARATOR}";
         }
 
         private static string CommandBuilder(string command, string args = EMPTY_ARGS)
