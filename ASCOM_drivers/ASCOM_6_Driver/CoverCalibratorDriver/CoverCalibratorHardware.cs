@@ -62,7 +62,6 @@
 using System;
 using System.Collections;
 using System.Windows.Forms;
-using ASCOM.Astrometry.AstroUtils;
 using ASCOM.DeviceInterface;
 using ASCOM.LocalServer;
 using ASCOM.Utilities;
