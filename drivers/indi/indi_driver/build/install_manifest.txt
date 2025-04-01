@@ -1,2 +1,0 @@
-/usr/bin/indi_fffpv1_flatpanel
-/usr/share/indi/indi_fffpv1_flatpanel.xml
