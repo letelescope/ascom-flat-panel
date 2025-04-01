@@ -398,3 +398,9 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+# Vscode
+*.vscode
+
+# Indi driver build target output
+*build
