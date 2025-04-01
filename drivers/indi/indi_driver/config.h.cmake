@@ -1,3 +1,12 @@
+//
+// Config.h template of Indi AuxDevice, LightBox and DustCap driver for LeTelescopeFFFPV1
+//
+// Copyright(C) 2025 - Present, Le Télescope - Ivry sur Seine - All Rights Reserved
+// Licensed under the MIT License. See the accompanying LICENSE file for terms.
+//
+// Authors:	    Florian Thibaud	
+//              Florian Gautier
+
 #ifndef CONFIG_H
 #define CONFIG_H
 
