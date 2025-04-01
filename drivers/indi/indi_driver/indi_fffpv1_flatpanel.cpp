@@ -18,7 +18,7 @@ FFFPV1FlatPanel::FFFPV1FlatPanel() :
 
 const char *FFFPV1FlatPanel::getDefaultName()
 {
-    return "Dummy Lightbox";
+    return "Le Telescope FFFPV1 Flat Panel";
 }
 
 bool FFFPV1FlatPanel::initProperties()

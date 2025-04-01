@@ -401,3 +401,6 @@ FodyWeavers.xsd
 
 # Vscode
 *.vscode
+
+# Indi driver build target output
+*build
