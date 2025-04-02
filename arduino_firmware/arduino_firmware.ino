@@ -723,7 +723,9 @@ void cmd_unknown(const String args) {
  *
  *
  * returns                            : Parsed message as  msg _cmd_payload
- * Serials errors and stop treatment  : ERROR_INVALID_INCOMING_MESSAGE If separators are ill placed
+ * Serials errors and stop treatment  :
+ * - ERROR_INVALID_INCOMING_MESSAGE If separators are ill placed
+ * - ERROR_INVALID_INCOMING_MESSAGE_TYPE If the message is not a "COMMAND"
  */
 msg_cmd_payload get_cmd_payload(const String message, bool *error) {
   auto type_cmd_sep_idx = message.indexOf(TYPE_COMMAND_SEPARATOR);

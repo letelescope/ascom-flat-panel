@@ -1,8 +1,8 @@
 # Le Telescope Flat Panel 
 Open source *ASCOM* and *INDI* driven automated flat panel for astrophotography. 
 
-> ⚠ **WARNING**  
-> This project is still very much work in progress. None of it is likely/expected to work at this stage
+> ⚠ **DISCLAIMER**  
+> This project is still very much work in progress. None of it is likely/expected to work at this stage !
 
 ## Introduction
 
@@ -38,7 +38,7 @@ The driver emmits and the firmware handles the incoming "COMMAND" messages. This
 - `COMMAND:NAME[@ARGS]` where NAME is [A-Z_]+ and ARGS may be optional or mandatory and their nature may depend on the command.
 
 The firmware then responds with 
-- either a `RESULT:CMD_NAME@MSG` if operation succeeded
+- either a `RESULT:CMD_NAME@VALUE` if operation succeeded
 - or an `ERROR:ERR_MESSAGE@DETAILS` if anything went wrong
 
 In a nutshell
@@ -86,9 +86,9 @@ The firware is entirely buildable and uploadable using the Arduino IDE
 
 #### Warning - Firmware calibrarion
 
-The firmware needs to be calibrated. At first boot the leds will flash to indicate. 
+The firmware needs to be calibrated. At first boot the leds will flash to indicate that. 
 
-Disconnect te servo from the mecanical assembly. Then from the IDE conenct to the board and using the Arduino serial monitor send (type) the "command" 
+Disconnect the servo from the mecanical assembly. Then from the IDE conenct to the board and using the Arduino serial monitor send (type) the "command" 
 
 ```
 COMMAND:CALIBRATION_RUN
@@ -99,6 +99,7 @@ The device should perform its calibration procedure and reply with
 ```
 RESULT:CALIBRATION_RUN@OK
 ```
+
 Once it has completed, re-attach the right arm to the servo. The device is now ready to be used.
 
 ### ASCOM Driver
@@ -144,7 +145,7 @@ As of N.I.N.A 3.1.HF2, the "ASCOM device instance reference " is not disposed wh
 
 This is a known bug c.f. [nina-issue-1378](https://bitbucket.org/Isbeorn/nina/issues/1378/device-instance-not-disposed-when) and [ascom developers  group thread](https://ascomtalk.groups.io/g/Developer/topic/112002512). 
 
-If this happens and some wierd side effect happen on reconnection. Just disconnect from the device. Kill the dangling process in the task manager. And reconnect. 
+If this happens and some weird side effect happen on reconnection. Just disconnect from the device. Kill the dangling process in the task manager. And reconnect. 
 
 ## Indi driver
 
@@ -219,7 +220,7 @@ Install the project...
 
 ## Miscellaneous
 
-- *What is "Le Télescope" ?* This the name of a french astronmy club located at Ivry sur Seine in the Paris suburbs. Please see the [website](https://letelescope.fr) for more informations  
+- *What is "Le Télescope" ?* This a french astronmy club located at Ivry sur Seine in the Paris suburbs. Please see the [website](https://letelescope.fr) for more informations.
 - *Why is this panel nicknamed FFFPV1 ?* This stands for "Florian Florian Flat Panel v1" based on the name of the two orginal authors. 
 
 
