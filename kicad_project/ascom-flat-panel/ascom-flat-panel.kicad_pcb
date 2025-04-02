@@ -155,7 +155,7 @@
 		(layer "F.Cu")
 		(uuid "09ee4de3-4acc-43ed-a044-c3b47fcdf1b7")
 		(at 128 80.5575)
-		(property "Reference" "Seeeduino XIAO"
+		(property "Reference" "U1"
 			(at 0.2 11.3425 0)
 			(unlocked yes)
 			(layer "F.SilkS")
@@ -818,7 +818,7 @@
 				)
 			)
 		)
-		(property "Value" "1N5817"
+		(property "Value" "1N5819"
 			(at 5.08 2.47 90)
 			(layer "F.Fab")
 			(uuid "17595b73-b219-475c-9a79-cbf8552dedbe")
@@ -2800,7 +2800,7 @@
 				)
 			)
 		)
-		(property "Value" "FQP30N06L"
+		(property "Value" "IRLZ34N"
 			(at 2.54 2.5 90)
 			(layer "F.Fab")
 			(uuid "f4d1184f-d5b1-4e4b-acec-cb1e8e6c3d49")
@@ -3522,7 +3522,7 @@
 				)
 			)
 		)
-		(property "Value" "1N4001"
+		(property "Value" "1N4007"
 			(at 5.08 2.47 90)
 			(layer "F.Fab")
 			(uuid "4c997288-7d71-470d-a663-7f4b09543b9b")
@@ -4158,7 +4158,7 @@
 				)
 			)
 		)
-		(property "Value" "FQP30N06L"
+		(property "Value" "IRLZ34N"
 			(at 2.54 2.5 90)
 			(layer "F.Fab")
 			(uuid "ee9d88c7-d240-44ec-8b34-f22dfd21be17")
@@ -6225,7 +6225,7 @@
 		(at 142.5 79.5)
 		(descr "JST XH series connector, B2B-XH-A (http://www.jst-mfg.com/product/pdf/eng/eXH.pdf), generated with kicad-footprint-generator")
 		(tags "connector JST XH vertical")
-		(property "Reference" "LED"
+		(property "Reference" "J3"
 			(at 1 4.5 180)
 			(layer "F.SilkS")
 			(uuid "80262762-9c8f-456d-95af-0069350da062")
@@ -6671,7 +6671,7 @@
 		(at 103.5 72.92)
 		(descr "Through hole straight pin header, 1x04, 2.54mm pitch, single row")
 		(tags "Through hole pin header THT 1x04 2.54mm single row")
-		(property "Reference" "SERVO"
+		(property "Reference" "J1"
 			(at -2.5 4.08 90)
 			(layer "F.SilkS")
 			(uuid "f4d777c7-4578-4ac7-978f-fe9ed74cbe5e")

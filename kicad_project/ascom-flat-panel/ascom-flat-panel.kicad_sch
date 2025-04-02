@@ -3746,7 +3746,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "FQP30N06L"
+		(property "Value" "IRLZ34N"
 			(at 196.342 113.03 0)
 			(effects
 				(font
@@ -4149,7 +4149,7 @@
 				)
 			)
 		)
-		(property "Value" "1N5817"
+		(property "Value" "1N5819"
 			(at 185.7375 43.434 0)
 			(effects
 				(font
@@ -4639,7 +4639,7 @@
 		(fields_autoplaced yes)
 		(uuid "a9f3cccc-89bd-4db8-9460-ab26fb722224")
 		(property "Reference" "D2"
-			(at 195.072 52.07 90)
+			(at 195.58 52.0699 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4647,8 +4647,8 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1N4001"
-			(at 195.072 54.61 90)
+		(property "Value" "1N4007"
+			(at 195.58 54.6099 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4801,7 +4801,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "FQP30N06L"
+		(property "Value" "IRLZ34N"
 			(at 92.202 113.03 0)
 			(effects
 				(font

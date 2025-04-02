@@ -513,7 +513,7 @@
       "plot": "",
       "pos_files": "",
       "specctra_dsn": "",
-      "step": "",
+      "step": "ascom-flat-panel.step",
       "svg": "",
       "vrml": ""
     },
