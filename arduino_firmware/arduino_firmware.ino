@@ -730,18 +730,18 @@ msg_cmd_payload get_cmd_payload(const String message, bool *error) {
   auto cmd_args_sep_idx = message.indexOf(COMMAND_ARGS_SEPARATOR);
   auto message_end_idx = message.length();
 
-  bool has_type_cmd_sep = type_cmd_sep_idx > 0;
+  bool has_type_cmd_sep = type_cmd_sep_idx >= 0;
   bool is_type_sep_at_beginnig = type_cmd_sep_idx == 0;
   bool is_type_sep_before_end = type_cmd_sep_idx < (message_end_idx - 1);
-  bool has_arg_sep = cmd_args_sep_idx > 0;
+  bool has_arg_sep = cmd_args_sep_idx >= 0;
   bool is_type_sep_before_arg_sep = type_cmd_sep_idx < cmd_args_sep_idx;
   bool is_arg_sep_before_end = cmd_args_sep_idx < (message_end_idx - 1);
 
   bool valid_separators = has_type_cmd_sep
                           && !is_type_sep_at_beginnig
                           && is_type_sep_before_end
-                          && (has_arg_sep && is_type_sep_before_arg_sep)
-                          && (has_arg_sep && is_arg_sep_before_end);
+                          && (!has_arg_sep || is_type_sep_before_arg_sep)
+                          && (!has_arg_sep || is_arg_sep_before_end);
 
   if (!valid_separators) {
     serialize_error(ERROR_INVALID_INCOMING_MESSAGE);
