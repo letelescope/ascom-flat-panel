@@ -26,7 +26,7 @@
  * are mandatory and should consists of a single "int"
  *
  * This firware reponse with 
- * - either a RESULT:CMD_NAME}@MSG   if operation succeeded
+ * - either a RESULT:CMD_NAME@VALUE  if operation succeeded
  * - or an ERROR:ERR_MESSAGE@DETAILS if anything went wrong
  *
  * In a nutshell
@@ -35,7 +35,7 @@
  * |              | COMMAND:CMD_NAME[@ARGS] | Flat Panel |
  * | ASCOM driver | --------------------->  | (firmware) |
  * |              | <---------------------  |            |
- * ---------------  RESULT:CMD_NAME@MSG      ------------
+ * ---------------  RESULT:CMD_NAME@VALUE    ------------
  *                          or
  *                 ERROR:ERR_MESSAGE@DETAILS
  *
@@ -43,7 +43,7 @@
  * - COMMAND:PING
  * - COMMAND:INFO
  * - COMMAND:BRIGHTNESS_GET
- * - COMMAND:BRIGHTNESS_SET@{(int) DESIRE_VALUE}
+ * - COMMAND:BRIGHTNESS_SET@{(int) DESIRED_VALUE}
  * - COMMAND:BRIGHTNESS_RESET
  * - COMMAND:COVER_GET
  * - COMMAND:COVER_OPEN
@@ -51,7 +51,7 @@
  * - COMMAND:CALIBRATION_RUN
  * - COMMAND:CALIBRATION_GET
  *
- * The protocol, the implementation of both the driver and the firmware, the electronics and the 3D models
+ * The protocol, the implementation of both the ASCOM driver and this firmware, the electronics and the 3D models
  * are heavily inspired by the the work  of Dark Sky Geek (https://github.com/jlecomte/) especially 
  * - https://github.com/jlecomte/ascom-flat-panel
  * - https://github.com/jlecomte/ascom-wireless-flat-panel
@@ -680,7 +680,7 @@ void cmd_cover_calibration_run(const String args) {
  */
 void cmd_cover_calibration_get(const String args) {
   if (!is_panel_calibrated()) {
-      serialize_error(ERROR_NOT_IMPLEMENTED);
+      serialize_error(ERROR_SERVO_NOT_CALIBRATED);
       return;
   }
 
@@ -723,25 +723,27 @@ void cmd_unknown(const String args) {
  *
  *
  * returns                            : Parsed message as  msg _cmd_payload
- * Serials errors and stop treatment  : ERROR_INVALID_INCOMING_MESSAGE If separators are ill placed
+ * Serials errors and stop treatment  :
+ * - ERROR_INVALID_INCOMING_MESSAGE If separators are ill placed
+ * - ERROR_INVALID_INCOMING_MESSAGE_TYPE If the message is not a "COMMAND"
  */
 msg_cmd_payload get_cmd_payload(const String message, bool *error) {
   auto type_cmd_sep_idx = message.indexOf(TYPE_COMMAND_SEPARATOR);
   auto cmd_args_sep_idx = message.indexOf(COMMAND_ARGS_SEPARATOR);
   auto message_end_idx = message.length();
 
-  bool has_type_cmd_sep = type_cmd_sep_idx > 0;
+  bool has_type_cmd_sep = type_cmd_sep_idx >= 0;
   bool is_type_sep_at_beginnig = type_cmd_sep_idx == 0;
   bool is_type_sep_before_end = type_cmd_sep_idx < (message_end_idx - 1);
-  bool has_arg_sep = cmd_args_sep_idx > 0;
+  bool has_arg_sep = cmd_args_sep_idx >= 0;
   bool is_type_sep_before_arg_sep = type_cmd_sep_idx < cmd_args_sep_idx;
   bool is_arg_sep_before_end = cmd_args_sep_idx < (message_end_idx - 1);
 
   bool valid_separators = has_type_cmd_sep
                           && !is_type_sep_at_beginnig
                           && is_type_sep_before_end
-                          && (has_arg_sep && is_type_sep_before_arg_sep)
-                          && (has_arg_sep && is_arg_sep_before_end);
+                          && (!has_arg_sep || is_type_sep_before_arg_sep)
+                          && (!has_arg_sep || is_arg_sep_before_end);
 
   if (!valid_separators) {
     serialize_error(ERROR_INVALID_INCOMING_MESSAGE);

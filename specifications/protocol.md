@@ -19,7 +19,7 @@ The **driver emmits** and the **firmware handles** the incoming "COMMAND" messag
 where NAME is [A-Z_]+ and ARGS may be optional or mandatory and their nature may depend on the command. For instance for a `COMMAND:BRIGHTNESS_SET@ARGS` message the ARGS are mandatory and should consists of a single "int"
 
 The firmware then responds with 
-- either a `RESULT:CMD_NAME@MSG`   if operation succeeded
+- either a `RESULT:CMD_NAME@VALUE`   if operation succeeded
 - or an `ERROR:ERR_MESSAGE@DETAILS` if anything went wrong
 
 In a nutshell
