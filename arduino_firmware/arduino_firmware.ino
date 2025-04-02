@@ -680,7 +680,7 @@ void cmd_cover_calibration_run(const String args) {
  */
 void cmd_cover_calibration_get(const String args) {
   if (!is_panel_calibrated()) {
-      serialize_error(ERROR_NOT_IMPLEMENTED);
+      serialize_error(ERROR_SERVO_NOT_CALIBRATED);
       return;
   }
 
