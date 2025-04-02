@@ -26,7 +26,7 @@
  * are mandatory and should consists of a single "int"
  *
  * This firware reponse with 
- * - either a RESULT:CMD_NAME}@MSG   if operation succeeded
+ * - either a RESULT:CMD_NAME@VALUE  if operation succeeded
  * - or an ERROR:ERR_MESSAGE@DETAILS if anything went wrong
  *
  * In a nutshell
@@ -35,7 +35,7 @@
  * |              | COMMAND:CMD_NAME[@ARGS] | Flat Panel |
  * | ASCOM driver | --------------------->  | (firmware) |
  * |              | <---------------------  |            |
- * ---------------  RESULT:CMD_NAME@MSG      ------------
+ * ---------------  RESULT:CMD_NAME@VALUE    ------------
  *                          or
  *                 ERROR:ERR_MESSAGE@DETAILS
  *
@@ -43,7 +43,7 @@
  * - COMMAND:PING
  * - COMMAND:INFO
  * - COMMAND:BRIGHTNESS_GET
- * - COMMAND:BRIGHTNESS_SET@{(int) DESIRE_VALUE}
+ * - COMMAND:BRIGHTNESS_SET@{(int) DESIRED_VALUE}
  * - COMMAND:BRIGHTNESS_RESET
  * - COMMAND:COVER_GET
  * - COMMAND:COVER_OPEN
@@ -51,7 +51,7 @@
  * - COMMAND:CALIBRATION_RUN
  * - COMMAND:CALIBRATION_GET
  *
- * The protocol, the implementation of both the driver and the firmware, the electronics and the 3D models
+ * The protocol, the implementation of both the ASCOM driver and this firmware, the electronics and the 3D models
  * are heavily inspired by the the work  of Dark Sky Geek (https://github.com/jlecomte/) especially 
  * - https://github.com/jlecomte/ascom-flat-panel
  * - https://github.com/jlecomte/ascom-wireless-flat-panel
