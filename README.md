@@ -63,7 +63,7 @@ The firware is entirely buildable and uploadable using the Arduino IDE
  
 #### Pre-requisites 
 
-- [Download](https://www.arduino.cc/en/software/) and nstall the Arduino IDE
+- [Download](https://www.arduino.cc/en/software/) and install the Arduino IDE
 - [Downlaod](https://wiki.seeedstudio.com/Seeeduino-XIAO/#software) and configure the Seeduino XIAO board for the Arduino IDE
 
 #### Compile and upload the firmware
@@ -86,9 +86,13 @@ The firware is entirely buildable and uploadable using the Arduino IDE
 
 #### Warning - Firmware calibrarion
 
-The firmware needs to be calibrated. At first boot the leds will flash to indicate that. 
+The firmware needs to be calibrated. At first boot the leds will flash to indicate that it needs to be calibrated. 
 
-Disconnect the servo from the mecanical assembly. Then from the IDE conenct to the board and using the Arduino serial monitor send (type) the "command" 
+> **WARNING**
+> Disconnect the servo from the mecanical assembly before launching the calibration procedure. 
+
+Then from the IDE connect to the board and using the Arduino serial monitor send (type) the "command" 
+
 
 ```
 COMMAND:CALIBRATION_RUN
