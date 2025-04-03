@@ -175,7 +175,7 @@ constexpr auto ERROR_WANTED_BRIGHTNESS_MSG_START = "INVALID_BRIGHTNESS@Wanted br
 constexpr auto ERROR_WANTED_BRIGHTNESS_NAN_MSG_END = "} is not a number.";
 constexpr auto ERROR_WANTED_BRIGHTNESS_NEGATIVE_MSG_END = "} is negative.";
 constexpr auto ERROR_WANTED_BRIGHTNESS_TOO_BIG_MSG_END = "} is bigger than max allowed value 1023";
-constexpr auto ERROR_SERVO_NOT_CALIBRATED = "SERVO_NO_CALIBRATED@Run command COVER_CALIBRATION_RUN first";
+constexpr auto ERROR_SERVO_NOT_CALIBRATED = "SERVO_NOT_CALIBRATED@Run command COVER_CALIBRATION_RUN first";
 
 #define NB_COMMANDS 10
 //Keeps the record of allowed/known commands
@@ -292,6 +292,9 @@ void setup() {
     // 
     // Similarly the panel.servo_position variable will be updated with the corrected servo
     // feedback_pin value in the "_close_cover" funcion.
+    // 
+    // No need to have the built-in led up anymore.
+    digitalWrite(LED_BUILTIN, LOW);
     panel.cover = OPEN;
     bool verbose = false;
     _close_cover(verbose);
@@ -662,8 +665,8 @@ void cmd_cover_calibration_run(const String args) {
 
   panel.cover = OPEN;
 
-  bool silent = true;
-  _close_cover(silent);
+  bool verbose = false;
+  _close_cover(verbose);
 
   serialize_result(COMMAND_COVER_CALIBRATION_RUN, RESULT_COVER_CALIBRATION_RUN);
 }
