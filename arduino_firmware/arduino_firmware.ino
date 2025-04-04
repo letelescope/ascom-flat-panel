@@ -248,13 +248,6 @@ FlashStorage(nvm_store, servo_cal_state_t);
  *   + If panel IS calibrated, cover wil be instructed to close and servo position will be retrieved from the feedback pin (corrected by calibration data).  
  */
 void setup() {
-  // start serial port at 57600 bps:
-  Serial.begin(57600);
-  while (!Serial) {
-    ;  // wait for serial port to connect. Needed for native USB port only
-  }
-  Serial.flush();
-
   // Make sure the RX, TX, and built-in LEDs don't turn on, they are very bright!
   // Even though the board is inside an enclosure, the light can be seen shining
   // through the small opening for the USB connector! Unfortunately, it is not
@@ -299,6 +292,14 @@ void setup() {
     bool verbose = false;
     _close_cover(verbose);
   }
+
+  // Once everything is correctly set
+  // start serial port at 57600 bps:
+  Serial.begin(57600);
+  while (!Serial) {
+    ;  // wait for serial port to connect. Needed for native USB port only
+  }
+  Serial.flush();
 }
 
 /*
@@ -890,7 +891,7 @@ bool is_panel_calibrated() {
 }
 
 // Function to calculate the mean of an array.
-// This is ripped almost as is from https://github.com/jlecomte/ascom-telescope-cover-v2 all credits to him.
+// This is ripped shamelessly as is from https://github.com/jlecomte/ascom-telescope-cover-v2 all credits to him.
 double mean(double arr[], int n) {
     double sum = 0.0;
     for (int i = 0; i < n; i++) {
@@ -900,7 +901,7 @@ double mean(double arr[], int n) {
 }
 
 // Function to calculate the slope and intercept of a linear regression line.
-// This is ripped almost as is from https://github.com/jlecomte/ascom-telescope-cover-v2 all credits to him.
+// This is ripped shamelessly as is from https://github.com/jlecomte/ascom-telescope-cover-v2 all credits to him.
 void linear_regression(double x[], double y[], int n, double *slope, double *intercept) {
     double x_mean = mean(x, n);
     double y_mean = mean(y, n);
