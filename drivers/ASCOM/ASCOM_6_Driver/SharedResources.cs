@@ -203,7 +203,7 @@ namespace ASCOM.LocalServer
                 throw new DriverException($"Sending validating message {message} failed", e);
             }
 
-            if (actual_result != expected_result) 
+            if (actual_result.Trim() != expected_result.Trim()) 
             {
                 try { SerialConnected = false; } catch { }
                 throw new DriverException($"Incorrect device. '{message}' : actual result {actual_result} - {expected_result}");

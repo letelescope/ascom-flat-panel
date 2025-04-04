@@ -61,6 +61,7 @@
 
 using System;
 using System.Collections;
+using System.Threading;
 using System.Windows.Forms;
 using ASCOM.DeviceInterface;
 using ASCOM.LocalServer;
@@ -94,7 +95,7 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         private const string EMPTY_ARGS = "";
         // Command Names
         private const string CMD_PING = "PING";
-        private const string CMD_COVER_GET = "COVER_GET";
+        private const string CMD_COVER_GET = "COVER_GET_STATE";
         private const string CMD_COVER_OPEN = "COVER_OPEN";
         private const string CMD_COVER_CLOSE = "COVER_CLOSE";
         private const string CMD_BRIGHTNESS_GET = "BRIGHTNESS_GET";
@@ -439,22 +440,23 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
             get
             {
                 var identifier = "CoverState Get";
-                string response = SendCommand(identifier: identifier, command: CMD_COVER_GET);
-                LogMessage(identifier, $"Cover is {response}");
-                switch (response)
-                {
-                    case "OPEN":
-                        return CoverStatus.Open;
-                    case "OPENING":
-                        return CoverStatus.Moving;
-                    case "CLOSING":
-                        return CoverStatus.Moving;
-                    case "CLOSED":
-                        return CoverStatus.Closed;
-                    default:
-                        LogMessage(identifier, "{response}: Unknown cover status");
-                        return CoverStatus.Unknown;
-                }
+                //string response = SendCommand(identifier: identifier, command: CMD_COVER_GET);
+                //LogMessage(identifier, $"Cover is {response}");
+                //switch (response)
+                //{
+                //    case "OPEN":
+                //        return CoverStatus.Open;
+                //    case "OPENING":
+                //        return CoverStatus.Moving;
+                //    case "CLOSING":
+                //        return CoverStatus.Moving;
+                //    case "CLOSED":
+                //        return CoverStatus.Closed;
+                //    default:
+                //        LogMessage(identifier, "{response}: Unknown cover status");
+                //        return CoverStatus.Unknown;
+                //}
+                return CoverStatus.Unknown;
             }
         }
 
