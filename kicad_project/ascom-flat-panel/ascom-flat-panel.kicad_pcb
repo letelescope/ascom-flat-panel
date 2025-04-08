@@ -139,7 +139,7 @@
 	(net 5 "SERVO POSITION FEEDBACK")
 	(net 6 "SERVO POSITION CONTROL")
 	(net 7 "+3V3")
-	(net 8 "Net-(J3-Pin_2)")
+	(net 8 "Net-(J2-Pin_2)")
 	(net 9 "Net-(Q1-G)")
 	(net 10 "Net-(Q2-G)")
 	(net 11 "SERVO POWER CONTROL")
@@ -4823,7 +4823,7 @@
 			(drill 1.1)
 			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
-			(net 8 "Net-(J3-Pin_2)")
+			(net 8 "Net-(J2-Pin_2)")
 			(pinfunction "D")
 			(pintype "unspecified")
 			(uuid "58ec0218-845b-4a2d-a2e3-15716437bd79")
@@ -6214,7 +6214,7 @@
 		(at 142.5 79.5)
 		(descr "JST XH series connector, B2B-XH-A (http://www.jst-mfg.com/product/pdf/eng/eXH.pdf), generated with kicad-footprint-generator")
 		(tags "connector JST XH vertical")
-		(property "Reference" "J3"
+		(property "Reference" "J2"
 			(at 1 4.5 180)
 			(layer "F.SilkS")
 			(uuid "80262762-9c8f-456d-95af-0069350da062")
@@ -6607,17 +6607,6 @@
 			(layer "F.Fab")
 			(uuid "63bc0e77-2c0d-4a25-b466-769c2a44349d")
 		)
-		(fp_text user "${REFERENCE}"
-			(at 1.25 2.7 0)
-			(layer "F.Fab")
-			(uuid "27f9b0c3-9f32-4f0f-b0d0-a16330f864aa")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-			)
-		)
 		(pad "1" thru_hole roundrect
 			(at 0 0)
 			(size 1.7 2)
@@ -6636,7 +6625,7 @@
 			(drill 1)
 			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
-			(net 8 "Net-(J3-Pin_2)")
+			(net 8 "Net-(J2-Pin_2)")
 			(pinfunction "Pin_2")
 			(pintype "passive")
 			(uuid "a56a364e-c491-4ec0-9d8b-00d52498b8be")

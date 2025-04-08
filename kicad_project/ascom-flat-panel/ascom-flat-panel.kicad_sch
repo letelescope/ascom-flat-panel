@@ -3391,7 +3391,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "25ab5a04-3e65-42d7-bd63-0649a0e31cff")
-		(property "Reference" "J3"
+		(property "Reference" "J2"
 			(at 97.028 102.8699 0)
 			(effects
 				(font
@@ -3445,7 +3445,7 @@
 		(instances
 			(project "ascom-flat-panel"
 				(path "/c93103f3-9ac9-4319-baa6-df31525a6c92"
-					(reference "J3")
+					(reference "J2")
 					(unit 1)
 				)
 			)
