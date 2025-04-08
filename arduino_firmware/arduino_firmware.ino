@@ -198,17 +198,14 @@ constexpr uint32_t MAX_BRIGHTNESS = 1023;
 constexpr uint32_t PWM_FREQ = 20000;
 
 /*
- * Pins assignment. Must be set according to the exact actual wiring
+ * Pins assignment. Must be set according to the exact actual wiring. 
+ * Check KiCad shcematics to check the correct pins
  */
-// There is conflict yet between LEDSTRIP pin and SERVO_FEEDBACK
-// High frequency PWM seems to work on PIN 8 according to Julien Lecomte (at least not on pin 7)
-// Maybe we should test if high freq works on pin 6 in order to have a spatial sepation of pins between leds and servo
-// Or we should set the servo pins to 4,5,6 and let led pin to 8 still in order to have a spatial sepation of pins between leds and servo
 constexpr unsigned int LEDSTRIP_PIN = 8;
 
-constexpr unsigned int SERVO_SWITCH_PIN = 7;
-constexpr unsigned int SERVO_FEEDBACK_PIN = 8;
-constexpr unsigned int SERVO_CONTROL_PIN = 9;
+constexpr unsigned int SERVO_SWITCH_PIN = 4;
+constexpr unsigned int SERVO_FEEDBACK_PIN = 5;
+constexpr unsigned int SERVO_CONTROL_PIN = 6;
 
 /*
  * Misc.
@@ -248,13 +245,6 @@ FlashStorage(nvm_store, servo_cal_state_t);
  *   + If panel IS calibrated, cover wil be instructed to close and servo position will be retrieved from the feedback pin (corrected by calibration data).  
  */
 void setup() {
-  // start serial port at 57600 bps:
-  Serial.begin(57600);
-  while (!Serial) {
-    ;  // wait for serial port to connect. Needed for native USB port only
-  }
-  Serial.flush();
-
   // Make sure the RX, TX, and built-in LEDs don't turn on, they are very bright!
   // Even though the board is inside an enclosure, the light can be seen shining
   // through the small opening for the USB connector! Unfortunately, it is not
@@ -299,6 +289,14 @@ void setup() {
     bool verbose = false;
     _close_cover(verbose);
   }
+
+  // Once everything is correctly set
+  // start serial port at 57600 bps:
+  Serial.begin(57600);
+  while (!Serial) {
+    ;  // wait for serial port to connect. Needed for native USB port only
+  }
+  Serial.flush();
 }
 
 /*
@@ -890,7 +888,7 @@ bool is_panel_calibrated() {
 }
 
 // Function to calculate the mean of an array.
-// This is ripped almost as is from https://github.com/jlecomte/ascom-telescope-cover-v2 all credits to him.
+// This is ripped shamelessly as is from https://github.com/jlecomte/ascom-telescope-cover-v2 all credits to him.
 double mean(double arr[], int n) {
     double sum = 0.0;
     for (int i = 0; i < n; i++) {
@@ -900,7 +898,7 @@ double mean(double arr[], int n) {
 }
 
 // Function to calculate the slope and intercept of a linear regression line.
-// This is ripped almost as is from https://github.com/jlecomte/ascom-telescope-cover-v2 all credits to him.
+// This is ripped shamelessly as is from https://github.com/jlecomte/ascom-telescope-cover-v2 all credits to him.
 void linear_regression(double x[], double y[], int n, double *slope, double *intercept) {
     double x_mean = mean(x, n);
     double y_mean = mean(y, n);

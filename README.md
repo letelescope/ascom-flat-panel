@@ -14,6 +14,7 @@ This project should contain all you need to build your own *ASCOM* and/or *INDI*
 - [drivers](./drivers/): Implementation of the drivers
   - [ASCOM](./drivers/ASCOM/) : Implementation of the *ASCOM* driver 
   - [INDI](./drivers/indi/) : Implementation of the *INDI* driver
+- [kicad_project](./kicad_project/): Electronic schematics and PCB layout
 - [specifications](./specifications/): Specifications of the project. Mainly the specs of the communication protocol between the drivers and the firmware.
 
 This project, the protocol, the implementation of both the *ASCOM* driver and the firmware, the electronics and the 3D models are heavily inspired by the the work  of [Dark Sky Geek](https://github.com/jlecomte/). And more precisely: 
