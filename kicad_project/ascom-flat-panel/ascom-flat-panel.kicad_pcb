@@ -159,7 +159,7 @@
 			(at 0.2 11.3425 0)
 			(unlocked yes)
 			(layer "F.SilkS")
-			(uuid "3a16289f-3c6a-416e-8a8b-10d21f25eb26")
+			(uuid "ab1e3e67-7e2f-4eb6-ad13-6b9cde7e0db5")
 			(effects
 				(font
 					(size 1 1)
@@ -171,7 +171,7 @@
 			(at 0 0.0625 0)
 			(unlocked yes)
 			(layer "F.Fab")
-			(uuid "aa7408ac-f26f-4912-ac0e-a8962bade4aa")
+			(uuid "8a5bca61-0375-482d-b4d2-6b7573560f6c")
 			(effects
 				(font
 					(size 0.635 0.635)
@@ -184,7 +184,7 @@
 			(unlocked yes)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "4c98b83f-127c-4660-b02a-fd04a3502f9c")
+			(uuid "65ca53fc-7115-4452-a032-d5d311254b2f")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -197,7 +197,7 @@
 			(unlocked yes)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "62c52875-8249-4e40-b694-34442166ba7a")
+			(uuid "52b81048-aa0f-40f0-bfda-57d2d7b1c439")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -732,6 +732,7 @@
 			)
 		)
 		(model "${AMZPATH}/3dmodels/AMz3D.3dshapes/Seeeduino XIAO SAMD21 v4.step"
+			(hide yes)
 			(offset
 				(xyz 0 0 0)
 			)
@@ -789,7 +790,7 @@
 				(xyz -0 -0 -90)
 			)
 		)
-		(model "C:/Users/dell/Documents/GitHub/ascom-flat-panel/kicad_project/seeeduino-xiao-samd21-3d-model/Seeeduino XIAO SAMD21 v4.step"
+		(model "${KIPRJMOD}/Seeeduino XIAO SAMD21 v4.step"
 			(offset
 				(xyz 0 0 0)
 			)

@@ -4550,7 +4550,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Seeeduino XIAO:XIAO-SAMD21-DIP"
+		(property "Footprint" "SEEED_STUDIO:XIAO-SAMD21-DIP"
 			(at 76.2 50.8 0)
 			(effects
 				(font
