@@ -404,3 +404,6 @@ FodyWeavers.xsd
 
 # Indi driver build target output
 *build
+
+#FreeCad
+models/*.FCBak
