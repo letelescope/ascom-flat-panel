@@ -2628,16 +2628,6 @@
 	)
 	(wire
 		(pts
-			(xy 187.96 81.28) (xy 206.248 81.28)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "076a2685-68d9-4caf-b5b6-a3d65f4cffdd")
-	)
-	(wire
-		(pts
 			(xy 169.164 111.76) (xy 171.958 111.76)
 		)
 		(stroke
@@ -2708,7 +2698,7 @@
 	)
 	(wire
 		(pts
-			(xy 203.2 86.36) (xy 206.248 86.36)
+			(xy 203.2 86.36) (xy 205.74 86.36)
 		)
 		(stroke
 			(width 0)
@@ -2755,6 +2745,16 @@
 			(type default)
 		)
 		(uuid "356c0aaf-6170-4c50-afcb-97e69af30f55")
+	)
+	(wire
+		(pts
+			(xy 187.96 81.28) (xy 205.74 81.28)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "38f0d194-600f-4e9e-9f26-8c8aeb0f9936")
 	)
 	(wire
 		(pts
@@ -2818,6 +2818,16 @@
 	)
 	(wire
 		(pts
+			(xy 187.96 78.74) (xy 205.74 78.74)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "723f8cf7-86c4-4521-ba62-04e041d7d32a")
+	)
+	(wire
+		(pts
 			(xy 88.9 127) (xy 88.9 116.84)
 		)
 		(stroke
@@ -2878,16 +2888,6 @@
 	)
 	(wire
 		(pts
-			(xy 187.706 78.74) (xy 206.248 78.74)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "aa0e7236-b1b9-4e5b-bc0c-9b2f26f8457c")
-	)
-	(wire
-		(pts
 			(xy 193.04 127) (xy 182.88 127)
 		)
 		(stroke
@@ -2938,7 +2938,7 @@
 	)
 	(wire
 		(pts
-			(xy 202.184 83.82) (xy 206.248 83.82)
+			(xy 201.93 83.82) (xy 205.74 83.82)
 		)
 		(stroke
 			(width 0)
@@ -3094,7 +3094,7 @@
 	)
 	(global_label "SERVO GND"
 		(shape input)
-		(at 187.96 81.28 180)
+		(at 188.214 78.74 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -3104,7 +3104,7 @@
 		)
 		(uuid "411cfdbf-a07e-4d4d-bc10-6bd7c37ebc8f")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 174.0891 81.28 0)
+			(at 174.3431 78.74 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3160,7 +3160,7 @@
 	)
 	(global_label "SERVO VCC"
 		(shape input)
-		(at 187.706 78.74 180)
+		(at 187.96 81.28 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -3170,7 +3170,7 @@
 		)
 		(uuid "623121c0-4c44-484b-8773-d09fa32d97b0")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 174.077 78.74 0)
+			(at 174.331 81.28 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3204,7 +3204,7 @@
 	)
 	(global_label "SERVO POSITION CONTROL"
 		(shape input)
-		(at 202.184 83.82 180)
+		(at 201.93 83.82 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -3214,7 +3214,7 @@
 		)
 		(uuid "aa81116e-ffb5-4f93-9e7e-a45fb78ba7e9")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 174.0406 83.82 0)
+			(at 173.7866 83.82 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3533,7 +3533,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "2kΩ"
+		(property "Value" "2.2kΩ"
 			(at 184.404 119.38 0)
 			(effects
 				(font
@@ -3585,7 +3585,7 @@
 	)
 	(symbol
 		(lib_id "Connector_Generic:Conn_01x04")
-		(at 211.328 81.28 0)
+		(at 210.82 81.28 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -3594,7 +3594,7 @@
 		(fields_autoplaced yes)
 		(uuid "3c590d74-4cf2-4e89-85be-078de1fb90ac")
 		(property "Reference" "J1"
-			(at 213.614 81.28 0)
+			(at 213.106 81.28 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3603,7 +3603,7 @@
 			)
 		)
 		(property "Value" "Servo"
-			(at 213.614 83.82 0)
+			(at 213.106 83.82 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3612,7 +3612,7 @@
 			)
 		)
 		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical"
-			(at 211.328 81.28 0)
+			(at 210.82 81.28 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3621,7 +3621,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 211.328 81.28 0)
+			(at 210.82 81.28 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3630,7 +3630,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 211.328 81.28 0)
+			(at 210.82 81.28 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4868,7 +4868,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:CP_Radial_D5.0mm_P2.50mm"
+		(property "Footprint" "Capacitor_THT:C_Radial_D6.3mm_H11.0mm_P2.50mm"
 			(at 155.9052 53.34 0)
 			(effects
 				(font
