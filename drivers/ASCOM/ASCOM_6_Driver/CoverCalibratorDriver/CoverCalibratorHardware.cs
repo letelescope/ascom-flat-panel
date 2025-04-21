@@ -440,23 +440,22 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
             get
             {
                 var identifier = "CoverState Get";
-                //string response = SendCommand(identifier: identifier, command: CMD_COVER_GET);
-                //LogMessage(identifier, $"Cover is {response}");
-                //switch (response)
-                //{
-                //    case "OPEN":
-                //        return CoverStatus.Open;
-                //    case "OPENING":
-                //        return CoverStatus.Moving;
-                //    case "CLOSING":
-                //        return CoverStatus.Moving;
-                //    case "CLOSED":
-                //        return CoverStatus.Closed;
-                //    default:
-                //        LogMessage(identifier, "{response}: Unknown cover status");
-                //        return CoverStatus.Unknown;
-                //}
-                return CoverStatus.Unknown;
+                string response = SendCommand(identifier: identifier, command: CMD_COVER_GET);
+                LogMessage(identifier, $"Cover is {response}");
+                switch (response)
+                {
+                    case "OPEN":
+                        return CoverStatus.Open;
+                    case "OPENING":
+                        return CoverStatus.Moving;
+                    case "CLOSING":
+                        return CoverStatus.Moving;
+                    case "CLOSED":
+                        return CoverStatus.Closed;
+                    default:
+                        LogMessage(identifier, "{response}: Unknown cover status");
+                        return CoverStatus.Unknown;
+                }
             }
         }
 
