@@ -203,10 +203,9 @@ constexpr uint32_t PWM_FREQ = 20000;
  */
 constexpr unsigned int LEDSTRIP_PIN = 8;
 
-constexpr unsigned int SERVO_SWITCH_PIN = 4;
-constexpr unsigned int SERVO_FEEDBACK_PIN = 5;
-constexpr unsigned int SERVO_CONTROL_PIN = 6;
-
+constexpr unsigned int SERVO_POWER_PIN = 4;
+constexpr unsigned int SERVO_POS_CONTROL_PIN = 5;
+constexpr unsigned int SERVO_FEEDBACK_PIN = 6;
 /*
  * Misc.
  */
@@ -258,9 +257,9 @@ void setup() {
   pinMode(LEDSTRIP_PIN, OUTPUT);
 
   // Setup Servo related pins
-  pinMode(SERVO_SWITCH_PIN, OUTPUT);
+  pinMode(SERVO_POWER_PIN, OUTPUT);
   pinMode(SERVO_FEEDBACK_PIN, INPUT);
-  pinMode(SERVO_CONTROL_PIN, OUTPUT);
+  pinMode(SERVO_POS_CONTROL_PIN, OUTPUT);
 
   // initializing panel
   panel.brightness = 0;
@@ -284,7 +283,7 @@ void setup() {
     // feedback_pin value in the "_close_cover" funcion.
     // 
     // No need to have the built-in led up anymore.
-    digitalWrite(LED_BUILTIN, LOW);
+    digitalWrite(LED_BUILTIN, HIGH);
     panel.cover = OPEN;
     bool verbose = false;
     _close_cover(verbose);
@@ -354,9 +353,9 @@ void receive_commands() {
 void check_for_calibration() {
 
   if (!is_panel_calibrated()) {
-    digitalWrite(LED_BUILTIN, HIGH);
-    delay(500);
     digitalWrite(LED_BUILTIN, LOW);
+    delay(500);
+    digitalWrite(LED_BUILTIN, HIGH);
     delay(500);
   }
 }
@@ -841,7 +840,7 @@ void set_brightness() {
 // Energize and attach servo.
 // This is ripped almost as is from https://github.com/jlecomte/ascom-telescope-cover-v2 all credits to him.
 int powerUpServo() {
-  digitalWrite(SERVO_SWITCH_PIN, HIGH);
+  digitalWrite(SERVO_POWER_PIN, HIGH);
 
   // Default position (closed), which will be used only once,
   // before we have successfully calibrated the servo.
@@ -871,7 +870,7 @@ int powerUpServo() {
   // The optional min and max pulse width parameters are actually quite important
   // and depend on the exact servo you are using. Without specifying them, you may
   // not be able to use the full range of motion (270 degrees for this project)
-  servo.attach(SERVO_CONTROL_PIN, 500, 2500);
+  servo.attach(SERVO_POS_CONTROL_PIN, 500, 2500);
 
   return current_pos;
 }
@@ -880,7 +879,7 @@ int powerUpServo() {
 // Magnets will keep the cover in position, whether it is open or closed.
 void powerDownServo() {
   servo.detach();
-  digitalWrite(SERVO_SWITCH_PIN, LOW);
+  digitalWrite(SERVO_POWER_PIN, LOW);
 }
 
 bool is_panel_calibrated() {
