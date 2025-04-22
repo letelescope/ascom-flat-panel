@@ -114,8 +114,8 @@ typedef struct {
 // Could ben restructured but this would bring layers of inderiction and less readability
 typedef struct {
   uint32_t brightness;
+  int servo_position;
   unsigned long last_step_time;
-  int initial_servo_position;
   cover_state_t cover;
   servo_cal_state_t calibration;
 } panel_state_t;
@@ -204,13 +204,14 @@ constexpr uint32_t PWM_FREQ = 20000;
 // MIN and MAX angle are default for "servos".
 // No 180° for MAX angle is not a mistake. It is really the value one wants here. 
 // Even though ours can go to 270° those are set using the pulse width MIN and MAX.C.f below.
-constexpr uint32_t SERVO_MIN_ANGLE = 0;
-constexpr uint32_t SERVO_MAX_ANGLE = 180;
+constexpr int SERVO_MIN_ANGLE = 0;
+constexpr int SERVO_MAX_ANGLE = 180; // Yes this is correct. Full amplitude is set with MIN_PW and MAX_PW
 // Used to get the proper full range of motion (270°). Used by the servo library to map
 // input angles (betwenn 0 and 180) to wanted 0 to 270° "real" wanted angles.
 // Those are figures from the  DSS-M15S Servo specifications and depend on the exact servo you are using.
 constexpr uint32_t SERVO_MIN_PW = 500;
 constexpr uint32_t SERVO_MAX_PW = 2500;
+
 /*
  * Pins assignment. Must be set according to the exact actual wiring. 
  * Check KiCad shcematics to check the correct pins
@@ -277,7 +278,7 @@ void setup() {
 
   // initializing panel
   panel.brightness = 0;
-  panel.initial_servo_position = 0;
+  panel.servo_position = 0;
   panel.last_step_time = 0L;
 
   // Read servo calibration data oin Flash storage:
@@ -286,7 +287,6 @@ void setup() {
   // When there is no calibration data yet, we have to assume that the cover is closed...
   if (!is_panel_calibrated()) {
       panel.cover = CLOSED;
-      panel.initial_servo_position = 0;
   } else {
     // Close the cover, in case it is not completely closed.
     // To make sure that `_closeçcover` does not have an undefined behavior,
@@ -294,6 +294,8 @@ void setup() {
     // That variable will be updated in the `_close_cover` function,
     // and then again once the cover has completely closed.
     // 
+    // Similarly the panel.servo_position variable will be updated with the corrected servo
+    // feedback_pin value in the "_close_cover" funcion.
     // 
     // No need to have the built-in led up anymore.
     digitalWrite(LED_BUILTIN, HIGH);
@@ -387,7 +389,6 @@ void check_for_calibration() {
  * - Panel is not calibrated
  * - Panel is OPEN
  * - Panel is CLOSED
- * - We did not wait engough (STEP_DELAY_MICROSEC) beween to steps
  */
 void update_panel_cover() {
   // We do not move we are not calibrated
@@ -401,39 +402,21 @@ void update_panel_cover() {
 
   panel.last_step_time = now;
 
-  // Current position holds the servo current postion
-  // Target postion will hold the wanted position for the servo at next step.
-  // One could argue that only one is variable is needed but let's use two for readability.
-  int servo_current_pos= servo_current_position();
-  int servo_target_pos = servo_current_pos;
-
-
   if (panel.cover == OPENING) {
-
-    if (is_servo_on_target(SERVO_MAX_ANGLE)) {
+    panel.servo_position++;
+    if (panel.servo_position >= SERVO_MAX_ANGLE) {
+      panel.servo_position = SERVO_MAX_ANGLE;
       panel.cover = OPEN;
-      servo_target_pos = SERVO_MAX_ANGLE;
-    } else {
-      servo_target_pos = min(servo_current_pos + 1,SERVO_MAX_ANGLE);
     }
-
   } else if (panel.cover == CLOSING) {
-    
-    if (is_servo_on_target(SERVO_MIN_ANGLE)) {
+    panel.servo_position--;
+    if (panel.servo_position <= SERVO_MIN_ANGLE) {
+      panel.servo_position = SERVO_MIN_ANGLE;
       panel.cover = CLOSED;
-      servo_target_pos = SERVO_MIN_ANGLE;
-    } else  {
-      servo_target_pos = max(servo_current_pos - 1, SERVO_MIN_ANGLE);
     }
-
   }
 
-  Serial.println("DEBUG:CURRENT_POS@ " + servo_current_pos);
-  Serial.println("DEBUG:TARGET_POS@" + servo_target_pos);
-  Serial.println("DEBUG:COVER_STATE@ " + panel.cover);
-  Serial.println("DEBUG:TARGET_PW@" + map_target(servo_target_pos));
-  
-  servo.write(map_target(servo_target_pos));
+  servo.write(panel.servo_position);
 
   if (panel.cover == OPEN || panel.cover == CLOSED) {
         powerDownServo();
@@ -606,7 +589,7 @@ void _open_cover(bool verbose) {
   }
 
   panel.cover = OPENING;
-  powerUpServo();
+  panel.servo_position = powerUpServo();
 
   cond_serialize_result(COMMAND_COVER_OPEN, RESULT_COVER_OPEN, verbose);
 }
@@ -646,7 +629,7 @@ void _close_cover(bool verbose) {
   }
 
   panel.cover = CLOSING;
-  powerUpServo();
+  panel.servo_position = powerUpServo();
 
   cond_serialize_result(COMMAND_COVER_CLOSE, RESULT_COVER_CLOSE, verbose);
 }
@@ -743,7 +726,7 @@ void cmd_unknown(const String args) {
  * Very simple command message parser. It simply check for position of the various delimiters 
  * and cut the incoming message accordingly. 
  *
- * As this firware only handles "COMMANDS", this methods expect messages formated as COMMAND:NAME[@ARGS] with:
+* As this firware only handles "COMMANDS", this methods expect messages formated as COMMAND:NAME[@ARGS] with:
  * - COMMAND == "COMMAND"
  * - NAME is [A-Z_]+
  * - ARGS is optional and [:alnum:_\s]+
@@ -879,23 +862,28 @@ int powerUpServo() {
 
   // Default position (closed), which will be used only once,
   // before we have successfully calibrated the servo.
-  int current_pos = panel.initial_servo_position;
+  int current_pos = panel.servo_position;
 
   if (is_panel_calibrated()) {
     // Short delay, so that the servo has been fully initialized.
     // Not 100% sure this is necessary, but it won't hurt.
     delay(100);
-    current_pos = servo_current_position();
-    // This step is critical! Without it, the servo does not know its position when it is attached below,
-    // and the first write command will make it jerk to that position, which is what we want to avoid...
-    servo.write(map_target(current_pos));
 
-  } else {
-    // We default to using the non calibrated method to set current postion (closed)
-    // This step is critical! Without it, the servo does not know its position when it is attached below,
-    // and the first write command will make it jerk to that position, which is what we want to avoid...
-    servo.write(current_pos);
+    int feedbackValue = analogRead(SERVO_FEEDBACK_PIN);
+    current_pos = (int)((feedbackValue - panel.calibration.intercept) / panel.calibration.slope);
+
+    // Deal with slight errors in the calibration process...
+    if (current_pos < SERVO_MIN_ANGLE) {
+      current_pos = SERVO_MIN_ANGLE;
+    } else if (current_pos > SERVO_MAX_ANGLE) {
+      current_pos = SERVO_MAX_ANGLE;
+    }
   }
+
+  // This step is critical! Without it, the servo does not know its position when it is attached below,
+  // and the first write command will make it jerk to that position, which is what we want to avoid...
+  servo.write(current_pos);
+  panel.servo_position = current_pos;
 
   // The optional min and max pulse width parameters are actually quite important
   // and depend on the exact servo you are using. Without specifying them, you may
@@ -904,6 +892,7 @@ int powerUpServo() {
 
   return current_pos;
 }
+
 
 // Detach and de-energize servo to eliminate any possible sources of vibrations.
 // Magnets will keep the cover in position, whether it is open or closed.
@@ -918,45 +907,6 @@ void powerDownServo() {
 bool is_panel_calibrated() {
   return panel.calibration.magic_number == NVM_MAGIC_NUMBER;
 }
-
-// Get current position from feedback pin, using calibration data
-int servo_current_position() {
-
-  int feedback = analogRead(SERVO_FEEDBACK_PIN);
-  int current_pos =  (int) ((feedback - panel.calibration.intercept) / panel.calibration.slope);
-
-  // Deal with slight errors in the calibration process...
-  if (current_pos < SERVO_MIN_ANGLE) {
-    current_pos = SERVO_MIN_ANGLE;
-  } else if (current_pos > SERVO_MAX_ANGLE) {
-    current_pos = SERVO_MAX_ANGLE;
-  }
-  return current_pos;
-}
-
-// Map a target angle to the servo PW command using calibration data (kind of reverse of servo_current_postion)
-int map_target(int angle) {
-  int target = (int) ((panel.calibration.slope * angle) +  panel.calibration.intercept);
-
-  //deal with slight calibration errors
-  if (target < SERVO_MIN_PW) {
-    target = SERVO_MIN_PW;
-  } else if (target > SERVO_MAX_PW) {
-    target = SERVO_MAX_PW;
-  }
-
-  return  target;
-}
-
-// Checks if targets is reached by by computing difference between feedback and exepected feedback of given angle.
-bool is_servo_on_target(int angle) {
-  int feedback = analogRead(SERVO_FEEDBACK_PIN);
-  int target = map_target(angle);
-
-  int tolerance = 2;
-  return abs(feedback - target) <= tolerance;
-}
-
 
 // Function to calculate the mean of an array.
 // This is ripped shamelessly as is from https://github.com/jlecomte/ascom-telescope-cover-v2 all credits to him.
