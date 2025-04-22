@@ -114,8 +114,8 @@ typedef struct {
 // Could ben restructured but this would bring layers of inderiction and less readability
 typedef struct {
   uint32_t brightness;
-  int servo_position;
   unsigned long last_step_time;
+  int initial_servo_position;
   cover_state_t cover;
   servo_cal_state_t calibration;
 } panel_state_t;
@@ -263,7 +263,7 @@ void setup() {
 
   // initializing panel
   panel.brightness = 0;
-  panel.servo_position = 0;
+  panel.initial_servo_position = 0;
   panel.last_step_time = 0L;
 
   // Read servo calibration data oin Flash storage:
@@ -272,6 +272,7 @@ void setup() {
   // When there is no calibration data yet, we have to assume that the cover is closed...
   if (!is_panel_calibrated()) {
       panel.cover = CLOSED;
+      panel.initial_servo_position = 0;
   } else {
     // Close the cover, in case it is not completely closed.
     // To make sure that `_closeçcover` does not have an undefined behavior,
@@ -279,8 +280,6 @@ void setup() {
     // That variable will be updated in the `_close_cover` function,
     // and then again once the cover has completely closed.
     // 
-    // Similarly the panel.servo_position variable will be updated with the corrected servo
-    // feedback_pin value in the "_close_cover" funcion.
     // 
     // No need to have the built-in led up anymore.
     digitalWrite(LED_BUILTIN, HIGH);
@@ -387,21 +386,23 @@ void update_panel_cover() {
 
   panel.last_step_time = now;
 
+  int servo_target_pos = servo_current_position();
+  
   if (panel.cover == OPENING) {
-    panel.servo_position++;
-    if (panel.servo_position >= 180) {
-      panel.servo_position = 180;
+    servo_target_pos++;
+    if (servo_target_pos >= 180) {
+      servo_target_pos = 180;
       panel.cover = OPEN;
     }
   } else if (panel.cover == CLOSING) {
-    panel.servo_position--;
-    if (panel.servo_position <= 0) {
-      panel.servo_position = 0;
+    servo_target_pos--;
+    if (servo_target_pos <= 0) {
+      servo_target_pos = 0;
       panel.cover = CLOSED;
     }
   }
 
-  servo.write(panel.servo_position);
+  servo.write(servo_target_pos);
 
   if (panel.cover == OPEN || panel.cover == CLOSED) {
         powerDownServo();
@@ -546,7 +547,7 @@ void cmd_cover_get_state(const String args) {
  * This commands tells the cover to open in response to a COMMAND:COVER_OPEN message.
  * 
  * - Powers up the servo 
- * - Sets the current "panel.servo_position" according to the (corrected) feedback_pin value
+ * - Write to the servo its position according to the (corrected) feedback_pin value
  * - Sets the panel.cover state to OPENING
  *
  * Incoming message : COMMAND:COVER_OPEN
@@ -574,7 +575,7 @@ void _open_cover(bool verbose) {
   }
 
   panel.cover = OPENING;
-  panel.servo_position = powerUpServo();
+  powerUpServo();
 
   cond_serialize_result(COMMAND_COVER_OPEN, RESULT_COVER_OPEN, verbose);
 }
@@ -585,7 +586,7 @@ void _open_cover(bool verbose) {
  * This commands tells the cover to close in response to a COMMAND:COVER_CLOSE message.
  * 
  * - Powers up the servo 
- * - Sets the current "panel.servo_position" according to the (corrected) feedback_pin value
+ * - Writes the servo postion according to the correct (corrected) feedback_pin value
  * - Sets the panel.cover state to CLOSINGs
  *
  * Incoming message : COMMAND:COVER_CLOSE
@@ -614,7 +615,7 @@ void _close_cover(bool verbose) {
   }
 
   panel.cover = CLOSING;
-  panel.servo_position = powerUpServo();
+  powerUpServo();
 
   cond_serialize_result(COMMAND_COVER_CLOSE, RESULT_COVER_CLOSE, verbose);
 }
@@ -844,28 +845,19 @@ int powerUpServo() {
 
   // Default position (closed), which will be used only once,
   // before we have successfully calibrated the servo.
-  int current_pos = panel.servo_position;
+  int current_pos = panel.initial_servo_position;
 
   if (is_panel_calibrated()) {
     // Short delay, so that the servo has been fully initialized.
     // Not 100% sure this is necessary, but it won't hurt.
     delay(100);
+    current_pos = servo_current_position();
 
-    int feedbackValue = analogRead(SERVO_FEEDBACK_PIN);
-    current_pos = (int)((feedbackValue - panel.calibration.intercept) / panel.calibration.slope);
-
-    // Deal with slight errors in the calibration process...
-    if (current_pos < 0) {
-      current_pos = 0;
-    } else if (current_pos > 180) {
-      current_pos = 180;
-    }
   }
 
   // This step is critical! Without it, the servo does not know its position when it is attached below,
   // and the first write command will make it jerk to that position, which is what we want to avoid...
   servo.write(current_pos);
-  panel.servo_position = current_pos;
 
   // The optional min and max pulse width parameters are actually quite important
   // and depend on the exact servo you are using. Without specifying them, you may
@@ -886,6 +878,20 @@ bool is_panel_calibrated() {
   return panel.calibration.magic_number == NVM_MAGIC_NUMBER;
 }
 
+// Get current position from feedback pin
+int servo_current_position() {
+  int feedbackValue = analogRead(SERVO_FEEDBACK_PIN);
+  int current_pos =  (int)((feedbackValue - panel.calibration.intercept) / panel.calibration.slope);
+
+      // Deal with slight errors in the calibration process...
+    if (current_pos < 0) {
+      current_pos = 0;
+    } else if (current_pos > 180) {
+      current_pos = 180;
+    }
+
+    return current_pos;
+}
 // Function to calculate the mean of an array.
 // This is ripped shamelessly as is from https://github.com/jlecomte/ascom-telescope-cover-v2 all credits to him.
 double mean(double arr[], int n) {
