@@ -54,7 +54,7 @@ In a nutshell
                                 or
                         ERROR:ERR_MESSAGE@DETAILS
 
-More details on this protocol are provided in [protocol.md](./serial_protocol/protocol.md)
+More details on this protocol are provided in [protocol.md](./specifications/protocol.md)
 
 
 ## Softwares developpement and compilations
