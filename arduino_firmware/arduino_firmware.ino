@@ -45,11 +45,11 @@
  * - COMMAND:BRIGHTNESS_GET
  * - COMMAND:BRIGHTNESS_SET@{(int) DESIRED_VALUE}
  * - COMMAND:BRIGHTNESS_RESET
- * - COMMAND:COVER_GET
+ * - COMMAND:COVER_GET_STATE
  * - COMMAND:COVER_OPEN
  * - COMMAND:COVER_CLOSE
- * - COMMAND:CALIBRATION_RUN
- * - COMMAND:CALIBRATION_GET
+ * - COMMAND:COVER_CALIBRATION_RUN
+ * - COMMAND:COVER_CALIBRATION_GET
  *
  * The protocol, the implementation of both the ASCOM driver and this firmware, the electronics and the 3D models
  * are heavily inspired by the the work  of Dark Sky Geek (https://github.com/jlecomte/) especially 
@@ -170,7 +170,7 @@ constexpr auto COMMAND_UNKNOWN = "UNKNOWN";
 constexpr auto ERROR_NOT_IMPLEMENTED = "UNSUPPORTED_COMMAND@Not implemented";
 constexpr auto ERROR_INVALID_INCOMING_MESSAGE = "INVALID_INCOMING_MESSAGE@Allowed messages are TYPE:MESSAGE:[@PARAMETER]";
 constexpr auto ERROR_INVALID_INCOMING_MESSAGE_TYPE = "INVALID_INCOMING_MESSAGE_TYPE@Allowed types COMMAND";
-constexpr auto ERROR_INVALID_COMMAND = "INVALID_COMMAND@Allowed commands PING, INFO, BRIGHTNESS_GET, BRIGHTNESS_SET, BRIGHTNESS_RESET";
+constexpr auto ERROR_INVALID_COMMAND = "INVALID_COMMAND@Allowed commands PING, INFO, BRIGHTNESS_GET, BRIGHTNESS_SET, BRIGHTNESS_RESET, COVER_GET_STATE, COVER_OPEN, COVER_CLOSE, COVER_CALIBRATION_RUN, COVER_CALIBRATION_GET";
 constexpr auto ERROR_WANTED_BRIGHTNESS_MSG_START = "INVALID_BRIGHTNESS@Wanted brightness {";
 constexpr auto ERROR_WANTED_BRIGHTNESS_NAN_MSG_END = "} is not a number.";
 constexpr auto ERROR_WANTED_BRIGHTNESS_NEGATIVE_MSG_END = "} is negative.";
@@ -197,6 +197,20 @@ constexpr uint32_t MIN_BRIGHTNESS = 0;
 constexpr uint32_t MAX_BRIGHTNESS = 1023;
 constexpr uint32_t PWM_FREQ = 20000;
 
+/*
+ * DSS-M15S Servo with analog feedback related constants 
+ */
+
+// MIN and MAX angle are default for "servos".
+// No 180° for MAX angle is not a mistake. It is really the value one wants here. 
+// Even though ours can go to 270° those are set using the pulse width MIN and MAX.C.f below.
+constexpr uint32_t SERVO_MIN_ANGLE = 0;
+constexpr uint32_t SERVO_MAX_ANGLE = 180;
+// Used to get the proper full range of motion (270°). Used by the servo library to map
+// input angles (betwenn 0 and 180) to wanted 0 to 270° "real" wanted angles.
+// Those are figures from the  DSS-M15S Servo specifications and depend on the exact servo you are using.
+constexpr uint32_t SERVO_MIN_PW = 500;
+constexpr uint32_t SERVO_MAX_PW = 2500;
 /*
  * Pins assignment. Must be set according to the exact actual wiring. 
  * Check KiCad shcematics to check the correct pins
@@ -373,6 +387,7 @@ void check_for_calibration() {
  * - Panel is not calibrated
  * - Panel is OPEN
  * - Panel is CLOSED
+ * - We did not wait engough (STEP_DELAY_MICROSEC) beween to steps
  */
 void update_panel_cover() {
   // We do not move we are not calibrated
@@ -386,23 +401,39 @@ void update_panel_cover() {
 
   panel.last_step_time = now;
 
-  int servo_target_pos = servo_current_position();
-  
+  // Current position holds the servo current postion
+  // Target postion will hold the wanted position for the servo at next step.
+  // One could argue that only one is variable is needed but let's use two for readability.
+  int servo_current_pos= servo_current_position();
+  int servo_target_pos = servo_current_pos;
+
+
   if (panel.cover == OPENING) {
-    servo_target_pos++;
-    if (servo_target_pos >= 180) {
-      servo_target_pos = 180;
+
+    if (is_servo_on_target(SERVO_MAX_ANGLE)) {
       panel.cover = OPEN;
+      servo_target_pos = SERVO_MAX_ANGLE;
+    } else {
+      servo_target_pos = min(servo_current_pos + 1,SERVO_MAX_ANGLE);
     }
+
   } else if (panel.cover == CLOSING) {
-    servo_target_pos--;
-    if (servo_target_pos <= 0) {
-      servo_target_pos = 0;
+    
+    if (is_servo_on_target(SERVO_MIN_ANGLE)) {
       panel.cover = CLOSED;
+      servo_target_pos = SERVO_MIN_ANGLE;
+    } else  {
+      servo_target_pos = max(servo_current_pos - 1, SERVO_MIN_ANGLE);
     }
+
   }
 
-  servo.write(servo_target_pos);
+  Serial.println("DEBUG:CURRENT_POS@ " + servo_current_pos);
+  Serial.println("DEBUG:TARGET_POS@" + servo_target_pos);
+  Serial.println("DEBUG:COVER_STATE@ " + panel.cover);
+  Serial.println("DEBUG:TARGET_PW@" + map_target(servo_target_pos));
+  
+  servo.write(map_target(servo_target_pos));
 
   if (panel.cover == OPEN || panel.cover == CLOSED) {
         powerDownServo();
@@ -517,11 +548,11 @@ void cmd_brightness_reset(const String args) {
 /*
  * "Get cover state" command handler. 
  * 
- * This commands gives the current cover state (OPEN, OPENING, CLOSING, CLOSED) in response to a COMMAND:COVER_GET message.
+ * This commands gives the current cover state (OPEN, OPENING, CLOSING, CLOSED) in response to a COMMAND:COVER_GET_STATE message.
  *
- * Incoming message : COMMAND:COVER_GET
+ * Incoming message : COMMAND:COVER_GET_STATE
  * Args             : Ignored
- * Serial response  : RESULT:COVER_GET@{panel.cover}, where panel.cover is string human readable translation of the current cover state
+ * Serial response  : RESULT:COVER_GET_STATE@{panel.cover}, where panel.cover is string human readable translation of the current cover state
  * Serial error     : Never
  */
 void cmd_cover_get_state(const String args) {
@@ -634,9 +665,9 @@ void _close_cover(bool verbose) {
  *
  * This has to be done only once after the firmware has been uploaded.
  *
- * Incoming message : COMMAND:CALIBRATION_RUN
+ * Incoming message : COMMAND:COVER_CALIBRATION_RUN
  * Args             : Ignored
- * Serial response  : RESULT:CALIBRATION_RUN@OK
+ * Serial response  : RESULT:COVER_CALIBRATION_RUN@OK
  * Serial error     : Never
  */
 void cmd_cover_calibration_run(const String args) {
@@ -674,9 +705,9 @@ void cmd_cover_calibration_run(const String args) {
  * 
  * This commands gives the calibration data in response to a COMMAND:CALIBRATION_RUN message.
  *
- * Incoming message : COMMAND:CALIBRATION_GET
+ * Incoming message : COMMAND:COVER_CALIBRATION_GET
  * Args             : Ignored
- * Serial response  : RESULT:CALIBRATION_GET@slope={panel.calibration.slope} - intercept={panel.calibration.intercept}
+ * Serial response  : RESULT:COVER_CALIBRATION_GET@slope={panel.calibration.slope} - intercept={panel.calibration.intercept}
  * Serial error     : if panel is not calibrated => "SERVO_NO_CALIBRATED@Run command COVER_CALIBRATION_RUN first"
  */
 void cmd_cover_calibration_get(const String args) {
@@ -712,14 +743,14 @@ void cmd_unknown(const String args) {
  * Very simple command message parser. It simply check for position of the various delimiters 
  * and cut the incoming message accordingly. 
  *
- * As this firware only handles "COMMANDS", this methods expect messages formated as TYPE:COMMAND[@ARGS] with:
- * - TYPE == "COMMAND"
- * - COMMAND is [A-Z_]+
+ * As this firware only handles "COMMANDS", this methods expect messages formated as COMMAND:NAME[@ARGS] with:
+ * - COMMAND == "COMMAND"
+ * - NAME is [A-Z_]+
  * - ARGS is optional and [:alnum:_\s]+
  *
  * Basically it splits the the message into three part
- * - Considers what is before ":" as TYPE
- * - Considers what is between ":" and "@" (if present) as COMMAND
+ * - Considers what is before ":" as TYPE (that should be COMMAND)
+ * - Considers what is between ":" and "@" (if present) as the NAME of the COMMAND
  * - Considers what is after "@" (if present) as ARGS
  *
  *
@@ -766,7 +797,7 @@ msg_cmd_payload get_cmd_payload(const String message, bool *error) {
   return msg_cmd_payload{ cmd_name, cmd_args };
 }
 
-// Returns the Enum value corresponding to the input string.
+// Queries the wanted command using its name.
 // Could be implemented as a Map if O(1) lookup is needed.
 command_t get_command_from_payload(const msg_cmd_payload input) {
 
@@ -810,6 +841,9 @@ void cond_serialize_error(String error, bool verbose) {
   }
 }
 
+// Check if the string contais only 0
+// Used to check if the parser gave 0 as a result because the wanted brightness was indeed zero, 
+// or because it failed to parse the string as a number
 bool has_only_zeros(String num) {
   bool only_zeros = num.length() > 0;
   for (auto c : num) {
@@ -852,17 +886,21 @@ int powerUpServo() {
     // Not 100% sure this is necessary, but it won't hurt.
     delay(100);
     current_pos = servo_current_position();
+    // This step is critical! Without it, the servo does not know its position when it is attached below,
+    // and the first write command will make it jerk to that position, which is what we want to avoid...
+    servo.write(map_target(current_pos));
 
+  } else {
+    // We default to using the non calibrated method to set current postion (closed)
+    // This step is critical! Without it, the servo does not know its position when it is attached below,
+    // and the first write command will make it jerk to that position, which is what we want to avoid...
+    servo.write(current_pos);
   }
-
-  // This step is critical! Without it, the servo does not know its position when it is attached below,
-  // and the first write command will make it jerk to that position, which is what we want to avoid...
-  servo.write(current_pos);
 
   // The optional min and max pulse width parameters are actually quite important
   // and depend on the exact servo you are using. Without specifying them, you may
   // not be able to use the full range of motion (270 degrees for this project)
-  servo.attach(SERVO_POS_CONTROL_PIN, 500, 2500);
+  servo.attach(SERVO_POS_CONTROL_PIN, SERVO_MIN_PW, SERVO_MAX_PW);
 
   return current_pos;
 }
@@ -874,24 +912,52 @@ void powerDownServo() {
   digitalWrite(SERVO_POWER_PIN, LOW);
 }
 
+// Name says what it does. 
+// It does so by checking if the Non-Volatile-Memory Magic number has been 
+// set to the know and expected value
 bool is_panel_calibrated() {
   return panel.calibration.magic_number == NVM_MAGIC_NUMBER;
 }
 
-// Get current position from feedback pin
+// Get current position from feedback pin, using calibration data
 int servo_current_position() {
-  int feedbackValue = analogRead(SERVO_FEEDBACK_PIN);
-  int current_pos =  (int)((feedbackValue - panel.calibration.intercept) / panel.calibration.slope);
 
-      // Deal with slight errors in the calibration process...
-    if (current_pos < 0) {
-      current_pos = 0;
-    } else if (current_pos > 180) {
-      current_pos = 180;
-    }
+  int feedback = analogRead(SERVO_FEEDBACK_PIN);
+  int current_pos =  (int) ((feedback - panel.calibration.intercept) / panel.calibration.slope);
 
-    return current_pos;
+  // Deal with slight errors in the calibration process...
+  if (current_pos < SERVO_MIN_ANGLE) {
+    current_pos = SERVO_MIN_ANGLE;
+  } else if (current_pos > SERVO_MAX_ANGLE) {
+    current_pos = SERVO_MAX_ANGLE;
+  }
+  return current_pos;
 }
+
+// Map a target angle to the servo PW command using calibration data (kind of reverse of servo_current_postion)
+int map_target(int angle) {
+  int target = (int) ((panel.calibration.slope * angle) +  panel.calibration.intercept);
+
+  //deal with slight calibration errors
+  if (target < SERVO_MIN_PW) {
+    target = SERVO_MIN_PW;
+  } else if (target > SERVO_MAX_PW) {
+    target = SERVO_MAX_PW;
+  }
+
+  return  target;
+}
+
+// Checks if targets is reached by by computing difference between feedback and exepected feedback of given angle.
+bool is_servo_on_target(int angle) {
+  int feedback = analogRead(SERVO_FEEDBACK_PIN);
+  int target = map_target(angle);
+
+  int tolerance = 2;
+  return abs(feedback - target) <= tolerance;
+}
+
+
 // Function to calculate the mean of an array.
 // This is ripped shamelessly as is from https://github.com/jlecomte/ascom-telescope-cover-v2 all credits to him.
 double mean(double arr[], int n) {
