@@ -115,6 +115,7 @@ typedef struct {
 typedef struct {
   uint32_t brightness;
   int servo_position;
+  uint32_t position_convergence_counter;
   unsigned long last_step_time;
   cover_state_t cover;
   servo_cal_state_t calibration;
@@ -229,6 +230,8 @@ constexpr unsigned int NVM_MAGIC_NUMBER = 0x12345678;
 
 // How long do we wait between each step (loop) in order to achieve the desired speed?
 constexpr unsigned long STEP_DELAY_MICROSEC = 30L * 1000; // 30 msec
+constexpr uint32_t MAX_CONVERGENCE_TRIES = 5;
+constexpr int CONVERGENCE_CRITERIA = 1;
 
 /************************************************
  *             Global/State variables           *
@@ -279,6 +282,7 @@ void setup() {
   // initializing panel
   panel.brightness = 0;
   panel.servo_position = 0;
+  panel.position_convergence_counter = 0;
   panel.last_step_time = 0L;
 
   // Read servo calibration data oin Flash storage:
@@ -418,8 +422,28 @@ void update_panel_cover() {
 
   servo.write(panel.servo_position);
 
+  int actual_pos = get_current_servo_pos();
+  if (panel.cover == OPEN) {
+    if (panel.position_convergence_counter < MAX_CONVERGENCE_TRIES) {
+      if ((SERVO_MAX_ANGLE- actual_pos) >= CONVERGENCE_CRITERIA) {
+        panel.cover = OPENING;
+        panel.position_convergence_counter++;
+      }
+    } 
+  }
+
+  if (panel.cover == CLOSED) {
+    if (panel.position_convergence_counter < MAX_CONVERGENCE_TRIES) {
+      if ((actual_pos- SERVO_MIN_ANGLE) >= CONVERGENCE_CRITERIA) {
+        panel.cover = CLOSING;
+        panel.position_convergence_counter++;
+      }
+    }
+  }
+  
   if (panel.cover == OPEN || panel.cover == CLOSED) {
-        powerDownServo();
+      panel.position_convergence_counter = 0;
+      powerDownServo();
   }
 }
 
@@ -868,16 +892,7 @@ int powerUpServo() {
     // Short delay, so that the servo has been fully initialized.
     // Not 100% sure this is necessary, but it won't hurt.
     delay(100);
-
-    int feedbackValue = analogRead(SERVO_FEEDBACK_PIN);
-    current_pos = (int)((feedbackValue - panel.calibration.intercept) / panel.calibration.slope);
-
-    // Deal with slight errors in the calibration process...
-    if (current_pos < SERVO_MIN_ANGLE) {
-      current_pos = SERVO_MIN_ANGLE;
-    } else if (current_pos > SERVO_MAX_ANGLE) {
-      current_pos = SERVO_MAX_ANGLE;
-    }
+    current_pos = get_current_servo_pos();
   }
 
   // This step is critical! Without it, the servo does not know its position when it is attached below,
@@ -901,6 +916,19 @@ void powerDownServo() {
   digitalWrite(SERVO_POWER_PIN, LOW);
 }
 
+int get_current_servo_pos(){
+  int feedbackValue = analogRead(SERVO_FEEDBACK_PIN);
+  int current_pos = (int)((feedbackValue - panel.calibration.intercept) / panel.calibration.slope);
+
+  // Deal with slight errors in the calibration process...
+  if (current_pos < SERVO_MIN_ANGLE) {
+    current_pos = SERVO_MIN_ANGLE;
+  } else if (current_pos > SERVO_MAX_ANGLE) {
+    current_pos = SERVO_MAX_ANGLE;
+  }
+
+  return current_pos;
+}
 // Name says what it does. 
 // It does so by checking if the Non-Volatile-Memory Magic number has been 
 // set to the know and expected value
