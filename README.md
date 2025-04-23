@@ -97,13 +97,13 @@ Then from the IDE connect to the board and using the Arduino serial monitor send
 
 
 ```
-COMMAND:CALIBRATION_RUN
+COMMAND:COVER_CALIBRATION_RUN
 ``` 
 
 The device should perform its calibration procedure and reply with 
 
 ```
-RESULT:CALIBRATION_RUN@OK
+RESULT:COVER_CALIBRATION_RUN@OK
 ```
 
 Once it has completed, re-attach the right arm to the servo. The device is now ready to be used.
