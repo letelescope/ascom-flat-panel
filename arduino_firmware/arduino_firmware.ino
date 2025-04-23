@@ -410,39 +410,49 @@ void update_panel_cover() {
     panel.servo_position++;
     if (panel.servo_position >= SERVO_MAX_ANGLE) {
       panel.servo_position = SERVO_MAX_ANGLE;
-      panel.cover = OPEN;
     }
   } else if (panel.cover == CLOSING) {
     panel.servo_position--;
     if (panel.servo_position <= SERVO_MIN_ANGLE) {
       panel.servo_position = SERVO_MIN_ANGLE;
-      panel.cover = CLOSED;
     }
   }
 
   servo.write(panel.servo_position);
 
-  int actual_pos = get_current_servo_pos();
-  if (panel.cover == OPEN) {
-    if (panel.position_convergence_counter < MAX_CONVERGENCE_TRIES) {
-      if ((SERVO_MAX_ANGLE- actual_pos) >= CONVERGENCE_CRITERIA) {
-        panel.cover = OPENING;
-        panel.position_convergence_counter++;
-      }
-    } 
+  //servo targets "open" position. Check if we are relly there
+  if (panel.servo_position == SERVO_MAX_ANGLE) {
+    
+    int actual_pos = get_current_servo_pos();
+
+    bool has_reached_target = (SERVO_MAX_ANGLE- actual_pos) <= CONVERGENCE_CRITERIA;
+    bool too_manmy_retries = panel.position_convergence_counter > MAX_CONVERGENCE_TRIES;
+    
+    if (has_reached_target || too_manmy_retries) {
+      panel.cover = OPEN;
+      panel.position_convergence_counter = 0;
+    } else {
+      panel.position_convergence_counter++;
+    }
   }
 
-  if (panel.cover == CLOSED) {
-    if (panel.position_convergence_counter < MAX_CONVERGENCE_TRIES) {
-      if ((actual_pos- SERVO_MIN_ANGLE) >= CONVERGENCE_CRITERIA) {
-        panel.cover = CLOSING;
-        panel.position_convergence_counter++;
-      }
+  //servo targets "closed" position. Check if we are relly there
+  if (panel.servo_position == SERVO_MIN_ANGLE) {
+    
+    int actual_pos = get_current_servo_pos();
+
+    bool has_reached_target = (actual_pos- SERVO_MIN_ANGLE) <= CONVERGENCE_CRITERIA;
+    bool too_manmy_retries = panel.position_convergence_counter > MAX_CONVERGENCE_TRIES;
+    
+    if (has_reached_target || too_manmy_retries) {
+      panel.cover = CLOSED;
+      panel.position_convergence_counter = 0;
+    } else {
+      panel.position_convergence_counter++;
     }
   }
   
   if (panel.cover == OPEN || panel.cover == CLOSED) {
-      panel.position_convergence_counter = 0;
       powerDownServo();
   }
 }
