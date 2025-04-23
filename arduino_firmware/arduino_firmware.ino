@@ -426,7 +426,7 @@ void update_panel_cover() {
   if (panel.servo_position == SERVO_MAX_ANGLE) {
     
     int actual_pos = get_current_servo_pos();
-
+    
     bool has_reached_target = (SERVO_MAX_ANGLE- actual_pos) <= CONVERGENCE_CRITERIA;
     bool too_manmy_retries = panel.position_convergence_counter > MAX_CONVERGENCE_RETRIES;
     
@@ -691,12 +691,13 @@ void cmd_cover_calibration_run(const String args) {
   
   powerUpServo();
 
-  int step = 10;
+  int step = 5;
   int n_data_points = 1 + 180 / step;
 
   double x[n_data_points] = { 0 };
   double y[n_data_points] = { 0 };
 
+  delay(1000);
   for (int i = 0, pos = 0; pos <= 180; i++, pos = i * step) {
     servo.write(pos);
     delay(1000);
