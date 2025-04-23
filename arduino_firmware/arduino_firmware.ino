@@ -114,7 +114,7 @@ typedef struct {
 // Could ben restructured but this would bring layers of inderiction and less readability
 typedef struct {
   uint32_t brightness;
-  int servo_position;
+  int servo_position; // Holds the targeted servo position (maybe different from the actual one)
   uint32_t position_convergence_counter;
   unsigned long last_step_time;
   cover_state_t cover;
@@ -158,17 +158,14 @@ constexpr auto RESULT_COVER_GET_STATE_CLOSING = "CLOSING";
 
 constexpr auto COMMAND_COVER_OPEN = "COVER_OPEN";
 constexpr auto RESULT_COVER_OPEN = "OK";
-constexpr auto ERROR_COVER_OPEN = "COVER_OPEN_IMPOSSIBLE@Cover is not closed nor closing.";
 constexpr auto COMMAND_COVER_CLOSE = "COVER_CLOSE";
 constexpr auto RESULT_COVER_CLOSE = "OK";
-constexpr auto ERROR_COVER_CLOSE = "COVER_CLOSE_IMPOSSIBLE@Cover is not open nor opening.";
 constexpr auto COMMAND_COVER_CALIBRATION_RUN = "COVER_CALIBRATION_RUN";
 constexpr auto RESULT_COVER_CALIBRATION_RUN = "0K";
 constexpr auto COMMAND_COVER_CALIBRATION_GET = "COVER_CALIBRATION_GET";
 
 constexpr auto COMMAND_UNKNOWN = "UNKNOWN";
 
-constexpr auto ERROR_NOT_IMPLEMENTED = "UNSUPPORTED_COMMAND@Not implemented";
 constexpr auto ERROR_INVALID_INCOMING_MESSAGE = "INVALID_INCOMING_MESSAGE@Allowed messages are TYPE:MESSAGE:[@PARAMETER]";
 constexpr auto ERROR_INVALID_INCOMING_MESSAGE_TYPE = "INVALID_INCOMING_MESSAGE_TYPE@Allowed types COMMAND";
 constexpr auto ERROR_INVALID_COMMAND = "INVALID_COMMAND@Allowed commands PING, INFO, BRIGHTNESS_GET, BRIGHTNESS_SET, BRIGHTNESS_RESET, COVER_GET_STATE, COVER_OPEN, COVER_CLOSE, COVER_CALIBRATION_RUN, COVER_CALIBRATION_GET";
@@ -203,7 +200,7 @@ constexpr uint32_t PWM_FREQ = 20000;
  */
 
 // MIN and MAX angle are default for "servos".
-// No 180° for MAX angle is not a mistake. It is really the value one wants here. 
+// Nope 180° for MAX angle is not a mistake. It is really the value one wants here. 
 // Even though ours can go to 270° those are set using the pulse width MIN and MAX.C.f below.
 constexpr int SERVO_MIN_ANGLE = 0;
 constexpr int SERVO_MAX_ANGLE = 180; // Yes this is correct. Full amplitude is set with MIN_PW and MAX_PW
@@ -230,7 +227,9 @@ constexpr unsigned int NVM_MAGIC_NUMBER = 0x12345678;
 
 // How long do we wait between each step (loop) in order to achieve the desired speed?
 constexpr unsigned long STEP_DELAY_MICROSEC = 30L * 1000; // 30 msec
-constexpr uint32_t MAX_CONVERGENCE_TRIES = 5;
+// How long do wait for convergence at most?
+constexpr uint32_t MAX_CONVERGENCE_RETRIES = 5;
+// How close we want to be?
 constexpr int CONVERGENCE_CRITERIA = 1;
 
 /************************************************
@@ -383,9 +382,11 @@ void check_for_calibration() {
  * Updates the servo/cover physical position, if need be, according to the OPENING or CLOSING state of the cover
  *
  * - If the Panel cover is "OPENING", increments the servo position
- *   +  If it reaches 180, marks the cover as OPEN
+ *   +  If it reaches SERVO_MAX_ANGLE, try to check MAX_CONVERGENCE_RETRIES times 
+ *      if it actually reached SERVO_MAX_ANGLE and marks the cover as OPEN
  * - If the Panel cover is "CLOSING", decrements the servo position 
- *   +  If it reaches 0, marks the cover as OPEN
+ *   +  If it reaches SERVO_MIN_ANGLE, try to check MAX_CONVERGENCE_RETRIES times
+ *      if actully reached SERVO_MIN_ANGLE and marks the cover as CLOSED
  * - Updates the "physical" servo postion with the calculated one
  * - Power down the servo il Panel is OPEN or CLOSED
  *
@@ -397,7 +398,7 @@ void check_for_calibration() {
 void update_panel_cover() {
   // We do not move we are not calibrated
   if (!is_panel_calibrated()) return;
-  // We do not move we we are yet either OPEN or CLOSED
+  // We do not move are in a steady state, i.e. either OPEN or CLOSED
   if (panel.cover == OPEN || panel.cover == CLOSED) return;
 
   unsigned long now = micros();
@@ -406,6 +407,7 @@ void update_panel_cover() {
 
   panel.last_step_time = now;
 
+  // Ramping up "slowly" target position
   if (panel.cover == OPENING) {
     panel.servo_position++;
     if (panel.servo_position >= SERVO_MAX_ANGLE) {
@@ -420,13 +422,13 @@ void update_panel_cover() {
 
   servo.write(panel.servo_position);
 
-  //servo targets "open" position. Check if we are relly there
+  //servo targets "open" position. Check if we are really there
   if (panel.servo_position == SERVO_MAX_ANGLE) {
     
     int actual_pos = get_current_servo_pos();
 
     bool has_reached_target = (SERVO_MAX_ANGLE- actual_pos) <= CONVERGENCE_CRITERIA;
-    bool too_manmy_retries = panel.position_convergence_counter > MAX_CONVERGENCE_TRIES;
+    bool too_manmy_retries = panel.position_convergence_counter > MAX_CONVERGENCE_RETRIES;
     
     if (has_reached_target || too_manmy_retries) {
       panel.cover = OPEN;
@@ -436,13 +438,13 @@ void update_panel_cover() {
     }
   }
 
-  //servo targets "closed" position. Check if we are relly there
+  //servo targets "closed" position. Check if we are really there
   if (panel.servo_position == SERVO_MIN_ANGLE) {
     
     int actual_pos = get_current_servo_pos();
 
     bool has_reached_target = (actual_pos- SERVO_MIN_ANGLE) <= CONVERGENCE_CRITERIA;
-    bool too_manmy_retries = panel.position_convergence_counter > MAX_CONVERGENCE_TRIES;
+    bool too_manmy_retries = panel.position_convergence_counter > MAX_CONVERGENCE_RETRIES;
     
     if (has_reached_target || too_manmy_retries) {
       panel.cover = CLOSED;
@@ -467,9 +469,9 @@ void update_panel_cover() {
  * Dummy command that answers PONG to a COMMAND:PING message.
  *
  * Incoming message :  COMMAND:PING 
- * Args             :             Ignored
- * Serial response  :   RESULT:PING@PONG
- * Serial error     : Never 
+ * Args             :  Ignored
+ * Serial response  :  RESULT:PING@PONG
+ * Serial error     :  Never 
  */
 void cmd_ping(const String args) {
   serialize_result(COMMAND_PING, RESULT_PING);
@@ -601,9 +603,7 @@ void cmd_cover_get_state(const String args) {
  * Incoming message : COMMAND:COVER_OPEN
  * Args             : Ignored
  * Serial response  : RESULT:COVER_OPEN@OK
- * Serial error     : Errors in two cases
- *                    - panel is not calibrated              => "SERVO_NO_CALIBRATED@Run command COVER_CALIBRATION_RUN first"
- *                    - panel is neither CLOSING nor CLOSING => "COVER_OPEN_IMPOSSIBLE@Cover is not closed nor closing.""
+ * Serial error     : If panel is not calibrated  => "SERVO_NO_CALIBRATED@Run command COVER_CALIBRATION_RUN first"
  */
 void cmd_cover_open(const String args) {
   bool verbose = true;
@@ -617,8 +617,9 @@ void _open_cover(bool verbose) {
     cond_serialize_error(ERROR_SERVO_NOT_CALIBRATED, verbose);
     return;
   }
-  if (!(panel.cover == CLOSED || panel.cover == CLOSING)) {
-    cond_serialize_error(ERROR_COVER_OPEN, verbose);
+  if (panel.cover == OPEN || panel.cover == OPENING) {
+    // Trying to open an already open or openning cover. Let's do nothing
+    cond_serialize_result(COMMAND_COVER_OPEN, RESULT_COVER_OPEN, verbose);
     return;
   }
 
@@ -640,9 +641,7 @@ void _open_cover(bool verbose) {
  * Incoming message : COMMAND:COVER_CLOSE
  * Args             : Ignored
  * Serial response  : RESULT:COVER_CLOSE@OK
- * Serial error     : Errors in two cases
- *                    - panel is not calibrated              => "SERVO_NO_CALIBRATED@Run command COVER_CALIBRATION_RUN first"
- *                    - panel is neither OPEN nor OPENING    => "COVER_CLOSE_IMPOSSIBLE@Cover is not open nor opening."
+ * Serial error     : If panel is not calibrated => "SERVO_NO_CALIBRATED@Run command COVER_CALIBRATION_RUN first"
  */
 void cmd_cover_close(const String args) {
   bool verbose = true;
@@ -657,8 +656,9 @@ void _close_cover(bool verbose) {
     return;
   }
 
-  if (!(panel.cover == OPEN || panel.cover == OPENING)) {
-    cond_serialize_error(ERROR_COVER_CLOSE, verbose);
+  if (panel.cover == CLOSED || panel.cover == CLOSING) {
+    // Trying to close an already closed or closing cover. Let's do nothing
+    cond_serialize_result(COMMAND_COVER_CLOSE, RESULT_COVER_CLOSE, verbose);
     return;
   }
 
@@ -858,7 +858,7 @@ void cond_serialize_error(String error, bool verbose) {
   }
 }
 
-// Check if the string contais only 0
+// Check if the string contains only "0"s (actual "ascii 0"s not the null caracter)
 // Used to check if the parser gave 0 as a result because the wanted brightness was indeed zero, 
 // or because it failed to parse the string as a number
 bool has_only_zeros(String num) {
@@ -883,8 +883,6 @@ void set_brightness() {
   // For example, it does not work on pin 7 of the Xiao, but it works on pin 8.
   //
   // No need to map anymore our bightness, it laredy a number between 0 and 1023 see BRIGHTNESS_SET command
-  // int value = map(brightness, MIN_BRIGHTNESS, MAX_BRIGHTNESS, 0, 1023);
-  //pwm(ledPin, PWM_FREQ, value);
   pwm(LEDSTRIP_PIN, PWM_FREQ, panel.brightness);
 }
 
@@ -926,6 +924,7 @@ void powerDownServo() {
   digitalWrite(SERVO_POWER_PIN, LOW);
 }
 
+// Get actual servo position using analog feedback and calibration data
 int get_current_servo_pos(){
   int feedbackValue = analogRead(SERVO_FEEDBACK_PIN);
   int current_pos = (int)((feedbackValue - panel.calibration.intercept) / panel.calibration.slope);

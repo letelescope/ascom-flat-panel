@@ -39,11 +39,11 @@ Allowed commands are:
 - `COMMAND:BRIGHTNESS_GET`
 - `COMMAND:BRIGHTNESS_SET@{(int) DESIRED_VALUE}`
 - `COMMAND:BRIGHTNESS_RESET`
-- `COMMAND:COVER_GET`
+- `COMMAND:COVER_GET_STATE`
 - `COMMAND:COVER_OPEN`
 - `COMMAND:COVER_CLOSE`
-- `COMMAND:CALIBRATION_RUN`
-- `COMMAND:CALIBRATION_GET`
+- `COMMAND:COVER_CALIBRATION_RUN`
+- `COMMAND:COVER_CALIBRATION_GET`
 
 ## Command Details 
 
@@ -97,18 +97,16 @@ Allowed commands are:
 - Incoming message : `COMMAND:COVER_OPEN`
 - Args             : Ignored
 - Serial response  : `RESULT:COVER_OPEN@OK`
-- Serial error     : Errors in two cases
-  - panel is not calibrated              => `ERROR:SERVO_NO_CALIBRATED@Run command COVER_CALIBRATION_RUN first`
-  - panel is neither CLOSING nor CLOSING => `ERROR:COVER_OPEN_IMPOSSIBLE@Cover is not closed nor closing.`
+- Serial error     : If panel is not calibrated => `ERROR:SERVO_NO_CALIBRATED@Run command COVER_CALIBRATION_RUN first`
+
 
 ### Close cover
 
 - Incoming message : `COMMAND:COVER_CLOSE`
 - Args             : Ignored
 - Serial response  : `RESULT:COVER_CLOSE@OK`
-- Serial error     : Errors in two cases
-  - panel is not calibrated              => `SERVO_NO_CALIBRATED@Run command COVER_CALIBRATION_RUN first`
-  - panel is neither OPEN nor OPENING    => `COVER_CLOSE_IMPOSSIBLE@Cover is not open nor opening.`
+- Serial error     : If panel is not calibrated => `SERVO_NO_CALIBRATED@Run command COVER_CALIBRATION_RUN first`
+
 
 
 ### Run calibration
@@ -134,7 +132,7 @@ This one is a special command that is not meant to be called. It is in fact the 
 - Incoming message : Any message not in the previously mentionned ones.
 - Args             : Ignored
 - Serial response  : Never
-- Serial error     : `ERROR:UNSUPPORTED_COMMAND@Not implemented` (always)
+- Serial error     : `ERROR:INVALID_COMMAND@Allowed commands PING, INFO, BRIGHTNESS_GET, BRIGHTNESS_SET, BRIGHTNESS_RESET, COVER_GET_STATE, COVER_OPEN, COVER_CLOSE, COVER_CALIBRATION_RUN, COVER_CALIBRATION_GET` (always)
 
 ## Specific error cases
 
@@ -144,4 +142,4 @@ The firmware may emit error message not related to a specific command.
 
 - If the driver/client emmits a valid message that is not a command, the firmware should respon with `ERROR:INVALID_INCOMING_MESSAGE_TYPE@Allowed types COMMAND`
 
-- If the driver/client emmits an unknown command, ie not one in this list, the firmware shoudl respond with `UNSUPPORTED_COMMAND@Not implemented`, c.f. [unknow "commands"](#unknown-commands) above
+- If the driver/client emmits an unknown command, ie not one in this list, the firmware shoudl respond with `ERROR:INVALID_COMMAND@Allowed commands PING, INFO, BRIGHTNESS_GET, BRIGHTNESS_SET, BRIGHTNESS_RESET, COVER_GET_STATE, COVER_OPEN, COVER_CLOSE, COVER_CALIBRATION_RUN, COVER_CALIBRATION_GET`, c.f. [unknow "commands"](#unknown-commands) above
