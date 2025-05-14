@@ -117,7 +117,7 @@ typedef struct {
   int servo_position; // Holds the targeted servo position (maybe different from the actual one)
   uint32_t position_convergence_counter;
   unsigned long last_step_time;
-  unsigne long last_cal_check_time;
+  unsigned long last_cal_check_time;
   cover_state_t cover;
   servo_cal_state_t calibration;
 } panel_state_t;
@@ -719,7 +719,7 @@ void cmd_cover_calibration_run(const String args) {
   linear_regression(x, y, n_data_points, &panel.calibration.slope, &panel.calibration.intercept);
   panel.calibration.magic_number = NVM_MAGIC_NUMBER;
   nvm_store.write(panel.calibration);
-  // Switch off the builtin led (no matter what it's current state is) panel is now calibrated
+  // Switch off the builtin led (no matter what its current state is) panel is now calibrated
   digitalWrite(LED_BUILTIN, HIGH);
 
   panel.cover = OPEN;
