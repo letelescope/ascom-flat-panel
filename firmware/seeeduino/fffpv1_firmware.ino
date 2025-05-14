@@ -117,6 +117,7 @@ typedef struct {
   int servo_position; // Holds the targeted servo position (maybe different from the actual one)
   uint32_t position_convergence_counter;
   unsigned long last_step_time;
+  unsigne long last_cal_check_time;
   cover_state_t cover;
   servo_cal_state_t calibration;
 } panel_state_t;
@@ -227,6 +228,8 @@ constexpr unsigned int NVM_MAGIC_NUMBER = 0x12345678;
 
 // How long do we wait between each step (loop) in order to achieve the desired speed?
 constexpr unsigned long STEP_DELAY_MICROSEC = 30L * 1000; // 30 msec
+// How long do we wait between each check (loop) in order to achieve correct blink rate? Blinks twice a sec.
+constexpr unsigned long BLINK_DELAY_MILLISEC = 500L; 
 // How long do wait for convergence at most?
 constexpr uint32_t MAX_CONVERGENCE_RETRIES = 5;
 // How close we want to be?
@@ -283,6 +286,7 @@ void setup() {
   panel.servo_position = 0;
   panel.position_convergence_counter = 0;
   panel.last_step_time = 0L;
+  panel.last_cal_check_time = 0L;
 
   // Read servo calibration data oin Flash storage:
   panel.calibration = nvm_store.read();
@@ -298,7 +302,7 @@ void setup() {
     // and then again once the cover has completely closed.
     // 
     // Similarly the panel.servo_position variable will be updated with the corrected servo
-    // feedback_pin value in the "_close_cover" funcion.
+    // feedback_pin value in the "_close_cover" function.
     // 
     // No need to have the built-in led up anymore.
     digitalWrite(LED_BUILTIN, HIGH);
@@ -322,7 +326,7 @@ void setup() {
  * In our case, each loop will sequentially
  *
  * - Handles incoming serial messages and fires the according commands 
- * - check if panel is calibrated and notify (by blinking buil-in led) the users to do so
+ * - check if panel is calibrated and notify (by blinking built-in led) the users to do so
  * - Update the servo position, if need be, according to the OPENING or CLOSING state of the cover
  */
 void loop() {
@@ -371,10 +375,16 @@ void receive_commands() {
 void check_for_calibration() {
 
   if (!is_panel_calibrated()) {
-    digitalWrite(LED_BUILTIN, LOW);
-    delay(500);
-    digitalWrite(LED_BUILTIN, HIGH);
-    delay(500);
+
+    unsigned long now = millis();
+
+    if (now - panel.last_cal_check_time < BLINK_DELAY_MILLISEC) return;
+
+    int current_state = digitalRead(LED_BUILTIN);
+    int toggled_state = current_state == HIGH ? LOW : HIGH;
+
+    digitalWrite(LED_BUILTIN, toggled_state);
+    panel.last_cal_check_time = now;
   }
 }
 
@@ -709,6 +719,8 @@ void cmd_cover_calibration_run(const String args) {
   linear_regression(x, y, n_data_points, &panel.calibration.slope, &panel.calibration.intercept);
   panel.calibration.magic_number = NVM_MAGIC_NUMBER;
   nvm_store.write(panel.calibration);
+  // Switch off the builtin led (no matter what it's current state is) panel is now calibrated
+  digitalWrite(LED_BUILTIN, HIGH);
 
   panel.cover = OPEN;
 

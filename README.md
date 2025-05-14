@@ -10,7 +10,7 @@ This project is an open source initiative, under the MIT license, by *Le Telesco
 
 This project should contain all you need to build your own *ASCOM* and/or *INDI* driven Flat Panel. 
 
-- [arduino_firmware](./arduino_firmware/): Firware of the programble chip used to control the panel and its cover
+- [firmware](./firmware/seeeduino/): Firware of the programble chip used to control the panel and its cover
 - [drivers](./drivers/): Implementation of the drivers
   - [ASCOM](./drivers/ASCOM/) : Implementation of the *ASCOM* driver 
   - [INDI](./drivers/indi/) : Implementation of the *INDI* driver
@@ -70,7 +70,7 @@ The firware is entirely buildable and uploadable using the Arduino IDE
 
 #### Compile and upload the firmware
 
-1) Using the Arduino IDE, open the [arduino_firmware.ino](./arduino_firmware/arduino_firmware.ino)
+1) Using the Arduino IDE, open the [fffpv1_firmware.ino](./firmware/seeeduino/fffpv1_firmware.ino)
 
 2) Click "verify" to compile the firmware. The output should be something like 
    ```
