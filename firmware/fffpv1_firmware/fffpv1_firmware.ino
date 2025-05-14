@@ -1,5 +1,5 @@
 /*
- * ffpv1_firmware.ino
+ * arduino_firmware.ino
  * Copyright (C) 2025 - Present, Le Télescope - Ivry sur Seine - All Rights Reserved
  * Licensed under the MIT License. See the accompanying LICENSE file for terms.
  *
@@ -101,7 +101,7 @@ typedef enum {
 
 // Represents the state of the flat panel servo configuration. 
 //
-// This configuration will be stored/retreived from flash memory. Hence de magic number, to check if the retrieved
+// This configuration will be stored/retreived from flash memory. Hence the magic number, to check if the retrieved
 // configuration is garbage or actual configuraton that was correctly stored previously.
 typedef struct {
   // Magic
@@ -333,7 +333,7 @@ void loop() {
   // First we seek for commands
   receive_commands();
 
-  // Then we check if calibration if needed
+  // Then we check if calibration is needed
   check_for_calibration();
 
   // Then we update panel cover position if needed
@@ -688,6 +688,7 @@ void _close_cover(bool verbose) {
  * - Powers up the servo 
  * - Use linear regression to calibrate the servo feedback pin response
  * - Sets the NVM flag to a known constant value
+ * - Turns off calibration status related LED (BUILT-IN)
  * - Stores the calibration data (and NVM flag) in the flash memory
  *
  * This has to be done only once after the firmware has been uploaded.
