@@ -700,6 +700,8 @@ void _close_cover(bool verbose) {
  */
 void cmd_cover_calibration_run(const String args) {
   
+  // Switch on the builtin led (no matter what its current state is). Panel is under calibration.
+  digitalWrite(LED_BUILTIN, LOW);
   powerUpServo();
 
   int step = 5;
@@ -720,7 +722,7 @@ void cmd_cover_calibration_run(const String args) {
   linear_regression(x, y, n_data_points, &panel.calibration.slope, &panel.calibration.intercept);
   panel.calibration.magic_number = NVM_MAGIC_NUMBER;
   nvm_store.write(panel.calibration);
-  // Switch off the builtin led (no matter what its current state is) panel is now calibrated
+  // Switch off the builtin led (no matter what its current state is). Panel is now calibrated
   digitalWrite(LED_BUILTIN, HIGH);
 
   panel.cover = OPEN;
