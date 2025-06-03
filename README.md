@@ -14,7 +14,7 @@ This project should contain all you need to build your own *ASCOM* and/or *INDI*
 - [drivers](./drivers/): Implementation of the drivers
   - [ASCOM](./drivers/ASCOM/) : Implementation of the *ASCOM* driver 
   - [INDI](./drivers/indi/) : Implementation of the *INDI* driver
-- [kicad_project](./kicad_project/): Electronic schematics and PCB layout
+- [electronics](./electronics/kicad_project/): Electronic schematics and PCB layout
 - [models](./models/): 3D models for the plat cap
 - [specifications](./specifications/): Specifications of the project. Mainly the specs of the communication protocol between the drivers and the firmware.
 
