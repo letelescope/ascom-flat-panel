@@ -21,7 +21,7 @@ OutputBaseFilename="FFFPv1_Setup"
 Compression=lzma
 SolidCompression=yes
 ; Put there by Platform if Driver Installer Support selected
-WizardImageFile="C:\Program Files (x86)\ASCOM\Platform 6 Developer Components\Installer Generator\Resources\WizardImage.bmp"
+WizardImageFile=".\WizardImage.bmp"
 LicenseFile="..\..\..\LICENSE"
 ; {cf}\ASCOM\Uninstall\CoverCalibrator folder created by Platform, always
 UninstallFilesDir="{cf}\ASCOM\Uninstall\CoverCalibrator\FFFPv1"
