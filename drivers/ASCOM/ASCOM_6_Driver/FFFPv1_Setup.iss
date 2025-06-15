@@ -16,6 +16,7 @@ MinVersion=6.1.7601
 DefaultDirName="{cf}\ASCOM\CoverCalibrator"
 DisableDirPage=yes
 DisableProgramGroupPage=yes
+DisableWelcomePage=No
 OutputDir=".\bin\release"
 OutputBaseFilename="FFFPv1_Setup"
 Compression=lzma
