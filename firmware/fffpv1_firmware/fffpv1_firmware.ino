@@ -174,7 +174,7 @@ constexpr auto ERROR_INVALID_COMMAND = "INVALID_COMMAND@Allowed commands PING, I
 constexpr auto ERROR_WANTED_BRIGHTNESS_MSG_START = "INVALID_BRIGHTNESS@Wanted brightness {";
 constexpr auto ERROR_WANTED_BRIGHTNESS_NAN_MSG_END = "} is not a number.";
 constexpr auto ERROR_WANTED_BRIGHTNESS_NEGATIVE_MSG_END = "} is negative.";
-constexpr auto ERROR_WANTED_BRIGHTNESS_TOO_BIG_MSG_END = "} is bigger than max allowed value 1023";
+constexpr auto ERROR_WANTED_BRIGHTNESS_TOO_BIG_MSG_END = "} is bigger than max allowed value 65535";
 constexpr auto ERROR_SERVO_NOT_CALIBRATED = "SERVO_NOT_CALIBRATED@Run command COVER_CALIBRATION_RUN first";
 
 #define NB_COMMANDS 10
@@ -194,7 +194,7 @@ constexpr command_t allowed_cmds[NB_COMMANDS] = {{ COMMAND_PING, &cmd_ping },
  * Light panel related constants
  */
 constexpr uint32_t MIN_BRIGHTNESS = 0;
-constexpr uint32_t MAX_BRIGHTNESS = 65535;//1023;
+constexpr uint32_t MAX_BRIGHTNESS = 65535;
 constexpr float PWM_FREQ = 20000.0f;
 
 /*
