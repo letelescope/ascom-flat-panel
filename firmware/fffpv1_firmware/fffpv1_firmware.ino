@@ -61,6 +61,7 @@
 
 #include <Servo.h>
 #include <FlashStorage.h>
+#include "samd-pwm.h"
 
 /************************************************
  *     Types, Objects, and data structures      *
@@ -193,8 +194,8 @@ constexpr command_t allowed_cmds[NB_COMMANDS] = {{ COMMAND_PING, &cmd_ping },
  * Light panel related constants
  */
 constexpr uint32_t MIN_BRIGHTNESS = 0;
-constexpr uint32_t MAX_BRIGHTNESS = 1023;
-constexpr uint32_t PWM_FREQ = 20000;
+constexpr uint32_t MAX_BRIGHTNESS = 65535;//1023;
+constexpr float PWM_FREQ = 20000.0f;
 
 /*
  * DSS-M15S Servo with analog feedback related constants 
@@ -245,6 +246,8 @@ panel_state_t panel;
 // Client used to interact with the servo motor.
 Servo servo;
 
+SAMD_PWM* pwm_controller;
+
 // Defines "nvm_store", the actual Flash sotrage where the calibration data will be stored/retrieved
 FlashStorage(nvm_store, servo_cal_state_t);
 
@@ -273,8 +276,14 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, HIGH);
   
-  // Setup LED pin as output
+  // Setup LED pin as output 
   pinMode(LEDSTRIP_PIN, OUTPUT);
+  // Set PWM to 0 duty cycle and correct freq - At boot lights are off
+  pwm_controller = new SAMD_PWM(LEDSTRIP_PIN, PWM_FREQ, 0);
+  if (pwm_controller)
+  {
+    pwm_controller->setPWM();
+  }
 
   // Setup Servo related pins
   pinMode(SERVO_POWER_PIN, OUTPUT);
@@ -899,7 +908,8 @@ void set_brightness() {
   // For example, it does not work on pin 7 of the Xiao, but it works on pin 8.
   //
   // No need to map anymore our bightness, it laredy a number between 0 and 1023 see BRIGHTNESS_SET command
-  pwm(LEDSTRIP_PIN, PWM_FREQ, panel.brightness);
+  //pwm(LEDSTRIP_PIN, PWM_FREQ, panel.brightness);
+  pwm_controller->setPWM_Int(LEDSTRIP_PIN, PWM_FREQ, panel.brightness);
 }
 
 

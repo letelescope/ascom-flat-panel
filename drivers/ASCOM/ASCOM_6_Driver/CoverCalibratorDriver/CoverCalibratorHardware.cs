@@ -104,7 +104,7 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         // Expected restults
         private const string GENERIC_RSLT_OK = "OK";
         private const string PING_RSLT_PONG = "PONG";
-        private const int MAX_BRIGHTNESS = 1023; // Maybe could be given by the hardware for better flexibility
+        private const int MAX_BRIGHTNESS = 65535; // Maybe could be given by the hardware for better flexibility
         private const int MIN_BRIGNTESS = 0;
 
 
