@@ -61,7 +61,6 @@
 
 using System;
 using System.Collections;
-using System.Threading;
 using System.Windows.Forms;
 using ASCOM.DeviceInterface;
 using ASCOM.LocalServer;

@@ -11,7 +11,6 @@
 //	* ALL DECLARATIONS MUST BE STATIC HERE!! INSTANCES OF THIS CLASS MUST NEVER BE CREATED!
 
 using System;
-using System.Linq.Expressions;
 using ASCOM.Utilities;
 
 namespace ASCOM.LocalServer
