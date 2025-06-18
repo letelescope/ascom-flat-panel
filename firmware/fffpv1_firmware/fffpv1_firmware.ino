@@ -194,7 +194,7 @@ constexpr command_t allowed_cmds[NB_COMMANDS] = {{ COMMAND_PING, &cmd_ping },
  * Light panel related constants
  */
 constexpr uint32_t MIN_BRIGHTNESS = 0;
-constexpr uint32_t MAX_BRIGHTNESS = 65535;
+constexpr uint32_t MAX_BRIGHTNESS = 2047; // Eventhough we use 16bits register counters for PWM at 20 000 Hz the actual resolution is more 2^11 (limited by the proc clok at 48Mhz that sets the lower limit for pulses)
 constexpr float PWM_FREQ = 20000.0f;
 
 /*
@@ -895,18 +895,9 @@ bool has_only_zeros(String num) {
 
 void set_brightness() {
   // This is ripped almost as is from https://github.com/jlecomte/ascom-flat-panel all credits to him.
-  // This only works on Seeeduino Xiao.
-  // The `pwm` function is defined in the following file:
-  // %localappdata%\Arduino15\packages\Seeeduino\hardware\samd\1.8.2\cores\arduino\wiring_pwm.cpp
-  // For other Arduino-compatible boards, consider using:
-  //   analogWrite(ledPin, brightness);
-  // The nice thing about the `pwm` function is that we can set the frequency
-  // to a much higher value (I use 20kHz) This does not work on all pins!
-  // For example, it does not work on pin 7 of the Xiao, but it works on pin 8.
-  //
-  // No need to map anymore our bightness, it laredy a number between 0 and 1023 see BRIGHTNESS_SET command
-  //pwm(LEDSTRIP_PIN, PWM_FREQ, panel.brightness);
-  pwm_controller.setPWM(LEDSTRIP_PIN, PWM_FREQ, panel.brightness);
+  // Map to the actual range of duty cycle that is 16bit based (TCCx are used in our case).
+  uint16_t actual_duty_cycle = map(panel.brightness, 0, MAX_BRIGHTNESS, 0 ,MAX_16BIT);
+  pwm_controller.setPWM(LEDSTRIP_PIN, PWM_FREQ, actual_duty_cycle);
 }
 
 
