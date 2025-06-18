@@ -54,7 +54,7 @@ public:
     }
   }
 
-  ~SAMD_PWM();
+  ~SAMD_PWM() {};
 
 private:
 
@@ -144,7 +144,7 @@ private:
 public:
 
   // dutycycle from 0-65535 for 0%-100%
-  bool setPWM_Int(const uint8_t& pin, const float& frequency, const uint16_t& dutycycle) {
+  bool setPWM(const uint8_t& pin, const float& frequency, const uint16_t& dutycycle) {
     bool freqChange = false;
 
     // Reprogram freq if necessary
@@ -315,49 +315,32 @@ public:
       return true;
     }
 
-    ////////////////////////////////////////
-
     return false;
   }
 
-  ///////////////////////////////////////////
-
-  bool setPWM() {
-    return setPWM_Int(_pin, _frequency, _dutycycle);
+  bool startPWM() {
+    return setPWM(_pin, _frequency, _dutycycle);
   }
-
-
-  ///////////////////////////////////////////
 
   inline float getActualDutyCycle() {
     return (((float)_dutycycle) * 100 / (1 << _resolution));
   }
 
-  ///////////////////////////////////////////
-
   inline float getActualFreq() {
     return _frequency;
   }
-
-  ///////////////////////////////////////////
 
   inline float getPWMPeriod() {
     return (1000000.0f / _frequency);
   }
 
-  ///////////////////////////////////////////
-
   inline uint32_t get_freq_CPU() {
     return F_CPU;
   }
 
-  ///////////////////////////////////////////
-
   inline uint32_t getPin() {
     return _pin;
   }
-
-  ///////////////////////////////////////////////////////////////////
 
 private:
 
@@ -384,7 +367,4 @@ private:
   // In number of bits
   uint8_t _resolution = 16;
 
-  ///////////////////////////////////////////
 };
-
-///////////////////////////////////////////

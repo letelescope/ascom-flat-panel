@@ -246,7 +246,8 @@ panel_state_t panel;
 // Client used to interact with the servo motor.
 Servo servo;
 
-SAMD_PWM* pwm_controller;
+//Controller to set led brightness
+SAMD_PWM pwm_controller = {LEDSTRIP_PIN, PWM_FREQ, 0};
 
 // Defines "nvm_store", the actual Flash sotrage where the calibration data will be stored/retrieved
 FlashStorage(nvm_store, servo_cal_state_t);
@@ -276,14 +277,9 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, HIGH);
   
-  // Setup LED pin as output 
-  pinMode(LEDSTRIP_PIN, OUTPUT);
-  // Set PWM to 0 duty cycle and correct freq - At boot lights are off
-  pwm_controller = new SAMD_PWM(LEDSTRIP_PIN, PWM_FREQ, 0);
-  if (pwm_controller)
-  {
-    pwm_controller->setPWM();
-  }
+  // Start pwm
+  pwm_controller.startPWM();
+
 
   // Setup Servo related pins
   pinMode(SERVO_POWER_PIN, OUTPUT);
@@ -292,6 +288,7 @@ void setup() {
 
   // initializing panel
   panel.brightness = 0;
+  set_brightness();
   panel.servo_position = 0;
   panel.position_convergence_counter = 0;
   panel.last_step_time = 0L;
@@ -909,7 +906,7 @@ void set_brightness() {
   //
   // No need to map anymore our bightness, it laredy a number between 0 and 1023 see BRIGHTNESS_SET command
   //pwm(LEDSTRIP_PIN, PWM_FREQ, panel.brightness);
-  pwm_controller->setPWM_Int(LEDSTRIP_PIN, PWM_FREQ, panel.brightness);
+  pwm_controller.setPWM(LEDSTRIP_PIN, PWM_FREQ, panel.brightness);
 }
 
 
