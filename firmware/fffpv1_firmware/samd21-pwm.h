@@ -1,10 +1,20 @@
 /*
- * samd-pwm.h
+ * samd21-pwm.h
  * Copyright (C) 2025 - Present, Le Télescope - Ivry sur Seine - All Rights Reserved
  * Licensed under the MIT License. See the accompanying LICENSE file for terms.
  *
- * Description: Library for hardware based fast pwm.
+ * Description: Library for hardware based fast pwm for SAMM21 based boards. 
+ * This was tested on a Seeeduino XIAO.
  * 
+ * This leverages the 16 bits timers counters to generates fast pulses and allow for "high frequency" PWM.
+ *
+ *  Not every pin is addressable by a "TCC". Check the specs to know which pin to use. 
+ *  If a pin uses a "TC" and not a "TCC" this lib will revert back automatically to the 8bit resolution. 
+ *
+ * Just a word of caution: Using a pin with a 16bit register does not guarant you get an effective 16bit resolution.
+ * The rationale being that the CPU clock frequency (48 MHz) is the limiting factor here. For exemple at 20kHz pwm, 
+ * there is arout 2500 cpu cycle during a full period. Hence effectively the resolution is at most something aroun 11bit. 
+ * This was validated experimentally. The effective rsolution is just shy aboce 11bit in this case.
  * Authors:
  * - Florian Thibaud
  * - Florian Gautier 
@@ -22,11 +32,11 @@
 
 static bool tcEnabled[TCC_INST_NUM + TC_INST_NUM] = { false };
 
-class SAMD_PWM {
+class SAMD21_PWM {
 public:
 
   // dutycycle = 0.0f - 100.0f
-  SAMD_PWM(const uint8_t& pin, const float& frequency, const uint16_t& dutycycle) {
+  SAMD21_PWM(const uint8_t& pin, const float& frequency, const uint16_t& dutycycle) {
     _pinDesc = g_APinDescription[pin];
     _pinAttr = _pinDesc.ulPinAttribute;
 
@@ -54,7 +64,7 @@ public:
     }
   }
 
-  ~SAMD_PWM() {};
+  ~SAMD21_PWM() {};
 
 private:
 

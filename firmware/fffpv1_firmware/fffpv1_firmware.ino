@@ -61,7 +61,7 @@
 
 #include <Servo.h>
 #include <FlashStorage.h>
-#include "samd-pwm.h"
+#include "samd21-pwm.h"
 
 /************************************************
  *     Types, Objects, and data structures      *
@@ -194,7 +194,11 @@ constexpr command_t allowed_cmds[NB_COMMANDS] = {{ COMMAND_PING, &cmd_ping },
  * Light panel related constants
  */
 constexpr uint32_t MIN_BRIGHTNESS = 0;
-constexpr uint32_t MAX_BRIGHTNESS = 2047; // Eventhough we use 16bits register counters for PWM at 20 000 Hz the actual resolution is more 2^11 (limited by the proc clok at 48Mhz that sets the lower limit for pulses)
+// Eventhough we use 16bits register counters for PWM at 20 000 Hz the actual resolution is more 2^11. 
+// The rationale being that the CPU clock frequency (48 MHz) is the limiting factor here. 
+// For exemple at 20kHz pwm, there is arout 2500 cpu cycle during a full period. Hence effectively the resolution is at most something aroun 11bit. 
+// This was validated experimentally. The effective rsolution is just shy aboce 11bit in this case. To be conservative we choose 11bit.
+constexpr uint32_t MAX_BRIGHTNESS = 2047; 
 constexpr float PWM_FREQ = 20000.0f;
 
 /*
@@ -247,7 +251,8 @@ panel_state_t panel;
 Servo servo;
 
 //Controller to set led brightness
-SAMD_PWM pwm_controller = {LEDSTRIP_PIN, PWM_FREQ, 0};
+// We choose PIN 8 as its timer counter is TCC1 wich is a 16 bits register that will allow us for the fast PWM and stil above par resolution.
+SAMD21_PWM pwm_controller = {LEDSTRIP_PIN, PWM_FREQ, 0};
 
 // Defines "nvm_store", the actual Flash sotrage where the calibration data will be stored/retrieved
 FlashStorage(nvm_store, servo_cal_state_t);
@@ -895,7 +900,8 @@ bool has_only_zeros(String num) {
 
 void set_brightness() {
   // This is ripped almost as is from https://github.com/jlecomte/ascom-flat-panel all credits to him.
-  // Map to the actual range of duty cycle that is 16bit based (TCCx are used in our case).
+  // The effective rsolution is just shy aboce 11bit in this case. henxe the brightness setting is somethin in betwen 0 an 2^11-1 (MAX_BRIGHTNESS)/
+  // The Pin 8 uses a 16 bit register TCC1. Hence we map the brightness setting from the range 0<->2^11 -1 to the "register" range 0 <-> 2^16 -1 
   uint16_t actual_duty_cycle = map(panel.brightness, 0, MAX_BRIGHTNESS, 0 ,MAX_16BIT);
   pwm_controller.setPWM(LEDSTRIP_PIN, PWM_FREQ, actual_duty_cycle);
 }
