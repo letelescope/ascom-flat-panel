@@ -203,8 +203,7 @@ public:
 
         GCLK->CLKCTRL.reg = (uint16_t)(GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK0 | GCLK_CLKCTRL_IDs[_tcNum]);
 
-        while (GCLK->STATUS.bit.SYNCBUSY == 1)
-          ;
+        while (GCLK->STATUS.bit.SYNCBUSY == 1);
 
         // Check which timer to use
         if (_tcNum >= TCC_INST_NUM) {
@@ -217,39 +216,33 @@ public:
           //reset
           TCx->COUNT8.CTRLA.bit.SWRST = 1;
 
-          while (TCx->COUNT16.STATUS.bit.SYNCBUSY)
-            ;
+          while (TCx->COUNT16.STATUS.bit.SYNCBUSY);
 
           // Disable TCx
           TCx->COUNT8.CTRLA.bit.ENABLE = 0;
 
-          while (TCx->COUNT16.STATUS.bit.SYNCBUSY)
-            ;
+          while (TCx->COUNT16.STATUS.bit.SYNCBUSY);
 
           // Set Timer counter Mode to 8 bits, normal PWM, PRESCALER_DIV256
           TCx->COUNT16.CTRLA.reg |= TC_CTRLA_MODE_COUNT8 | TC_CTRLA_WAVEGEN_NPWM | TC_CTRLA_PRESCALER_DIV256;
 
-          while (TCx->COUNT16.STATUS.bit.SYNCBUSY)
-            ;
+          while (TCx->COUNT16.STATUS.bit.SYNCBUSY);
 
           // Set the Dutycycle
           TCx->COUNT8.CC[_tcChannel].reg = (uint8_t)newDC;
 
-          while (TCx->COUNT16.STATUS.bit.SYNCBUSY)
-            ;
+          while (TCx->COUNT16.STATUS.bit.SYNCBUSY);
 
           // Set PER to _compareValue to match frequency
           // convert to 8-bit
           TCx->COUNT8.PER.reg = _compareValue >> 8;
 
-          while (TCx->COUNT16.STATUS.bit.SYNCBUSY)
-            ;
+          while (TCx->COUNT16.STATUS.bit.SYNCBUSY);
 
           // Enable TCx
           TCx->COUNT8.CTRLA.bit.ENABLE = 1;
 
-          while (TCx->COUNT16.STATUS.bit.SYNCBUSY)
-            ;
+          while (TCx->COUNT16.STATUS.bit.SYNCBUSY);
         } else {
 
           // -- Configure TCC
@@ -258,38 +251,32 @@ public:
           // Disable TCCx
           TCCx->CTRLA.bit.ENABLE = 0;
 
-          while (TCCx->SYNCBUSY.reg & TCC_SYNCBUSY_MASK)
-            ;
+          while (TCCx->SYNCBUSY.reg & TCC_SYNCBUSY_MASK);
 
           // Set prescaler
           TCCx->CTRLA.reg |= _prescalerConfigBits;
 
-          while (TCCx->SYNCBUSY.reg & TCC_SYNCBUSY_MASK)
-            ;
+          while (TCCx->SYNCBUSY.reg & TCC_SYNCBUSY_MASK);
 
           // Set TCCx as normal PWM
           TCCx->WAVE.reg |= TCC_WAVE_WAVEGEN_NPWM;
 
-          while (TCCx->SYNCBUSY.reg & TCC_SYNCBUSY_MASK)
-            ;
+          while (TCCx->SYNCBUSY.reg & TCC_SYNCBUSY_MASK);
 
           // Set the Dutycycle
           TCCx->CC[_tcChannel].reg = newDC;
 
-          while (TCCx->SYNCBUSY.reg & TCC_SYNCBUSY_MASK)
-            ;
+          while (TCCx->SYNCBUSY.reg & TCC_SYNCBUSY_MASK);
 
           // Set PER to _compareValue to match frequency
           TCCx->PER.reg = _compareValue;
 
-          while (TCCx->SYNCBUSY.reg & TCC_SYNCBUSY_MASK)
-            ;
+          while (TCCx->SYNCBUSY.reg & TCC_SYNCBUSY_MASK);
 
           // Enable TCCx
           TCCx->CTRLA.bit.ENABLE = 1;
 
-          while (TCCx->SYNCBUSY.reg & TCC_SYNCBUSY_MASK)
-            ;
+          while (TCCx->SYNCBUSY.reg & TCC_SYNCBUSY_MASK);
         }
       } else {
         // Old pin and same freq
@@ -300,25 +287,21 @@ public:
           // Set the Dutycycle
           TCx->COUNT16.CC[_tcChannel].reg = newDC;
 
-          while (TCx->COUNT16.STATUS.bit.SYNCBUSY)
-            ;
+          while (TCx->COUNT16.STATUS.bit.SYNCBUSY);
         } else {
           Tcc* TCCx = (Tcc*)GetTC(_pinDesc.ulPWMChannel);
           TCCx->CTRLBSET.bit.LUPD = 1;
 
-          while (TCCx->SYNCBUSY.reg & TCC_SYNCBUSY_MASK)
-            ;
+          while (TCCx->SYNCBUSY.reg & TCC_SYNCBUSY_MASK);
 
           // Set the Dutycycle
           TCCx->CCB[_tcChannel].reg = newDC;
 
-          while (TCCx->SYNCBUSY.reg & TCC_SYNCBUSY_MASK)
-            ;
+          while (TCCx->SYNCBUSY.reg & TCC_SYNCBUSY_MASK);
 
           TCCx->CTRLBCLR.bit.LUPD = 1;
 
-          while (TCCx->SYNCBUSY.reg & TCC_SYNCBUSY_MASK)
-            ;
+          while (TCCx->SYNCBUSY.reg & TCC_SYNCBUSY_MASK);
         }
       }
 
