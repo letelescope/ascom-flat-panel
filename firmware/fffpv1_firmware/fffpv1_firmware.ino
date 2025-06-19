@@ -251,7 +251,7 @@ panel_state_t panel;
 Servo servo;
 
 //Controller to set led brightness
-// We choose PIN 8 as its timer counter is TCC1 wich is a 16 bits register that will allow us for the fast PWM and stil above par resolution.
+// We choose PIN 8 as its timer counter is TCC1 wich is a 16bit register that will allow us for the fast PWM and stil above par resolution.
 SAMD21_PWM pwm_controller = {LEDSTRIP_PIN, PWM_FREQ, 0};
 
 // Defines "nvm_store", the actual Flash sotrage where the calibration data will be stored/retrieved
@@ -900,7 +900,7 @@ bool has_only_zeros(String num) {
 
 void set_brightness() {
   // This is ripped almost as is from https://github.com/jlecomte/ascom-flat-panel all credits to him.
-  // The effective rsolution is just shy aboce 11bit in this case. henxe the brightness setting is somethin in betwen 0 an 2^11-1 (MAX_BRIGHTNESS)/
+  // The effective rsolution is just shy above 11bit in this case. Hence the brightness setting is something in between 0 an 2^11-1 (MAX_BRIGHTNESS)/
   // The Pin 8 uses a 16 bit register TCC1. Hence we map the brightness setting from the range 0<->2^11 -1 to the "register" range 0 <-> 2^16 -1 
   uint16_t actual_duty_cycle = map(panel.brightness, 0, MAX_BRIGHTNESS, 0 ,MAX_16BIT);
   pwm_controller.setPWM(LEDSTRIP_PIN, PWM_FREQ, actual_duty_cycle);
