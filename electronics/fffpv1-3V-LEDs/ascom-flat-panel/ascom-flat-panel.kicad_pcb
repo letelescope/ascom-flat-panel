@@ -92,6 +92,7 @@
 			(psnegative no)
 			(psa4output no)
 			(plot_black_and_white yes)
+			(plotinvisibletext no)
 			(sketchpadsonfab no)
 			(plotpadnumbers no)
 			(hidednponfab no)
@@ -771,7 +772,7 @@
 		(descr "C, Radial series, Radial, pin pitch=2.50mm, diameter=6.3mm, height=11mm, Non-Polar Electrolytic Capacitor")
 		(tags "C Radial series Radial pin pitch 2.50mm diameter 6.3mm height 11mm Non-Polar Electrolytic Capacitor")
 		(property "Reference" "C2"
-			(at 1.25 -4.4 90)
+			(at 2.7 -4.15 90)
 			(layer "F.SilkS")
 			(uuid "37f5c91c-4db9-4e2c-9742-36d29820fd2d")
 			(effects
@@ -4967,7 +4968,7 @@
 		(descr "C, Radial series, Radial, pin pitch=2.50mm, diameter=6.3mm, height=11mm, Non-Polar Electrolytic Capacitor")
 		(tags "C Radial series Radial pin pitch 2.50mm diameter 6.3mm height 11mm Non-Polar Electrolytic Capacitor")
 		(property "Reference" "C1"
-			(at 1.25 -4.5 270)
+			(at 1.85 -4.35 270)
 			(layer "F.SilkS")
 			(uuid "62c159cc-0e1e-454d-9c17-2c4c2018a815")
 			(effects
@@ -6802,7 +6803,7 @@
 		(uuid "f67e0795-9d96-4e61-9b85-b079e402fbad")
 	)
 	(gr_text "LED"
-		(at 146.5 92 90)
+		(at 150.75 85.65 90)
 		(layer "F.SilkS")
 		(uuid "2eb5630f-e531-4d1c-89d2-15f521326094")
 		(effects
