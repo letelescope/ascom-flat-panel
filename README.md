@@ -27,14 +27,81 @@ Kudos to him.
 
 ## Construction
 
+### Why a "motorized flat panel" ? And do we mean by "motorized flat panel" ?
+
+In this scenario a flat panel is made of two things
+- A light panel with variable brightness
+- A motorized cover
+
+The cover is motorized using a servo motor and held in open/close positions using simple magnets. The lightpanel is made using LEDs and the variable brightness is achieved via pulse width modulation (PWM). This "electronico-mechanical" assembly is controlled via a Sam-d21 controlled base board with a custom firmware within a custom PCB. The SAM-D21 is particullarly suited because
+
+- it can output 5V
+- It has 16 bits counters necessary to achieve fast PWM. We do not want flickering flats...
+
+One can connect and send commands to the flat-panel using Serial (COM Port) over USB. When plugged in the device will be recognized by windows/linux  as a COM device. 
+
+Finally this is drived by ASCOM/INDI, such that one can fully automate taking flats following the acquisition sessions of our beloved night sky targets. 
+
+> ⚠ **DISCLAIMER**  
+> This project is built around the Seeeduino XIAO board that uses the ATSAMD21G18A-MU chip. This is the only beard that we tested. This may work on other boards that uses these SAMD21 chips, but this may need so rework on the firware, the PCB layout and the mechanical assembly. 
+
+Now that we have the big picture let's get real and build the thing !
+
+[INSERT HERE SOME PHOTOS]
+
 ### Pre-requisites
+
+Very few pre-requisites are nessecary in order to build the flat panel. More precisely one will need to
+
+- have access to a 3D printer, to print the mechanical assembly parts.
+- some soldering skills and a soldering kit, to solder the components to the custom PCB
+- install the arduino IDE, to upload the firmware
+- love "diy-ing", because you may need to want/need to tweaks things a bit to make it work in your setup. 
+  
+And that'it ! For instance you won't need software developpement skills as both the driver and the firmware are usable as is. Moreover, the ASCOM driver installer is already pre-compiled and made available to the download. Unfortunaltely one cannot make an "installer" for the arduino firware, yet using the Arduino IDE, it's a matter of three clicks. 
 
 ### Bill of material 
 
+[TODO] ADD BILL OF MATERIAL 
+
+### Get a coherent version. 
+
+We heavily use the git version control "tags" to label a release version. We also leverage the "Gihtub releases" that add the possibility to pin "binaries" (ie anything we want PCB layouts, Driver installers, mechanincal assembly 3D printer files,...). 
+
+When we deem a version is "usable" we tag it, ie we freez this repository at a particular "commit", and create a release out it. 
+
+To access the various releases just got the the [releases page](https://github.com/letelescope/ascom-flat-panel/releases/) of this repository.
+
+![Access the releases](./.static/releases.png)
+
+And choose the release you want. The latest should be the "better". 
+
+![Access the content of a release](./.static/release.png)
+
+We recommend that you use one of these released version as they are coherent and tested. Be carefull some release are labelle "pre-release" and should be used with caution. Those are developpement, beta and alpha version. Use it at you own risk ** as all the material on this repository. But even more in this case :D** . In the same spirit, we do not recommend you use the "head" of this repository as this is work in progress it is not guaranteed to be stable...
+
 ### Electronic circuit
+
+We provide two options for the electronic circuit:
+
+#### The +3V3 output for LEDs
+
+This is best suited for small refractors using fewer LEDs and/or fast optics. 
+
+Here is the schematics for this option
+
+![Circuit with +3V3 output for LEDs](./.static/+3V3-LEDs-circuit-schematics.png)
+
+#### The +5V output for LEDs
+
+This is best suited for bigger tubes using a larger number of LEDs drawing more current. 
+
+![Circuit with +5V output for LEDs](./.static/+5V-LEDs-circuit-schematics.png)
 
 #### Cicruit layout breadbord validation
 
+We recommend you prototye the circuit using breadbords first. 
+- That 
 #### Printed Circuit Board
 
 #### Firware upload
