@@ -25,7 +25,61 @@ This project, the protocol, the implementation of both the *ASCOM* driver and th
 
 Kudos to him. 
 
-## Principle
+## Construction
+
+### Pre-requisites
+
+### Bill of material 
+
+### Electronic circuit
+
+#### Cicruit layout breadbord validation
+
+#### Printed Circuit Board
+
+#### Firware upload
+
+#### Firmware checks
+
+### Mechanical Assembly
+
+#### Prints from pre-designed assemblies
+
+#### Modification of pre-designed assemblies
+
+#### Calibration of servo motor 
+
+### ASCOM Driver Install
+
+#### Pre-compiled installer
+
+#### Build from sources
+
+#### Driver valdiation
+
+### INDI Driver
+
+## Testing
+
+### Firware "unit" testing
+
+#### Set brightness levels
+
+#### Open/Close the cover
+
+### Connect to the panel from N.I.N.A via ASCOM
+
+## Usage
+
+### N.I.N.A smart flats
+
+#### Auto-exposure
+
+#### Auto-brightness
+
+## Developpement 
+
+### Principle
 
 In this scenario a flat panel is made of two things
 - A light panel with variable brightness
@@ -57,18 +111,18 @@ In a nutshell
 More details on this protocol are provided in [protocol.md](./specifications/protocol.md)
 
 
-## Softwares developpement and compilations
+### Softwares developpement and compilations
 
-### Seeduino firmware
+#### Seeduino firmware
 
 The firware is entirely buildable and uploadable using the Arduino IDE
  
-#### Pre-requisites 
+##### Pre-requisites 
 
 - [Download](https://www.arduino.cc/en/software/) and install the Arduino IDE
 - [Downlaod](https://wiki.seeedstudio.com/Seeeduino-XIAO/#software) and configure the Seeduino XIAO board for the Arduino IDE
 
-#### Compile and upload the firmware
+##### Compile and upload the firmware
 
 1) Using the Arduino IDE, open the [fffpv1_firmware.ino](./firmware/seeeduino/fffpv1_firmware.ino)
 
@@ -86,7 +140,7 @@ The firware is entirely buildable and uploadable using the Arduino IDE
 
 3) Connect the Seeeduino and click upload to test it
 
-#### Warning - Firmware calibrarion
+##### Warning - Firmware calibrarion
 
 The firmware needs to be calibrated. At first boot the leds will flash to indicate that it needs to be calibrated. 
 
@@ -108,18 +162,18 @@ RESULT:COVER_CALIBRATION_RUN@OK
 
 Once it has completed, re-attach the right arm to the servo. The device is now ready to be used.
 
-### ASCOM Driver
+#### ASCOM Driver
 
 The ASCOM driver is a C# .Net project that have been first created using the ASCOM 6 Visual Studio 2022 templates. Hence we recommend using Visual Studio 2022 when building it. Feel free to change this procedure to match your tooling. 
 
-#### Pre-requisites 
+##### Pre-requisites 
  
 - [ASCOM 6](https://github.com/ASCOMInitiative/ASCOMPlatform/releases/tag/v6.6SP2Release) plateform
 - [Visual Studio 2022](https://visualstudio.microsoft.com/fr/vs/). Comunity edition is totally fine. 
 - A fully functional [ASCOM developper environement](https://ascom-standards.org/COMDeveloper/Index.htm) . Especiall, you may want to add the ASCOM "extensions" to Visual Studio.
 
 
-#### Compile and upload the firmware
+##### Compile and upload the firmware
 
 1) Open the ["solution"](./drivers/ASCOM/ASCOM_6_Driver/ASCOM_6_Driver.sln) from Visual Studio 2022
 
@@ -143,7 +197,7 @@ The ASCOM driver is a C# .Net project that have been first created using the ASC
 
 4) You can now launch the driver from any ASCOM client, e.g. N.I.N.A or the ASCOM Diagnostic tool
 
-#### Warning - When used with N.I.N.A
+##### Warning - When used with N.I.N.A
 
 As of N.I.N.A 3.1.HF2, the "ASCOM device instance reference " is not disposed when connection failed. In our setup this may happen if the flat panel is not connected to the PC. In this scenario, the connection will fail, but a "driver process" will hang, waiting for N.I.N.A to dispose of the reference.
 
@@ -153,16 +207,16 @@ This is a known bug c.f. [nina-issue-1378](https://bitbucket.org/Isbeorn/nina/is
 
 If this happens and some weird side effect happen on reconnection. Just disconnect from the device. Kill the dangling process in the task manager. And reconnect. 
 
-## Indi driver
+### Indi driver
 
 The indi driver is in its **really** early developement phase. It should no be used for anything else but developement. 
 
-### Pre-requisite
+#### Pre-requisite
 
 - A fully functional [Indi driver developer environement](https://docs.indilib.org/drivers/basics/project-setup.html). On Windows we recommend using a WSL2 environment. 
 - One can also look at how to dev on "indi", c.f. the [getting started](https://docs.indilib.org/getting-started/)
 
-### Compile and install the driver
+#### Compile and install the driver
 
 in the [indi](./drivers/indi/indi_driver/) directory, from VSCode integrated terminal or anyother terminal run
 
