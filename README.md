@@ -137,11 +137,48 @@ We recommend you prototype the circuit using breadbords first.
 - This allows to check each component/part of the circuit independetly. It's always better to find a faulty resistor before it soldered on a PCB.
 - It's always fun to prototype. 
 
+Here is and example of what the "+5V" circuit may look like on a breadbord.
+
+![+5V circuit breadboard prototype](./.static/breadboard-5V.jpg).
+
 #### Printed Circuit Board
+
+[TODO] THE 
 
 #### Firware upload
 
+#### Pre-requisite
+
+The firmware needs to be uploaded using the Arduino IDE. [Arduino IDE setup section](#pre-requisites-1) of this documentation to set it. 
+
+#### Upload the firware
+
+1. Open the file [firmware source file](./firmware/fffpv1_firmware/fffpv1_firmware.ino)from the Arduino IDE. 
+
+2. Connect the board via US. 
+   
+3. Select the board.
+   
+4. Click the "arrow" at the top left to compile and upload the firmware on the board. 
+
+The output should look something like: 
+
+![Arduino IDE firmware upload](./.static/Firware-Upload.png)
+
 #### Firmware checks
+
+Once the firware uploaded, do not disconnect the board yet. Still from the Arduino IDE open the "Serial Monitor". One connected, In the console type
+
+``` sh
+COMMAND:PING
+```
+the board should answer
+
+``` sh
+RESULT:PONG
+```
+
+Congrats the Seeeduino is ready to act as your flat pannel controler !
 
 ### Mechanical Assembly
 
@@ -151,15 +188,76 @@ We recommend you prototype the circuit using breadbords first.
 
 #### Calibration of servo motor 
 
+> **WARNING**
+> The firmware needs to be calibrated.
+
+At first boot the leds will flash to indicate that it needs to be calibrated. 
+
+> **WARNING**
+> Disconnect the servo from the mecanical assembly before launching the calibration procedure. 
+
+Then from the IDE connect to the board and using the Arduino serial monitor send (type) the "command" 
+
+```
+COMMAND:COVER_CALIBRATION_RUN
+``` 
+
+The device should perform its calibration procedure and reply with 
+
+```
+RESULT:COVER_CALIBRATION_RUN@OK
+```
+
+Once it has completed, re-attach the right arm to the servo. The device is now ready to be used.
+
 ### ASCOM Driver Install
+
+You can either used the installer to install the ASCOM driver or build it from source. For the sake of simplicity we recommend using the installer. 
 
 #### Pre-compiled installer
 
+The installer is pined on the each release [releases page](https://github.com/letelescope/ascom-flat-panel/releases/). 
+
+1. From the wanted release, download the file "FFFPv1_Setup.exe". 
+
+2. "Double-click" on the downloaded file to launch it. 
+
+   > **WARNING**
+   > Windows will warn that the publisher is unknown. This is perfectly fine. As buying a verified signing key, is definitely not a priority for us, we could not sign the installer. Yet this is perfectly safe to use it. 
+
+3. Follow the instruction to install and register the driver. 
+
+Congrats you just installed the driver !
+
+[driver install](./.static/driver-install-sucess.png)
+
 #### Build from sources
+
+To build it from sources please check the relevant section of the "developpement documentation". 
 
 #### Driver valdiation
 
+Once install, one can use the ASCOM platform tools to check that this was installed properly. 
+
+1. First check that the driver was properly "registered". From the ASCOM profile explorer check that the *ASCOM Le Telescope FFFPV1 CoverCalibrator* is listed in the Cover Calibrators. 
+
+![ASCOM Le Telescope FFFPV1 CoverCalibrator](./.static/profile-explorer.png) 
+
+2. Then check that the driver is instiable using the ASCOM diagnostic tools
+   
+   a. Find and configure the "properties" of the driver
+
+![Driver properties](./.static/diagnostics-tools-properties.png)
+
+   b. Connect to the driver. Expect nothing to happen. 
+
+![Connect driver](./.static/diagnostics-tools.png)
+
+
 ### INDI Driver
+
+> **WARNING**
+> INDO driver is NOT functional DO NOT USE IT. 
 
 ## Testing
 
