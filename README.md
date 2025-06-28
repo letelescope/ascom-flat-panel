@@ -245,13 +245,18 @@ Once install, one can use the ASCOM platform tools to check that this was instal
 
 2. Then check that the driver is instiable using the ASCOM diagnostic tools
    
-   a. Find and configure the "properties" of the driver
+   a. Select the "Cover Calibrator" device type and elect the "FFPV1 Cover Calibrator"
+
+![Cover Calibrator device type](./.static/diagnostics-tools.png)
+
+
+   b. Find and configure the "properties" of the driver
 
 ![Driver properties](./.static/diagnostics-tools-properties.png)
 
    b. Connect to the driver. Expect nothing to happen. 
 
-![Connect driver](./.static/diagnostics-tools.png)
+![Connect driver](./.static/diagnostics-tools-connect.png)
 
 
 ### INDI Driver
