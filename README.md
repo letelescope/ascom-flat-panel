@@ -25,6 +25,11 @@ This project, the protocol, the implementation of both the *ASCOM* driver and th
 
 Kudos to him. 
 
+The Pulse Width Modulation (PWM), used to control the panel brightness, implementation is heavily inspired, or more accurately shamelessly ripped, from the work of [Khoih Hoang](https://github.com/khoih-prog) and more precisely [SAMD_PWM](https://github.com/khoih-prog/SAMD_PWM/) . 
+
+
+Kudos to him too.
+
 ## Construction
 
 ### Why a "motorized flat panel" ? And do we mean by "motorized flat panel" ?
@@ -33,17 +38,18 @@ In this scenario a flat panel is made of two things
 - A light panel with variable brightness
 - A motorized cover
 
-The cover is motorized using a servo motor and held in open/close positions using simple magnets. The lightpanel is made using LEDs and the variable brightness is achieved via pulse width modulation (PWM). This "electronico-mechanical" assembly is controlled via a Sam-d21 controlled base board with a custom firmware within a custom PCB. The SAM-D21 is particullarly suited because
+The cover is motorized using a servo motor and held in open/close positions using simple magnets. The lightpanel is made using LEDs and the variable brightness is achieved via pulse width modulation (PWM). This "electronico-mechanical" assembly is controlled via a SAM-D21 based board with a custom firmware within a custom PCB. The SAM-D21 is particullarly suited because
 
-- it can output 5V
-- It has 16 bits counters necessary to achieve fast PWM. We do not want flickering flats...
+- it can output 5V, that is needed to power the servo.
+- it can output +3V3 and allow us to choose between 3V anf 5V to power the LEDs.
+- It has 16 bits timer counters necessary to achieve fast PWM. We do not want flickering flats...
 
-One can connect and send commands to the flat-panel using Serial (COM Port) over USB. When plugged in the device will be recognized by windows/linux  as a COM device. 
+One can connect and send commands to the flat-panel using Serial (COM Port) over USB. When plugged in the device will be recognized by windows/linux as a COM device. 
 
 Finally this is drived by ASCOM/INDI, such that one can fully automate taking flats following the acquisition sessions of our beloved night sky targets. 
 
 > ⚠ **DISCLAIMER**  
-> This project is built around the Seeeduino XIAO board that uses the ATSAMD21G18A-MU chip. This is the only beard that we tested. This may work on other boards that uses these SAMD21 chips, but this may need so rework on the firware, the PCB layout and the mechanical assembly. 
+> This project is built around the Seeeduino XIAO board that uses the ATSAMD21G18A-MU chip. This is the only board that we tested. This may work on other boards that uses these SAMD21 chips, but this may need some rework on the firware, the PCB layout and the mechanical assembly. 
 
 Now that we have the big picture let's get real and build the thing !
 
@@ -51,14 +57,14 @@ Now that we have the big picture let's get real and build the thing !
 
 ### Pre-requisites
 
-Very few pre-requisites are nessecary in order to build the flat panel. More precisely one will need to
+Very few pre-requisites are necessary in order to build the flat panel. More precisely one will need to
 
 - have access to a 3D printer, to print the mechanical assembly parts.
-- some soldering skills and a soldering kit, to solder the components to the custom PCB
+- have some soldering skills and a soldering kit, to solder the components to the custom PCB
 - install the arduino IDE, to upload the firmware
 - love "diy-ing", because you may need to want/need to tweaks things a bit to make it work in your setup. 
   
-And that'it ! For instance you won't need software developpement skills as both the driver and the firmware are usable as is. Moreover, the ASCOM driver installer is already pre-compiled and made available to the download. Unfortunaltely one cannot make an "installer" for the arduino firware, yet using the Arduino IDE, it's a matter of three clicks. 
+And that's it ! For instance you won't need software developpement skills as both the driver and the firmware are usable as is. Moreover, the ASCOM driver installer is already pre-compiled and made available to the download. Unfortunaltely one cannot make an "installer" for the arduino firware. Yet using the Arduino IDE to upload the firmware is a matter of three clicks. 
 
 ### Bill of material 
 
@@ -66,9 +72,9 @@ And that'it ! For instance you won't need software developpement skills as both 
 
 ### Get a coherent version. 
 
-We heavily use the git version control "tags" to label a release version. We also leverage the "Gihtub releases" that add the possibility to pin "binaries" (ie anything we want PCB layouts, Driver installers, mechanincal assembly 3D printer files,...). 
+We heavily use the git version control "tags" to label released versions. We also leverage the "GitHub releases" that add the possibility to pin "binaries" (ie anything we want PCB layouts, Driver installers, mechanincal assembly 3D printer files,...) on "tagged" versions. 
 
-When we deem a version is "usable" we tag it, ie we freez this repository at a particular "commit", and create a release out it. 
+When we deem a version is "usable" we tag it, ie we freez this repository at a particular "commit", and create a release out of it. 
 
 To access the various releases just got the the [releases page](https://github.com/letelescope/ascom-flat-panel/releases/) of this repository.
 
@@ -78,11 +84,36 @@ And choose the release you want. The latest should be the "better".
 
 ![Access the content of a release](./.static/release.png)
 
-We recommend that you use one of these released version as they are coherent and tested. Be carefull some release are labelle "pre-release" and should be used with caution. Those are developpement, beta and alpha version. Use it at you own risk ** as all the material on this repository. But even more in this case :D** . In the same spirit, we do not recommend you use the "head" of this repository as this is work in progress it is not guaranteed to be stable...
+We recommend that you use one of these released version as they are coherent and tested. Be carefull some release are labelled "pre-release" and should be used with caution. Those are developpement, beta and alpha version. Use it at you own risk as all the material on this repository. But even more in this case :D. 
+
+In the same spirit, we do not recommend you use the "head" of the main branch (or any other branch) of this repository as this is work in progress and hence is not guaranteed to be stable or even usable...
 
 ### Electronic circuit
 
-We provide two options for the electronic circuit:
+We provide two options for the electronic circuit. The diffrence is made on the tension value used to power the LEDs: either +3V3 or +5V. But appart from that the two circuits share the same principles:
+
+- The Pin "8"  of the Seeeduino XIAO is used to control the LED brightness:
+  + It is connected, via a voltage divider bridge, to the gate of a IRLZ34N MOSFET.
+  - The "+"terminal of the LEDs (strip or pannel) are conn is plugged to the constant +3V3 (or +5V) output of the Seeeduino
+  - The "-" terminal of the LEDs (strip or pannel) is connected to the drain of the IRLZ34N MOSFET. 
+  - The source of the MOSFET is grounded. 
+  - High frenquency PWN is used to swich rapidly ON and OFF the mosfet, and allow to control the effective tension applied to the LEDs. 
+
+> ⚠ **WARNING**  
+> The choice of Pin 8 to for PWM is not random. Not all pins of Seeeduino XIAO (and SAM-D21 chips) are not capable to produce high frequency PWM. That's possible with Pin 8 because it use timer counter TCC1 which is 16bits.  And If you want to choose another pin please check the [documentation](https://ww1.microchip.com/downloads/en/DeviceDoc/SAM_D21_DA1_Family_DataSheet_DS40001882F.pdf) first. 
+
+
+- The Pin "5,6,7"  of the Seeeduino XIAO are used for power control, position control and feedback for the servo:
+  - Power control is connected, via a voltage divider bridge, to the gate of a IRLZ34N MOSFET.
+  - Feedback is directly connected to the feedback pin of the servo.
+  - Position control is directly connected to the position control pin of the servo.
+  
+- Servo VCC and Servo ground are decoupled using diodes.
+
+- +5V (and +3V3 if needed) ar decoupled from ground using a 10μF capacitors. It acts both as
+  - an energy store for a stable +5V/+3V3 output.
+  - a "wire" for very high frequency spurious oscillations and effectively ground them. 
+
 
 #### The +3V3 output for LEDs
 
@@ -100,8 +131,12 @@ This is best suited for bigger tubes using a larger number of LEDs drawing more 
 
 #### Cicruit layout breadbord validation
 
-We recommend you prototye the circuit using breadbords first. 
-- That 
+We recommend you prototype the circuit using breadbords first. 
+
+- This can help you choose between the +5V and +3V3 version. A quick "hint", don't go for to bright ouputs for LEDs as a very bright pannel is in fact not really needed when taking flats. Especially with fast optics. 
+- This allows to check each component/part of the circuit independetly. It's always better to find a faulty resistor before it soldered on a PCB.
+- It's always fun to prototype. 
+
 #### Printed Circuit Board
 
 #### Firware upload

@@ -1,5 +1,5 @@
 /*
- * arduino_firmware.ino
+ * fffpv1_firmware.ino
  * Copyright (C) 2025 - Present, Le Télescope - Ivry sur Seine - All Rights Reserved
  * Licensed under the MIT License. See the accompanying LICENSE file for terms.
  *
