@@ -188,12 +188,12 @@ Congrats the Seeeduino is ready to act as your flat pannel controler !
 
 #### Calibration of servo motor 
 
-> **WARNING**
+> ⚠ **WARNING**
 > The firmware needs to be calibrated.
 
 At first boot the leds will flash to indicate that it needs to be calibrated. 
 
-> **WARNING**
+> ⚠ **WARNING**
 > Disconnect the servo from the mecanical assembly before launching the calibration procedure. 
 
 Then from the IDE connect to the board and using the Arduino serial monitor send (type) the "command" 
@@ -222,7 +222,7 @@ The installer is pined on the each release [releases page](https://github.com/le
 
 2. "Double-click" on the downloaded file to launch it. 
 
-   > **WARNING**
+   > ⚠ **WARNING**
    > Windows will warn that the publisher is unknown. This is perfectly fine. As buying a verified signing key, is definitely not a priority for us, we could not sign the installer. Yet this is perfectly safe to use it. 
 
 3. Follow the instruction to install and register the driver. 
@@ -237,13 +237,11 @@ To build it from sources please check the relevant section of the "developpement
 
 #### Driver valdiation
 
-Once install, one can use the ASCOM platform tools to check that this was installed properly. 
-
-1. First check that the driver was properly "registered". From the ASCOM profile explorer check that the *ASCOM Le Telescope FFFPV1 CoverCalibrator* is listed in the Cover Calibrators. 
+Once install is complete, one can use the ASCOM profile explorer tool to check that this was installed properly. From the ASCOM profile explorer check that the *ASCOM Le Telescope FFFPV1 CoverCalibrator* is listed in the Cover Calibrators. 
 
 ![ASCOM Le Telescope FFFPV1 CoverCalibrator](./.static/profile-explorer.png) 
 
-2. Then check that the driver is instiable using the ASCOM diagnostic tools
+1. Then check that the driver is instiable using the ASCOM diagnostic tools
    
    a. Select the "Cover Calibrator" device type and elect the "FFPV1 Cover Calibrator"
 
@@ -261,18 +259,115 @@ Once install, one can use the ASCOM platform tools to check that this was instal
 
 ### INDI Driver
 
-> **WARNING**
+> ⚠ **WARNING**
 > INDO driver is NOT functional DO NOT USE IT. 
 
 ## Testing
 
+To avoid mass troubleshooting, one can test each component fairly separately. Below are listed some tests that can be used to validate the setup. Going from "unit test" to big-bang integration tests from your favourite acquisition software. 
+
 ### Firware "unit" testing
+
+Once the firware uploaded, one should already have tested that the seeduino was responsive. If not reconnect the the board via USB. From the Arduino IDE, open the "Serial Monitor". Once connected, In the console type
+
+``` sh
+COMMAND:PING
+```
+the board should answer
+
+``` sh
+RESULT:PONG
+```
+If that's not the case, please make sure that you uploaded the (correct version of the) firmware firt. 
+
+If that is indeed the case, congrats you are ready to test more "interresting" features of the firmware.
 
 #### Set brightness levels
 
+From the "Serial Monitor", in the console type the following command to adjust the LED panel brightness level:
+
+``` sh
+COMMAND:BRIGHTNESS_SET@1024
+```
+the board should answer in the console
+
+``` sh
+RESULT:BRIGHTNESS_SET@1024
+```
+In parrallel, if it is connected to the board, the light panel should have been turned on. Feel free to change the value (number after the '@') to adjust the brightness. Max allowed value is 2043 and min value is 0. 
+
+Use ```COMMAND:BRIGHTNESS_RESET``` to switch off the panel.
+
+Congrats the variable light panel is functionnal. 
+
 #### Open/Close the cover
 
+> ⚠ **WARNING**
+> To be able to open/close the panel, the panel should be calibrated first. Check the "mechanical assembly" section for the procedure. 
+
+When turned on, the panel should be closed. To open it,from the "Serial Monitor", in the console type the following command:
+
+``` sh
+COMMAND:COVER_OPEN
+```
+the panel should start moving and the board should answer in the console
+
+``` sh
+RESULT:COVER_OPEN@OK
+```
+
+Once open to close it simply type in the consle
+
+``` sh
+COMMAND:COVER_CLOSE
+```
+the panel should start moving and the board should answer in the console
+
+``` sh
+RESULT:COVER_CLOSE@OK
+```
+
+Finally at any given time, to know the status of the mecanical panel type 
+
+``` sh
+COMMAND:COVER_GET_STATE
+```
+the panel should start moving and the board should answer in the console
+
+```
+RESULT:COVER_GET@{panel.cover}
+```
+
+where panel.cover is string human readable translation of the current cover state. Possible values are in [**OPEN**, **OPENING**, **CLOSING**,]; 
+
+Congrats the motorized cover is functionnal. 
+
+### Driver "unit testing"
+
+After install completion, one one should already have used the ASCOM profile explorer tool to check that this was installed properly. If that's not the case from the ASCOM profile explorer check that the *ASCOM Le Telescope FFFPV1 CoverCalibrator* is listed in the Cover Calibrators. 
+
+![ASCOM Le Telescope FFFPV1 CoverCalibrator](./.static/profile-explorer.png) 
+
+1. Then check that the driver is instiable using the ASCOM diagnostic tools
+   
+   a. Select the "Cover Calibrator" device type and elect the "FFPV1 Cover Calibrator"
+
+![Cover Calibrator device type](./.static/diagnostics-tools.png)
+
+
+   b. Find and configure the "properties" of the driver
+
+![Driver properties](./.static/diagnostics-tools-properties.png)
+
+   b. Connect to the driver. Expect nothing much to happen. 
+
+![Connect driver](./.static/diagnostics-tools-connect.png)
+
+Congrats the driver seems to work as expected !
+
 ### Connect to the panel from N.I.N.A via ASCOM
+
+Great ! If you read this, at this stage , the firware, the driver, the mecanical assembly should work, or at least one should be confident enought that they are working. Let's make the final test (and the only one relevant in fact). Let's take some flats from N.I.N.A. 
 
 ## Usage
 

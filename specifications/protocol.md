@@ -87,7 +87,7 @@ Allowed commands are:
 
 ### Get cover state 
 
-- Incoming message : `COMMAND:COVER_GET`
+- Incoming message : `COMMAND:COVER_GET_STATE`
 - Args             : Ignored
 - Serial response  : `RESULT:COVER_GET@{panel.cover}`, where panel.cover is string human readable translation of the current cover state. Possible values are in [**OPEN**, **OPENING**, **CLOSING**, **CLOSED**]
 - Serial error     : Never
