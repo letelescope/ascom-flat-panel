@@ -45,7 +45,7 @@ The cover is motorized using a servo motor and held in open/close positions usin
 
 One can connect and send commands to the flat-panel using Serial (COM Port) over USB. When plugged in the device will be recognized by windows/linux as a COM device. 
 
-Finally this is drived by ASCOM/INDI, such that one can fully automate taking flats following the acquisition sessions of our beloved night sky targets. 
+Finally this is driven by ASCOM/INDI, such that one can fully automate taking flats following the acquisition sessions of our beloved night sky targets. 
 
 > ⚠ **DISCLAIMER**  
 > This project is built around the Seeeduino XIAO board that uses the ATSAMD21G18A-MU chip. This is the only board that we tested. This may work on other boards that uses these SAMD21 chips, but this may need some rework on the firware, the PCB layout and the mechanical assembly. 
