@@ -228,7 +228,7 @@ The installer is pined on the each release [releases page](https://github.com/le
 
 Congrats you just installed the driver !
 
-[driver install](./.static/driver-install-sucess.png)
+![driver install](./.static/driver-install-sucess.png)
 
 #### Build from sources
 
