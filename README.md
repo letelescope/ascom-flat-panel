@@ -25,8 +25,7 @@ This project, the protocol, the implementation of both the *ASCOM* driver and th
 
 Kudos to him. 
 
-The Pulse Width Modulation (PWM), used to control the panel brightness, implementation is heavily inspired, or more accurately shamelessly ripped, from the work of [Khoih Hoang](https://github.com/khoih-prog) and more precisely [SAMD_PWM](https://github.com/khoih-prog/SAMD_PWM/) . 
-
+The Pulse Width Modulation (PWM), used to control the panel brightness, implementation is heavily inspired, or more accurately shamelessly ripped, from the work of [Khoih Hoang](https://github.com/khoih-prog) and more precisely [SAMD_PWM](https://github.com/khoih-prog/SAMD_PWM/). 
 
 Kudos to him too.
 
