@@ -234,27 +234,11 @@ Congrats you just installed the driver !
 
 To build it from sources please check the relevant section of the "developpement documentation". 
 
-#### Driver valdiation
+#### Driver validation
 
 Once install is complete, one can use the ASCOM profile explorer tool to check that this was installed properly. From the ASCOM profile explorer check that the *ASCOM Le Telescope FFFPV1 CoverCalibrator* is listed in the Cover Calibrators. 
 
 ![ASCOM Le Telescope FFFPV1 CoverCalibrator](./.static/profile-explorer.png) 
-
-1. Then check that the driver is instiable using the ASCOM diagnostic tools
-   
-   a. Select the "Cover Calibrator" device type and elect the "FFPV1 Cover Calibrator"
-
-![Cover Calibrator device type](./.static/diagnostics-tools.png)
-
-
-   b. Find and configure the "properties" of the driver
-
-![Driver properties](./.static/diagnostics-tools-properties.png)
-
-   b. Connect to the driver. Expect nothing to happen. 
-
-![Connect driver](./.static/diagnostics-tools-connect.png)
-
 
 ### INDI Driver
 
