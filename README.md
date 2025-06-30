@@ -2,8 +2,9 @@
 
 [![Website](https://img.shields.io/badge/website-Le_Télescope-blue)](https://letelescope.fr/)
 [![Latest Release](https://img.shields.io/badge/download-latest-blue)](https://github.com/letelescope/ascom-flat-panel/releases)
-[![Latest Release](https://img.shields.io/github/release/letelescope/ascom-flat-panel/ascom-flat-panel.svg)](https://github.com/freecad/freecad/releases/latest)
 [![ASCOM plateform](https://img.shields.io/badge/ASCOM_standards-012056)](https://ascom-standards.org/)
+[![FreeCAD](https://img.shields.io/badge/FreeCAD-da464b)](https://www.freecad.org/)
+[![KiCAD](https://img.shields.io/badge/KiCAD-314cb0)](https://www.kicad.org/)
 [![Arduino](https://img.shields.io/badge/Arduino-00878F?logo=arduino&logoColor=fff&style=plastic)](https://www.arduino.cc/)
 [![No Maintenance Intended](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/) 
 
