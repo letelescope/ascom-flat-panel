@@ -1,8 +1,7 @@
 # Le Telescope Flat Panel 
 
 [![Website](https://img.shields.io/badge/website-Le_Télescope-blue)](https://letelescope.fr/)
-[![Latest Release](https://img.shields.io/badge/download-latest-blue)](https://github.com/letelescope/ascom-flat-panel/releases)
-[![GitHub release](https://img.shields.io/github/release/letelescope/ascom-flat-panel.svg)](https://github.com/letelescope/ascom-flat-panel/releases)
+[![GitHub release](https://img.shields.io/github/v/release/letelescope/ascom-flat-panel?include_prereleases)](https://github.com/letelescope/ascom-flat-panel/releases)
 [![Licence](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/letelescope/ascom-flat-panel/blob/main/LICENSE)
 [![ASCOM plateform](https://img.shields.io/badge/ASCOM_standards-012056)](https://ascom-standards.org/)
 [![FreeCAD](https://img.shields.io/badge/FreeCAD-da464b)](https://www.freecad.org/)
