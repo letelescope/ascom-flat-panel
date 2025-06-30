@@ -1,8 +1,8 @@
 # Le Telescope Flat Panel 
 
-[![Website](https://img.shields.io/badge/website-Le_Télescope-blue)](https://nighttime-imaging.eu/)
+[![Website](https://img.shields.io/badge/website-Le_Télescope-blue)](https://letelescope.fr/)
 [![Latest Release](https://img.shields.io/badge/download-latest-blue)](https://github.com/letelescope/ascom-flat-panel/releases)
-[![Arduino](https://img.shields.io/badge/Arduino-00979D?style=for-the-badge&logo=Arduino&logoColor=white)](https://www.arduino.cc/)
+[![Arduino](https://img.shields.io/badge/Arduino-00878F?logo=arduino&logoColor=fff&style=plastic)](https://www.arduino.cc/)
 [![No Maintenance Intended](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/) 
 
 Open source *ASCOM* and *INDI* driven automated flat panel for astrophotography. 
