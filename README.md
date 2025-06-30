@@ -2,7 +2,7 @@
 
 [![Website](https://img.shields.io/badge/website-Le_Télescope-blue)](https://letelescope.fr/)
 [![GitHub release](https://img.shields.io/github/v/release/letelescope/ascom-flat-panel?include_prereleases)](https://github.com/letelescope/ascom-flat-panel/releases)
-[![Licence](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/letelescope/ascom-flat-panel/blob/main/LICENSE)
+[![Licence](https://img.shields.io/github/license/letelescope/ascom-flat-panel)](https://github.com/letelescope/ascom-flat-panel/blob/main/LICENSE)
 [![ASCOM plateform](https://img.shields.io/badge/ASCOM_standards-012056)](https://ascom-standards.org/)
 [![FreeCAD](https://img.shields.io/badge/FreeCAD-da464b)](https://www.freecad.org/)
 [![KiCAD](https://img.shields.io/badge/KiCAD-314cb0)](https://www.kicad.org/)
