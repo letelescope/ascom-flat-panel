@@ -156,7 +156,7 @@ Here is and example of what the "+5V" circuit may look like on a breadbord.
 
 #### Printed Circuit Board
 
-[TODO] THE 
+[TODO] THE PCB IS READY TO BE PRINTED . JUST EXPLAIN HOW HERE
 
 #### Firware upload
 
@@ -195,7 +195,13 @@ Congrats the Seeeduino is ready to act as your flat pannel controler !
 
 ### Mechanical Assembly
 
+Moving on to the actual print and build of the assembly. 
+
 #### Prints from pre-designed assemblies
+
+This repository (and therefore the tagged release version) contains a fully fonctional model. This is made to fit an Askar SQA-55 and uses premade 100mm led panel. It also feature an adapter to fit an Askar 71f. 
+
+"Ready to print" STL files are also pinned to the release. Just download the fffpv1-100mm_led_pan_diam_stl.zip archive, unzip it. The archiver files are organized within two folders "Black" and "White". Files in he "black" repository can be printed in the  color of your choice, but the one in the "white" folder should be printed using white PLA for better performance. This is especially true for the "spacer/diffuser" that, as its name suggests, helps homogenise the illumination of the panel.
 
 #### Modification of pre-designed assemblies
 
@@ -370,7 +376,29 @@ Great ! If you read this, at this stage , the firware, the driver, the mecanical
 
 ## Usage
 
+The FFFPV1 should be now be fully usable and drivable from N.I.N.A. 
+
+### Flat-Panel Connection
+
+Let's connect to the flat panel. 
+
+0. Plug the flat panel to the computer via USB
+
+In the equipment tab, from the flat panl section, 
+
+1. Select the *ASCOM Le Telescope FFFPV1 CoverCalibrator*.
+2. Click the gear icon and select the correct COM Port. 
+3. Hit OK to save the configuration.
+   ![N.I.N.A Flat Panel equipement section](./.static/NINA-flat-panel.png)
+
+4. Click the "power" button to connect to the flat panel. 
+   ![N.I.N.A Flat Panel connection](./.static/NINA-flat-panel-connected.png)
+
+From ther you can turn on and off the panel, set the wanted brightness and/or open/close the cover. 
+
 ### N.I.N.A smart flats
+
+Let's now use the N.I.N.A smart flats capabilities to automate flat frames recording.
 
 #### Auto-exposure
 
