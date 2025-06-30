@@ -45,7 +45,7 @@ Kudos to him too.
 
 ## Construction
 
-### Why a "motorized flat panel" ? And do we mean by "motorized flat panel" ?
+### Why a "motorized flat panel" ? And what do we mean by "motorized flat panel" ?
 
 In this scenario a flat panel is made of two things
 - A light panel with variable brightness
