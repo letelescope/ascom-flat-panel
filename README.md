@@ -37,6 +37,8 @@ The Pulse Width Modulation (PWM), used to control the panel brightness, implemen
 
 Kudos to him too.
 
+----
+
 ## Construction
 
 ### Why a "motorized flat panel" ? And do we mean by "motorized flat panel" ?
@@ -253,6 +255,8 @@ Once install is complete, one can use the ASCOM profile explorer tool to check t
 > ⚠ **WARNING**
 > INDO driver is NOT functional DO NOT USE IT. 
 
+---
+
 ## Testing
 
 To avoid mass troubleshooting, one can test each component fairly separately. Below are listed some tests that can be used to validate the setup. Going from "unit test" to big-bang integration tests from your favourite acquisition software. 
@@ -367,6 +371,8 @@ Great ! If you read this, at this stage , the firware, the driver, the mecanical
 #### Auto-exposure
 
 #### Auto-brightness
+
+---
 
 ## Developpement 
 
