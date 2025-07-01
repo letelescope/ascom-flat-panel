@@ -205,6 +205,8 @@ This repository (and therefore the tagged release version) contains a fully fonc
 
 #### Modification of pre-designed assemblies
 
+#### Manufacturing sequence
+
 #### Calibration of servo motor 
 
 > ⚠ **WARNING**
