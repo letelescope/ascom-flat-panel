@@ -613,5 +613,5 @@ Install the project...
 
 - *What is "Le Télescope" ?* This a french astronmy club located at Ivry sur Seine in the Paris suburbs. Please see the [website](https://letelescope.fr) for more informations.
 - *Why is this panel nicknamed FFFPV1 ?* This stands for "Florian Florian Flat Panel v1" based on the name of the two orginal authors. 
-
+- *Special thanks to Fabrice Houvet*. He was, with his 3D printer of real help when prototyping this flat panel. 
 
