@@ -156,7 +156,11 @@ Here is and example of what the "+5V" circuit may look like on a breadbord.
 
 #### Printed Circuit Board
 
-[TODO] THE PCB IS READY TO BE PRINTED . JUST EXPLAIN HOW HERE
+We had our PCBs printed by [PCBWay](https://www.pcbway.com/). If you do not modify the PCB layout and want to have it printed by PCBWay, you can just download one of the provided zip files that are pinned to the release (fffpv1-electronics-5V-LEDs-pcbway-files.zip or fffpv1-electronics-3V-LEDs-pcbway-files.zip, depending if you intend to use the +5V or +3V3 version).
+
+If you want to modify the PCB layout, you have two options depending on the company you chose to print your PCB :
+- If you chose PCBWay, just run a "Desing Rules Check" after your modifications are done to make sure there is no error (there may be warnings, but who cares about warnings ?). The PCBWay design rules are associated to the KiCAD project (they are implemented in the ascom-flat-panel.kicad_dru file). From here you can generate the fabrication files using the KiCAD interface and following the recommandations explained on the PCBWay website, OR you can simply install the PCBWay plugin for KiCAD, which will do the job for you in one click, and will drive you to the PCBWay website to complete your order (yes, we live in a fantastic era).
+- If you chose another company, make sure their design rules are implemented to the KiCAD project. Depending on the company, you may find them in tables on the company's website and implement them using the KiCAD interface, or they can provide a .kicad_dru file you can use instead of the one we provide. Then perform a "Desing Rules Check" to check your modifications. Then you can generate the fabrication files using the KiCAD interface and following the recommandations provided by your supplier, or you can find out if there is a KiCAD plugin to do the job. Some suppliers will just take your KiCAD project and do all of this by their own, leaving you with basically nothing to do but creating an account and uploading your project (and pay, of course).
 
 #### Firmware upload
 
