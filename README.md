@@ -51,11 +51,11 @@ In this scenario a flat panel is made of two things
 - A light panel with variable brightness
 - A motorized cover
 
-The cover is motorized using a servo motor and held in open/close positions using simple magnets. The lightpanel is made using LEDs and the variable brightness is achieved via pulse width modulation (PWM). This "electronico-mechanical" assembly is controlled via a SAM-D21 based board with a custom firmware within a custom PCB. The SAM-D21 is particullarly suited because
+The cover is motorized using a servo motor and held in open/close positions using simple magnets. The lightpanel is made using LEDs and the variable brightness is achieved via pulse width modulation (PWM). This "electronico-mechanical" assembly is controlled via a SAMD21 based board with a custom firmware within a custom PCB. The SAMD21 is particullarly suited because:
 
 - it can output 5V, that is needed to power the servo.
-- it can output +3V3 and allow us to choose between 3V anf 5V to power the LEDs.
-- It has 16 bits timer counters necessary to achieve fast PWM. We do not want flickering flats...
+- it can output +3V3 and allow us to choose between 3V and 5V to power the LEDs.
+- it has 16 bits timer counters necessary to achieve fast PWM. We do not want flickering flats...
 
 One can connect and send commands to the flat-panel using Serial (COM Port) over USB. When plugged in the device will be recognized by windows/linux as a COM device. 
 
@@ -70,9 +70,9 @@ Now that we have the big picture let's get real and build the thing !
 
 ### Pre-requisites
 
-Very few pre-requisites are necessary in order to build the flat panel. More precisely one will need to
+Very few pre-requisites are necessary in order to build the flat panel. More precisely one will need to:
 
-- have access to a 3D printer, to print the mechanical assembly parts.
+- have access to a 3D printer, to print the mechanical assembly parts
 - have some soldering skills and a soldering kit, to solder the components to the custom PCB
 - install the arduino IDE, to upload the firmware
 - love "diy-ing", because you may need to want/need to tweaks things a bit to make it work in your setup. 
@@ -87,9 +87,9 @@ And that's it ! For instance you won't need software developpement skills as bot
 
 We heavily use the git version control "tags" to label released versions. We also leverage the "GitHub releases" that add the possibility to pin "binaries" (ie anything we want PCB layouts, Driver installers, mechanincal assembly 3D printer files,...) on "tagged" versions. 
 
-When we deem a version is "usable" we tag it, ie we freez this repository at a particular "commit", and create a release out of it. 
+When we deem a version is "usable" we tag it, ie we freeze this repository at a particular "commit", and create a release out of it. 
 
-To access the various releases just got the the [releases page](https://github.com/letelescope/ascom-flat-panel/releases/) of this repository.
+To access the various releases just got the [releases page](https://github.com/letelescope/ascom-flat-panel/releases/) of this repository.
 
 ![Access the releases](./.static/releases.png)
 
@@ -97,34 +97,34 @@ And choose the release you want. The latest should be the "better".
 
 ![Access the content of a release](./.static/release.png)
 
-We recommend that you use one of these released version as they are coherent and tested. Be carefull some release are labelled "pre-release" and should be used with caution. Those are developpement, beta and alpha version. Use it at you own risk as all the material on this repository. But even more in this case :D. 
+We recommend that you use one of these released version as they are coherent and tested. Be careful some release are labelled "pre-release" and should be used with caution. Those are developpement, beta and alpha version. Use it at you own risk like all the material on this repository. But even more in this case :D. 
 
 In the same spirit, we do not recommend you use the "head" of the main branch (or any other branch) of this repository as this is work in progress and hence is not guaranteed to be stable or even usable...
 
 ### Electronic circuit
 
-We provide two options for the electronic circuit. The diffrence is made on the tension value used to power the LEDs: either +3V3 or +5V. But appart from that the two circuits share the same principles:
+We provide two options for the electronic circuit. The difference is made on the tension value used to power the LEDs: either +3V3 or +5V. But appart from that the two circuits share the same principles:
 
 - The Pin "8"  of the Seeeduino XIAO is used to control the LED brightness:
   + It is connected, via a voltage divider bridge, to the gate of a IRLZ34N MOSFET.
-  - The "+"terminal of the LEDs (strip or pannel) are conn is plugged to the constant +3V3 (or +5V) output of the Seeeduino
-  - The "-" terminal of the LEDs (strip or pannel) is connected to the drain of the IRLZ34N MOSFET. 
+  - The "+"terminal of the LEDs (strip or panel) is plugged to the constant +3V3 (or +5V) output of the Seeeduino
+  - The "-" terminal of the LEDs (strip or panel) is connected to the drain of the IRLZ34N MOSFET. 
   - The source of the MOSFET is grounded. 
-  - High frenquency PWN is used to swich rapidly ON and OFF the mosfet, and allow to control the effective tension applied to the LEDs. 
+  - High frenquency PWM is used to swich rapidly ON and OFF the MOSFET, and allow to control the effective tension applied to the LEDs. 
 
 > ⚠ **WARNING**  
-> The choice of Pin 8 to for PWM is not random. Not all pins of Seeeduino XIAO (and SAM-D21 chips) are not capable to produce high frequency PWM. That's possible with Pin 8 because it use timer counter TCC1 which is 16bits.  And If you want to choose another pin please check the [documentation](https://ww1.microchip.com/downloads/en/DeviceDoc/SAM_D21_DA1_Family_DataSheet_DS40001882F.pdf) first. 
+> The choice of Pin 8 for PWM is not random. Not all pins of Seeeduino XIAO (and SAM-D21 chips) are capable to produce high frequency PWM. That's possible with Pin 8 because it use timer counter TCC1 which is 16bits.  And If you want to choose another pin please check the [documentation](https://ww1.microchip.com/downloads/en/DeviceDoc/SAM_D21_DA1_Family_DataSheet_DS40001882F.pdf) first. 
 
 
-- The Pin "5,6,7"  of the Seeeduino XIAO are used for power control, position control and feedback for the servo:
+- The Pins "5,6,7"  of the Seeeduino XIAO are used for power control, position control and servo feedback:
   - Power control is connected, via a voltage divider bridge, to the gate of a IRLZ34N MOSFET.
   - Feedback is directly connected to the feedback pin of the servo.
   - Position control is directly connected to the position control pin of the servo.
   
 - Servo VCC and Servo ground are decoupled using diodes.
 
-- +5V (and +3V3 if needed) ar decoupled from ground using a 10μF capacitors. It acts both as
-  - an energy store for a stable +5V/+3V3 output.
+- +5V (and +3V3 if needed) are decoupled from ground using 10μF capacitors. It acts both as
+  - an energy storage for a stable +5V/+3V3 output.
   - a "wire" for very high frequency spurious oscillations and effectively ground them. 
 
 
@@ -146,8 +146,8 @@ This is best suited for bigger tubes using a larger number of LEDs drawing more 
 
 We recommend you prototype the circuit using breadbords first. 
 
-- This can help you choose between the +5V and +3V3 version. A quick "hint", don't go for to bright ouputs for LEDs as a very bright pannel is in fact not really needed when taking flats. Especially with fast optics. 
-- This allows to check each component/part of the circuit independetly. It's always better to find a faulty resistor before it soldered on a PCB.
+- This can help you choose between the +5V and +3V3 version. A quick "hint", don't go for to bright ouputs for LEDs as a very bright panel is in fact not really needed when taking flats. Especially with fast optics. 
+- This allows to check each component/part of the circuit independently. It's always better to find a faulty component before it is soldered on a PCB.
 - It's always fun to prototype. 
 
 Here is and example of what the "+5V" circuit may look like on a breadbord.
@@ -158,7 +158,7 @@ Here is and example of what the "+5V" circuit may look like on a breadbord.
 
 [TODO] THE PCB IS READY TO BE PRINTED . JUST EXPLAIN HOW HERE
 
-#### Firware upload
+#### Firmware upload
 
 #### Pre-requisite
 
@@ -166,7 +166,7 @@ The firmware needs to be uploaded using the Arduino IDE. [Arduino IDE setup sect
 
 #### Upload the firware
 
-1. Open the file [firmware source file](./firmware/fffpv1_firmware/fffpv1_firmware.ino)from the Arduino IDE. 
+1. Open the file [firmware source file](./firmware/fffpv1_firmware/fffpv1_firmware.ino) from the Arduino IDE. 
 
 2. Connect the board via US. 
    
@@ -180,7 +180,7 @@ The output should look something like:
 
 #### Firmware checks
 
-Once the firware uploaded, do not disconnect the board yet. Still from the Arduino IDE open the "Serial Monitor". One connected, In the console type
+Once the firware is uploaded, do not disconnect the board yet. Still from the Arduino IDE open the "Serial Monitor". Once connected, in the console type:
 
 ``` sh
 COMMAND:PING
@@ -191,7 +191,7 @@ the board should answer
 RESULT:PONG
 ```
 
-Congrats the Seeeduino is ready to act as your flat pannel controler !
+Congrats! The Seeeduino is ready to act as your flat panel controller !
 
 ### Mechanical Assembly
 
@@ -199,9 +199,9 @@ Moving on to the actual print and build of the assembly.
 
 #### Prints from pre-designed assemblies
 
-This repository (and therefore the tagged release version) contains a fully fonctional model. This is made to fit an Askar SQA-55 and uses premade 100mm led panel. It also feature an adapter to fit an Askar 71f. 
+This repository (and therefore the tagged release version) contains a fully fonctional model. This is made to fit an Askar SQA-55 and uses premade 100mm led panel. It also feature an adapter to fit an Askar 71F. 
 
-"Ready to print" STL files are also pinned to the release. Just download the fffpv1-100mm_led_pan_diam_stl.zip archive, unzip it. The archiver files are organized within two folders "Black" and "White". Files in he "black" repository can be printed in the  color of your choice, but the one in the "white" folder should be printed using white PLA for better performance. This is especially true for the "spacer/diffuser" that, as its name suggests, helps homogenise the illumination of the panel.
+"Ready to print" STL files are also pinned to the release. Just download the fffpv1-100mm_led_pan_diam_stl.zip archive, unzip it. The archiver files are organized within two folders "Black" and "White". Files in he "black" repository can be printed in the color of your choice, but the one in the "white" folder should be printed using white PLA for better performance. This is especially true for the "spacer/diffuser" that, as its name suggests, helps homogenise the illumination of the panel.
 
 #### Modification of pre-designed assemblies
 
@@ -212,20 +212,20 @@ This repository (and therefore the tagged release version) contains a fully fonc
 > ⚠ **WARNING**
 > The firmware needs to be calibrated.
 
-At first boot the leds will flash to indicate that it needs to be calibrated. 
+At first boot the LEDs will flash to indicate that it needs to be calibrated. 
 
 > ⚠ **WARNING**
 > Disconnect the servo from the mecanical assembly before launching the calibration procedure. 
 
 Then from the IDE connect to the board and using the Arduino serial monitor send (type) the "command" 
 
-```
+``` sh
 COMMAND:COVER_CALIBRATION_RUN
 ``` 
 
 The device should perform its calibration procedure and reply with 
 
-```
+``` sh
 RESULT:COVER_CALIBRATION_RUN@OK
 ```
 
@@ -237,7 +237,7 @@ You can either used the installer to install the ASCOM driver or build it from s
 
 #### Pre-compiled installer
 
-The installer is pined on the each release [releases page](https://github.com/letelescope/ascom-flat-panel/releases/). 
+The installer is pined on each release [releases page](https://github.com/letelescope/ascom-flat-panel/releases/). 
 
 1. From the wanted release, download the file "FFFPv1_Setup.exe". 
 
@@ -248,13 +248,13 @@ The installer is pined on the each release [releases page](https://github.com/le
 
 3. Follow the instruction to install and register the driver. 
 
-Congrats you just installed the driver !
+Congrats! You just installed the driver !
 
 ![driver install](./.static/driver-install-sucess.png)
 
 #### Build from sources
 
-To build it from sources please check the relevant section of the "developpement documentation". 
+To build it from source please check the relevant section of the "developpement documentation". 
 
 #### Driver validation
 
@@ -275,7 +275,7 @@ To avoid mass troubleshooting, one can test each component fairly separately. Be
 
 ### Firware "unit" testing
 
-Once the firware uploaded, one should already have tested that the seeduino was responsive. If not reconnect the the board via USB. From the Arduino IDE, open the "Serial Monitor". Once connected, In the console type
+Once the firware is uploaded, one should already have tested that the seeduino was responsive. If not, reconnect the board via USB. From the Arduino IDE, open the "Serial Monitor". Once connected, in the console type:
 
 ``` sh
 COMMAND:PING
@@ -287,7 +287,7 @@ RESULT:PONG
 ```
 If that's not the case, please make sure that you uploaded the (correct version of the) firmware firt. 
 
-If that is indeed the case, congrats you are ready to test more "interresting" features of the firmware.
+If that is indeed the case, congrats you are ready to test more "interesting" features of the firmware.
 
 #### Set brightness levels
 
@@ -301,7 +301,7 @@ the board should answer in the console
 ``` sh
 RESULT:BRIGHTNESS_SET@1024
 ```
-In parrallel, if it is connected to the board, the light panel should have been turned on. Feel free to change the value (number after the '@') to adjust the brightness. Max allowed value is 2043 and min value is 0. 
+In parallel, if it is connected to the board, the light panel should have been turned on. Feel free to change the value (number after the '@') to adjust the brightness. Max allowed value is 2047 and min value is 0. 
 
 Use ```COMMAND:BRIGHTNESS_RESET``` to switch off the panel.
 
@@ -312,7 +312,7 @@ Congrats the variable light panel is functionnal.
 > ⚠ **WARNING**
 > To be able to open/close the panel, the panel should be calibrated first. Check the "mechanical assembly" section for the procedure. 
 
-When turned on, the panel should be closed. To open it,from the "Serial Monitor", in the console type the following command:
+When turned on, the panel should be closed. To open it, from the "Serial Monitor", in the console type the following command:
 
 ``` sh
 COMMAND:COVER_OPEN
@@ -351,7 +351,7 @@ Congrats the motorized cover is functionnal.
 
 ### Driver "unit testing"
 
-After install completion, one one should already have used the ASCOM profile explorer tool to check that this was installed properly. If that's not the case from the ASCOM profile explorer check that the *ASCOM Le Telescope FFFPV1 CoverCalibrator* is listed in the Cover Calibrators. 
+After install completion, one should already have used the ASCOM profile explorer tool to check that this was installed properly. If that's not the case from the ASCOM profile explorer check that the *ASCOM Le Telescope FFFPV1 CoverCalibrator* is listed in the Cover Calibrators. 
 
 ![ASCOM Le Telescope FFFPV1 CoverCalibrator](./.static/profile-explorer.png) 
 
@@ -374,7 +374,7 @@ Congrats the driver seems to work as expected !
 
 ### Connect to the panel from N.I.N.A via ASCOM
 
-Great ! If you read this, at this stage , the firware, the driver, the mecanical assembly should work, or at least one should be confident enought that they are working. Let's make the final test (and the only one relevant in fact). Let's take some flats from N.I.N.A. 
+Great ! If you read this, at this stage, the firware, the driver and the mecanical assembly should work, or at least one should be confident enough that they are working. Let's make the final test (and the only one relevant in fact). Let's take some flats from N.I.N.A. 
 
 ## Usage
 
@@ -386,7 +386,7 @@ Let's connect to the flat panel.
 
 0. Plug the flat panel to the computer via USB
 
-In the equipment tab, from the flat panl section, 
+In the equipment tab, from the flat panel section:
 
 1. Select the *ASCOM Le Telescope FFFPV1 CoverCalibrator*.
 2. Click the gear icon and select the correct COM Port. 
@@ -396,7 +396,7 @@ In the equipment tab, from the flat panl section,
 4. Click the "power" button to connect to the flat panel. 
    ![N.I.N.A Flat Panel connection](./.static/NINA-flat-panel-connected.png)
 
-From ther you can turn on and off the panel, set the wanted brightness and/or open/close the cover. 
+From there you can turn on and off the panel, set the wanted brightness and/or open/close the cover. 
 
 ### N.I.N.A smart flats
 
