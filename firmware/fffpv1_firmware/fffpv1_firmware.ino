@@ -923,16 +923,17 @@ int powerUpServo() {
     current_pos = get_current_servo_pos();
   }
 
-  // This step is critical! Without it, the servo does not know its position when it is attached below,
-  // and the first write command will make it jerk to that position, which is what we want to avoid...
-  servo.write(current_pos);
-  panel.servo_position = current_pos;
 
   // The optional min and max pulse width parameters are actually quite important
   // and depend on the exact servo you are using. Without specifying them, you may
   // not be able to use the full range of motion (270 degrees for this project)
   servo.attach(SERVO_POS_CONTROL_PIN, SERVO_MIN_PW, SERVO_MAX_PW);
 
+  // This step is critical! Without it, the servo does not know its position when it is attached below,
+  // and the first write command will make it jerk to that position, which is what we want to avoid...
+  servo.write(current_pos);
+  panel.servo_position = current_pos;
+  
   return current_pos;
 }
 
