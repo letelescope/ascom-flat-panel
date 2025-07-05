@@ -456,6 +456,7 @@ The firware is entirely buildable and uploadable using the Arduino IDE
 
 - [Download](https://www.arduino.cc/en/software/) and install the Arduino IDE
 - [Downlaod](https://wiki.seeedstudio.com/Seeeduino-XIAO/#software) and configure the Seeduino XIAO board for the Arduino IDE
+- From the Arduino IDE [download](https://docs.arduino.cc/libraries/adafruit-sleepydog-library/) and install the official Adafruit SleepyDog library. This is used to properly handle disconnection. 
 
 ##### Compile and upload the firmware
 
@@ -508,7 +509,7 @@ The ASCOM driver is a C# .Net project that have been first created using the ASC
 - A fully functional [ASCOM developper environement](https://ascom-standards.org/COMDeveloper/Index.htm) . Especiall, you may want to add the ASCOM "extensions" to Visual Studio.
 
 
-##### Compile and upload the firmware
+##### Compile and register the driver
 
 1) Open the ["solution"](./drivers/ASCOM/ASCOM_6_Driver/ASCOM_6_Driver.sln) from Visual Studio 2022
 

@@ -125,6 +125,15 @@ WARNING: Disconect the right arm from the servo before runing the calibration
 - Serial response  : `RESULT:CALIBRATION_GET@slope={panel.calibration.slope} - intercept={panel.calibration.intercept}`
 - Serial error     : if panel is not calibrated => `SERVO_NO_CALIBRATED@Run command COVER_CALIBRATION_RUN first`
 
+### Disconnect
+
+
+- Incoming message : `COMMAND:DISCONNECT`
+- Args             : Ignored
+- Serial response  : `RESULT:DISCONNECT@OK`
+- Serial error     : never
+
+
 ### Unknown commands
 
 This one is a special command that is not meant to be called. It is in fact the result of an unknow command sent to the firmware.

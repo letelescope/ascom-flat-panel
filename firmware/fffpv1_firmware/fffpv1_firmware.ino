@@ -61,6 +61,7 @@
 
 #include <Servo.h>
 #include <FlashStorage.h>
+#include <Adafruit_SleepyDog.h>
 #include "samd21-pwm.h"
 
 /************************************************
@@ -166,18 +167,21 @@ constexpr auto COMMAND_COVER_CALIBRATION_RUN = "COVER_CALIBRATION_RUN";
 constexpr auto RESULT_COVER_CALIBRATION_RUN = "0K";
 constexpr auto COMMAND_COVER_CALIBRATION_GET = "COVER_CALIBRATION_GET";
 
+constexpr auto COMMAND_DISCONNECT = "DISCONNECT";
+constexpr auto RESULT_DISCONNECT = "0K";
+
 constexpr auto COMMAND_UNKNOWN = "UNKNOWN";
 
 constexpr auto ERROR_INVALID_INCOMING_MESSAGE = "INVALID_INCOMING_MESSAGE@Allowed messages are TYPE:MESSAGE:[@PARAMETER]";
 constexpr auto ERROR_INVALID_INCOMING_MESSAGE_TYPE = "INVALID_INCOMING_MESSAGE_TYPE@Allowed types COMMAND";
-constexpr auto ERROR_INVALID_COMMAND = "INVALID_COMMAND@Allowed commands PING, INFO, BRIGHTNESS_GET, BRIGHTNESS_SET, BRIGHTNESS_RESET, COVER_GET_STATE, COVER_OPEN, COVER_CLOSE, COVER_CALIBRATION_RUN, COVER_CALIBRATION_GET";
+constexpr auto ERROR_INVALID_COMMAND = "INVALID_COMMAND@Allowed commands PING, INFO, BRIGHTNESS_GET, BRIGHTNESS_SET, BRIGHTNESS_RESET, COVER_GET_STATE, COVER_OPEN, COVER_CLOSE, COVER_CALIBRATION_RUN, COVER_CALIBRATION_GET, DISCONNECT";
 constexpr auto ERROR_WANTED_BRIGHTNESS_MSG_START = "INVALID_BRIGHTNESS@Wanted brightness {";
 constexpr auto ERROR_WANTED_BRIGHTNESS_NAN_MSG_END = "} is not a number.";
 constexpr auto ERROR_WANTED_BRIGHTNESS_NEGATIVE_MSG_END = "} is negative.";
 constexpr auto ERROR_WANTED_BRIGHTNESS_TOO_BIG_MSG_END = "} is bigger than max allowed value 2047";
 constexpr auto ERROR_SERVO_NOT_CALIBRATED = "SERVO_NOT_CALIBRATED@Run command COVER_CALIBRATION_RUN first";
 
-#define NB_COMMANDS 10
+#define NB_COMMANDS 11
 //Keeps the record of allowed/known commands
 constexpr command_t allowed_cmds[NB_COMMANDS] = {{ COMMAND_PING, &cmd_ping },
                                       { COMMAND_INFO, &cmd_info },
@@ -188,7 +192,8 @@ constexpr command_t allowed_cmds[NB_COMMANDS] = {{ COMMAND_PING, &cmd_ping },
                                       { COMMAND_COVER_OPEN, &cmd_cover_open },
                                       { COMMAND_COVER_CLOSE, &cmd_cover_close },
                                       { COMMAND_COVER_CALIBRATION_RUN, &cmd_cover_calibration_run },
-                                      { COMMAND_COVER_CALIBRATION_GET, &cmd_cover_calibration_get }};
+                                      { COMMAND_COVER_CALIBRATION_GET, &cmd_cover_calibration_get },
+                                      { COMMAND_DISCONNECT, &cmd_disconnect }};
 
 /*
  * Light panel related constants
@@ -281,6 +286,11 @@ void setup() {
   pinMode(PIN_LED_RXL, INPUT);
   pinMode(LED_BUILTIN, OUTPUT);
 
+  // Setup Servo related pins
+  pinMode(SERVO_POWER_PIN, OUTPUT);
+  pinMode(SERVO_FEEDBACK_PIN, INPUT);
+  pinMode(SERVO_POS_CONTROL_PIN, OUTPUT);
+
 
   // start serial port at 57600 bps:
   Serial.begin(57600);
@@ -295,12 +305,6 @@ void setup() {
 
   // Start pwm
   pwm_controller.startPWM();
-
-
-  // Setup Servo related pins
-  pinMode(SERVO_POWER_PIN, OUTPUT);
-  pinMode(SERVO_FEEDBACK_PIN, INPUT);
-  pinMode(SERVO_POS_CONTROL_PIN, OUTPUT);
 
   // initializing panel
   panel.brightness = 0;
@@ -347,6 +351,7 @@ void setup() {
  * - Update the servo position, if need be, according to the OPENING or CLOSING state of the cover
  */
 void loop() {
+
   // First we seek for commands
   receive_commands();
 
@@ -770,6 +775,20 @@ void cmd_cover_calibration_get(const String args) {
   serialize_result(COMMAND_COVER_CALIBRATION_GET, message);
 }
 
+/*
+ * "Disconnect" command handler. 
+ * 
+ * This commands gives the calibration data in response to a COMMAND:DISCONNECT message.
+ *
+ * Incoming message : COMMAND:DISCONNECT
+ * Args             : Ignored
+ * Serial response  : RESULT:DISCONNECT@OK
+ * Serial error     : never
+ */
+void cmd_disconnect(const String args) {
+  serialize_result(COMMAND_DISCONNECT, RESULT_DISCONNECT);
+  Watchdog.enable(1000);
+}
 /*
  * Special "unknown" command handler. 
  * 
