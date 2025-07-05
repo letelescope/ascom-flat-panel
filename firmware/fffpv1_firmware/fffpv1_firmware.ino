@@ -280,8 +280,19 @@ void setup() {
   pinMode(PIN_LED_TXL, INPUT);
   pinMode(PIN_LED_RXL, INPUT);
   pinMode(LED_BUILTIN, OUTPUT);
+
+
+  // start serial port at 57600 bps:
+  Serial.begin(57600);
+  // Let's wait for an actual connection on the serial port. 
+  // This will prevent non necessary PWM and more importantly non wanted servo energization.
+  while (!Serial) {
+    ; 
+  }
+
   digitalWrite(LED_BUILTIN, HIGH);
   
+
   // Start pwm
   pwm_controller.startPWM();
 
@@ -322,12 +333,7 @@ void setup() {
     _close_cover(verbose);
   }
 
-  // Once everything is correctly set
-  // start serial port at 57600 bps:
-  Serial.begin(57600);
-  while (!Serial) {
-    ;  // wait for serial port to connect. Needed for native USB port only
-  }
+
   Serial.flush();
 }
 
@@ -933,7 +939,7 @@ int powerUpServo() {
   // and the first write command will make it jerk to that position, which is what we want to avoid...
   servo.write(current_pos);
   panel.servo_position = current_pos;
-  
+
   return current_pos;
 }
 
