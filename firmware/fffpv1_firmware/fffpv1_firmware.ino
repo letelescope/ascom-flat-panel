@@ -778,7 +778,8 @@ void cmd_cover_calibration_get(const String args) {
 /*
  * "Disconnect" command handler. 
  * 
- * This commands gives the calibration data in response to a COMMAND:DISCONNECT message.
+ * This command diconnects the current com commnection in response to a COMMAND:DISCONNECT message.
+ * If fact it reboots the board, hence disconnecting the connection and wiating for a new one. 
  *
  * Incoming message : COMMAND:DISCONNECT
  * Args             : Ignored
