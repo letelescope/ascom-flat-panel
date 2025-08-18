@@ -100,6 +100,7 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         private const string CMD_BRIGHTNESS_GET = "BRIGHTNESS_GET";
         private const string CMD_BRIGHTNESS_SET = "BRIGHTNESS_SET";
         private const string CMD_BRIGHTNESS_RESET = "BRIGHTNESS_RESET";
+        private const string CMD_DISCONNECT = "DISCONNECT";
         // Expected restults
         private const string GENERIC_RSLT_OK = "OK";
         private const string PING_RSLT_PONG = "PONG";
@@ -354,7 +355,18 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
                 else
                 {
                     LogMessage("Connected Set", $"Disconnecting from port {comPort}");
+                    var disconnect_command_msg = CommandBuilder(CMD_DISCONNECT);
+                    var disconnect_expected_result_msg = ExpectedResultPrefixBuilder(CMD_DISCONNECT) + GENERIC_RSLT_OK;
+
+                    var actual_rslt = SharedResources.SendMessage(disconnect_command_msg);
+
                     SharedResources.SerialConnected = false;
+
+                    if (actual_rslt != disconnect_command_msg) {
+                        LogMessage("Connected Set", $"Failed disconnecting from port {comPort}, device may be in a dangling state");
+                        throw new DriverException($"Connection to port {comPort} failed,device may be in a dangling state");
+                    }
+
                 }
             }
         }

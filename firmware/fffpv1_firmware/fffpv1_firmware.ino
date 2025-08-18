@@ -1,5 +1,5 @@
 /*
- * arduino_firmware.ino
+ * fffpv1_firmware.ino
  * Copyright (C) 2025 - Present, Le Télescope - Ivry sur Seine - All Rights Reserved
  * Licensed under the MIT License. See the accompanying LICENSE file for terms.
  *
@@ -61,6 +61,7 @@
 
 #include <Servo.h>
 #include <FlashStorage.h>
+#include <Adafruit_SleepyDog.h>
 #include "samd21-pwm.h"
 
 /************************************************
@@ -166,18 +167,21 @@ constexpr auto COMMAND_COVER_CALIBRATION_RUN = "COVER_CALIBRATION_RUN";
 constexpr auto RESULT_COVER_CALIBRATION_RUN = "0K";
 constexpr auto COMMAND_COVER_CALIBRATION_GET = "COVER_CALIBRATION_GET";
 
+constexpr auto COMMAND_DISCONNECT = "DISCONNECT";
+constexpr auto RESULT_DISCONNECT = "0K";
+
 constexpr auto COMMAND_UNKNOWN = "UNKNOWN";
 
 constexpr auto ERROR_INVALID_INCOMING_MESSAGE = "INVALID_INCOMING_MESSAGE@Allowed messages are TYPE:MESSAGE:[@PARAMETER]";
 constexpr auto ERROR_INVALID_INCOMING_MESSAGE_TYPE = "INVALID_INCOMING_MESSAGE_TYPE@Allowed types COMMAND";
-constexpr auto ERROR_INVALID_COMMAND = "INVALID_COMMAND@Allowed commands PING, INFO, BRIGHTNESS_GET, BRIGHTNESS_SET, BRIGHTNESS_RESET, COVER_GET_STATE, COVER_OPEN, COVER_CLOSE, COVER_CALIBRATION_RUN, COVER_CALIBRATION_GET";
+constexpr auto ERROR_INVALID_COMMAND = "INVALID_COMMAND@Allowed commands PING, INFO, BRIGHTNESS_GET, BRIGHTNESS_SET, BRIGHTNESS_RESET, COVER_GET_STATE, COVER_OPEN, COVER_CLOSE, COVER_CALIBRATION_RUN, COVER_CALIBRATION_GET, DISCONNECT";
 constexpr auto ERROR_WANTED_BRIGHTNESS_MSG_START = "INVALID_BRIGHTNESS@Wanted brightness {";
 constexpr auto ERROR_WANTED_BRIGHTNESS_NAN_MSG_END = "} is not a number.";
 constexpr auto ERROR_WANTED_BRIGHTNESS_NEGATIVE_MSG_END = "} is negative.";
 constexpr auto ERROR_WANTED_BRIGHTNESS_TOO_BIG_MSG_END = "} is bigger than max allowed value 2047";
 constexpr auto ERROR_SERVO_NOT_CALIBRATED = "SERVO_NOT_CALIBRATED@Run command COVER_CALIBRATION_RUN first";
 
-#define NB_COMMANDS 10
+#define NB_COMMANDS 11
 //Keeps the record of allowed/known commands
 constexpr command_t allowed_cmds[NB_COMMANDS] = {{ COMMAND_PING, &cmd_ping },
                                       { COMMAND_INFO, &cmd_info },
@@ -188,7 +192,8 @@ constexpr command_t allowed_cmds[NB_COMMANDS] = {{ COMMAND_PING, &cmd_ping },
                                       { COMMAND_COVER_OPEN, &cmd_cover_open },
                                       { COMMAND_COVER_CLOSE, &cmd_cover_close },
                                       { COMMAND_COVER_CALIBRATION_RUN, &cmd_cover_calibration_run },
-                                      { COMMAND_COVER_CALIBRATION_GET, &cmd_cover_calibration_get }};
+                                      { COMMAND_COVER_CALIBRATION_GET, &cmd_cover_calibration_get },
+                                      { COMMAND_DISCONNECT, &cmd_disconnect }};
 
 /*
  * Light panel related constants
@@ -280,16 +285,26 @@ void setup() {
   pinMode(PIN_LED_TXL, INPUT);
   pinMode(PIN_LED_RXL, INPUT);
   pinMode(LED_BUILTIN, OUTPUT);
-  digitalWrite(LED_BUILTIN, HIGH);
-  
-  // Start pwm
-  pwm_controller.startPWM();
-
 
   // Setup Servo related pins
   pinMode(SERVO_POWER_PIN, OUTPUT);
   pinMode(SERVO_FEEDBACK_PIN, INPUT);
   pinMode(SERVO_POS_CONTROL_PIN, OUTPUT);
+
+
+  // start serial port at 57600 bps:
+  Serial.begin(57600);
+  // Let's wait for an actual connection on the serial port. 
+  // This will prevent non necessary PWM and more importantly non wanted servo energization.
+  while (!Serial) {
+    ; 
+  }
+
+  digitalWrite(LED_BUILTIN, HIGH);
+  
+
+  // Start pwm
+  pwm_controller.startPWM();
 
   // initializing panel
   panel.brightness = 0;
@@ -322,12 +337,7 @@ void setup() {
     _close_cover(verbose);
   }
 
-  // Once everything is correctly set
-  // start serial port at 57600 bps:
-  Serial.begin(57600);
-  while (!Serial) {
-    ;  // wait for serial port to connect. Needed for native USB port only
-  }
+
   Serial.flush();
 }
 
@@ -341,6 +351,7 @@ void setup() {
  * - Update the servo position, if need be, according to the OPENING or CLOSING state of the cover
  */
 void loop() {
+
   // First we seek for commands
   receive_commands();
 
@@ -765,6 +776,21 @@ void cmd_cover_calibration_get(const String args) {
 }
 
 /*
+ * "Disconnect" command handler. 
+ * 
+ * This command diconnects the current com commnection in response to a COMMAND:DISCONNECT message.
+ * If fact it reboots the board, hence disconnecting the connection and wiating for a new one. 
+ *
+ * Incoming message : COMMAND:DISCONNECT
+ * Args             : Ignored
+ * Serial response  : RESULT:DISCONNECT@OK
+ * Serial error     : never
+ */
+void cmd_disconnect(const String args) {
+  serialize_result(COMMAND_DISCONNECT, RESULT_DISCONNECT);
+  Watchdog.enable(1000);
+}
+/*
  * Special "unknown" command handler. 
  * 
  * This commands always answers with an error message.
@@ -923,15 +949,16 @@ int powerUpServo() {
     current_pos = get_current_servo_pos();
   }
 
-  // This step is critical! Without it, the servo does not know its position when it is attached below,
-  // and the first write command will make it jerk to that position, which is what we want to avoid...
-  servo.write(current_pos);
-  panel.servo_position = current_pos;
 
   // The optional min and max pulse width parameters are actually quite important
   // and depend on the exact servo you are using. Without specifying them, you may
   // not be able to use the full range of motion (270 degrees for this project)
   servo.attach(SERVO_POS_CONTROL_PIN, SERVO_MIN_PW, SERVO_MAX_PW);
+
+  // This step is critical! Without it, the servo does not know its position when it is attached below,
+  // and the first write command will make it jerk to that position, which is what we want to avoid...
+  servo.write(current_pos);
+  panel.servo_position = current_pos;
 
   return current_pos;
 }

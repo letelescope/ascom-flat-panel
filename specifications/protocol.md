@@ -87,7 +87,7 @@ Allowed commands are:
 
 ### Get cover state 
 
-- Incoming message : `COMMAND:COVER_GET`
+- Incoming message : `COMMAND:COVER_GET_STATE`
 - Args             : Ignored
 - Serial response  : `RESULT:COVER_GET@{panel.cover}`, where panel.cover is string human readable translation of the current cover state. Possible values are in [**OPEN**, **OPENING**, **CLOSING**, **CLOSED**]
 - Serial error     : Never
@@ -124,6 +124,15 @@ WARNING: Disconect the right arm from the servo before runing the calibration
 - Args             : Ignored
 - Serial response  : `RESULT:CALIBRATION_GET@slope={panel.calibration.slope} - intercept={panel.calibration.intercept}`
 - Serial error     : if panel is not calibrated => `SERVO_NO_CALIBRATED@Run command COVER_CALIBRATION_RUN first`
+
+### Disconnect
+
+
+- Incoming message : `COMMAND:DISCONNECT`
+- Args             : Ignored
+- Serial response  : `RESULT:DISCONNECT@OK`
+- Serial error     : never
+
 
 ### Unknown commands
 
