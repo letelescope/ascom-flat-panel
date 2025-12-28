@@ -547,7 +547,7 @@ void cmd_brightness_set(const String args) {
     return;
   }
 
-  if (wanted_brightness > MAX_BRIGHTNESS) {
+  if ((uint32_t)wanted_brightness > MAX_BRIGHTNESS) {
     auto message = ERROR_WANTED_BRIGHTNESS_MSG_START + args + ERROR_WANTED_BRIGHTNESS_TOO_BIG_MSG_END;
     serialize_error(message);
     return;
@@ -815,11 +815,18 @@ msg_cmd_payload get_cmd_payload(const String message, bool *error) {
   auto message_end_idx = message.length();
 
   bool has_type_cmd_sep = type_cmd_sep_idx >= 0;
+
+  if (!has_type_cmd_sep) {
+    serialize_error(ERROR_INVALID_INCOMING_MESSAGE);
+    *error = true;
+    return msg_cmd_payload{};
+  }
+
   bool is_type_sep_at_beginnig = type_cmd_sep_idx == 0;
-  bool is_type_sep_before_end = type_cmd_sep_idx < (message_end_idx - 1);
+  bool is_type_sep_before_end = (uint32_t)type_cmd_sep_idx < (message_end_idx - 1);
   bool has_arg_sep = cmd_args_sep_idx >= 0;
   bool is_type_sep_before_arg_sep = type_cmd_sep_idx < cmd_args_sep_idx;
-  bool is_arg_sep_before_end = cmd_args_sep_idx < (message_end_idx - 1);
+  bool is_arg_sep_before_end = (uint32_t)cmd_args_sep_idx < (message_end_idx - 1);
 
   bool valid_separators = has_type_cmd_sep
                           && !is_type_sep_at_beginnig
@@ -880,7 +887,7 @@ void cond_serialize_result(String command, String message, bool verbose) {
 
 void serialize_error(String error) {
   bool verbose = true;
-  cond_serialize_error(error, true);
+  cond_serialize_error(error, verbose);
 }
 
 void cond_serialize_error(String error, bool verbose) {

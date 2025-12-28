@@ -1,9 +1,4 @@
-#ifndef ARDUINO_FFFP_H
-#define ARDUINO_FFFP_H
-
 #include <Arduino.h>
-
-#endif
 
 /************************************************
  *     Types, Objects, and data structures      *
@@ -17,7 +12,7 @@
 
 
 
-typedef struct msg_cmd_payload {
+struct msg_cmd_payload {
   String name;
   String args;
 };
@@ -28,7 +23,7 @@ typedef struct msg_cmd_payload {
 typedef void (*cmd_handler_ptr)(String);
 
 //Main command data structure. A command has a name, and holds a pointer to a function that will perform the action. 
-typedef struct command_t {
+struct command_t {
   const char *name;
   cmd_handler_ptr handle;
 };
