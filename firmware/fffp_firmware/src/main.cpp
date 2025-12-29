@@ -1,5 +1,5 @@
 /*
- * fffpv1_firmware.ino
+ * fffp_firmware/main.cpp
  * Copyright (C) 2025 - Present, Le Télescope - Ivry sur Seine - All Rights Reserved
  * Licensed under the MIT License. See the accompanying LICENSE file for terms.
  *

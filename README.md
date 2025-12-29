@@ -181,7 +181,7 @@ The firmware needs to be uploaded using Visual Studio Code/PlateformIO . [Platef
    
 3. Select the board.
    
-4. Click the "arrow" at the top left to compile and upload the firmware on the board. 
+4. Click the "arrow" at the bottom to compile and upload the firmware on the board. 
 
 The output should look something like: 
 

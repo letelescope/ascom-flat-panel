@@ -1,3 +1,16 @@
+/*
+ * fffp.h
+ * Copyright (C) 2025 - Present, Le Télescope - Ivry sur Seine - All Rights Reserved
+ * Licensed under the MIT License. See the accompanying LICENSE file for terms.
+ *
+ * Types, data structures, constants and function prototypes for the FFFP firmware.
+ *
+ * Authors:
+ * - Florian Thibaud
+ * - Florian Gautier
+ *
+ */
+ 
 #include <Arduino.h>
 
 /************************************************
