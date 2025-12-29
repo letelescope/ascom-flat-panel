@@ -19,7 +19,7 @@ Open source *ASCOM* and *INDI* driven automated flat panel for astrophotography.
 
 ## Introduction
 
-This project is an open source initiative, under the MIT license, by *Le Telescope*. This is the v1 of a fully automated and drivable motorized flat panel/dust cap. The device is nicknamed FFFPV1. Don't ask why! If you still want to know, see the  [misc. section](#miscellaneous) of this readme.
+This project is an open source initiative, under the MIT license, by *Le Telescope*. This is the v2 of a fully automated and drivable motorized flat panel/dust cap. The device is nicknamed FFFPV2. Don't ask why! If you still want to know, see the  [misc. section](#miscellaneous) of this readme.
 
 This project should contain all you need to build your own *ASCOM* and/or *INDI* driven Flat Panel. 
 
@@ -103,6 +103,8 @@ And choose the release you want. The latest should be the "better".
 We recommend that you use one of these released version as they are coherent and tested. Be careful some release are labelled "pre-release" and should be used with caution. Those are developpement, beta and alpha version. Use it at you own risk like all the material on this repository. But even more in this case :D. 
 
 In the same spirit, we do not recommend you use the "head" of the main branch (or any other branch) of this repository as this is work in progress and hence is not guaranteed to be stable or even usable...
+
+> If you already have an FFFPV1, please note that both drivers and firmware **should** be backward compatible. You can use the latest version of both the ASCOM driver with your FFFPV1 without any issue and vice-versa: upload the new firmware on your FFFPV1 device and still use the legacy v1 driver. Yet we recommend you use the latest version of the driver, the firmware, the electronic circuit and the assembly as they all have been improved coherently.
 
 ### Electronic circuit
 
