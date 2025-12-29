@@ -4,10 +4,10 @@
 [![GitHub release](https://img.shields.io/github/v/release/letelescope/ascom-flat-panel?include_prereleases)](https://github.com/letelescope/ascom-flat-panel/releases)
 [![Licence](https://img.shields.io/github/license/letelescope/ascom-flat-panel)](https://github.com/letelescope/ascom-flat-panel/blob/main/LICENSE)
 [![ASCOM plateform](https://img.shields.io/badge/ASCOM_standards-012056)](https://ascom-standards.org/)
-[![FreeCAD](https://img.shields.io/badge/FreeCAD-da464b)](https://www.freecad.org/)
-[![KiCAD](https://img.shields.io/badge/KiCAD-314cb0)](https://www.kicad.org/)
-[![Arduino](https://img.shields.io/badge/Arduino-00878F?logo=arduino&logoColor=fff)](https://www.arduino.cc/)
+[![designed with FreeCAD](https://img.shields.io/badge/designed%20with-FreeCAD-da464b)](https://www.freecad.org/)
+[![routed with KiCAD](https://img.shields.io/badge/routed%20with-KiCAD-314cb0)](https://www.kicad.org/)
 [![Build with PlatformIO](https://img.shields.io/badge/build%20with-PlatformIO-orange?logo=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB3aWR0aD0iMjUwMCIgaGVpZ2h0PSIyNTAwIiB2aWV3Qm94PSIwIDAgMjU2IDI1NiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCI+PHBhdGggZD0iTTEyOCAwQzkzLjgxIDAgNjEuNjY2IDEzLjMxNCAzNy40OSAzNy40OSAxMy4zMTQgNjEuNjY2IDAgOTMuODEgMCAxMjhjMCAzNC4xOSAxMy4zMTQgNjYuMzM0IDM3LjQ5IDkwLjUxQzYxLjY2NiAyNDIuNjg2IDkzLjgxIDI1NiAxMjggMjU2YzM0LjE5IDAgNjYuMzM0LTEzLjMxNCA5MC41MS0zNy40OUMyNDIuNjg2IDE5NC4zMzQgMjU2IDE2Mi4xOSAyNTYgMTI4YzAtMzQuMTktMTMuMzE0LTY2LjMzNC0zNy40OS05MC41MUMxOTQuMzM0IDEzLjMxNCAxNjIuMTkgMCAxMjggMCIgZmlsbD0iI0ZGN0YwMCIvPjxwYXRoIGQ9Ik0yNDkuMzg2IDEyOGMwIDY3LjA0LTU0LjM0NyAxMjEuMzg2LTEyMS4zODYgMTIxLjM4NkM2MC45NiAyNDkuMzg2IDYuNjEzIDE5NS4wNCA2LjYxMyAxMjggNi42MTMgNjAuOTYgNjAuOTYgNi42MTQgMTI4IDYuNjE0YzY3LjA0IDAgMTIxLjM4NiA1NC4zNDYgMTIxLjM4NiAxMjEuMzg2IiBmaWxsPSIjRkZGIi8+PHBhdGggZD0iTTE2MC44NjkgNzQuMDYybDUuMTQ1LTE4LjUzN2M1LjI2NC0uNDcgOS4zOTItNC44ODYgOS4zOTItMTAuMjczIDAtNS43LTQuNjItMTAuMzItMTAuMzItMTAuMzJzLTEwLjMyIDQuNjItMTAuMzIgMTAuMzJjMCAzLjc1NSAyLjAxMyA3LjAzIDUuMDEgOC44MzdsLTUuMDUgMTguMTk1Yy0xNC40MzctMy42Ny0yNi42MjUtMy4zOS0yNi42MjUtMy4zOWwtMi4yNTggMS4wMXYxNDAuODcybDIuMjU4Ljc1M2MxMy42MTQgMCA3My4xNzctNDEuMTMzIDczLjMyMy04NS4yNyAwLTMxLjYyNC0yMS4wMjMtNDUuODI1LTQwLjU1NS01Mi4xOTd6TTE0Ni41MyAxNjQuOGMtMTEuNjE3LTE4LjU1Ny02LjcwNi02MS43NTEgMjMuNjQzLTY3LjkyNSA4LjMyLTEuMzMzIDE4LjUwOSA0LjEzNCAyMS41MSAxNi4yNzkgNy41ODIgMjUuNzY2LTM3LjAxNSA2MS44NDUtNDUuMTUzIDUxLjY0NnptMTguMjE2LTM5Ljc1MmE5LjM5OSA5LjM5OSAwIDAgMC05LjM5OSA5LjM5OSA5LjM5OSA5LjM5OSAwIDAgMCA5LjQgOS4zOTkgOS4zOTkgOS4zOTkgMCAwIDAgOS4zOTgtOS40IDkuMzk5IDkuMzk5IDAgMCAwLTkuMzk5LTkuMzk4em0yLjgxIDguNjcyYTIuMzc0IDIuMzc0IDAgMSAxIDAtNC43NDkgMi4zNzQgMi4zNzQgMCAwIDEgMCA0Ljc0OXoiIGZpbGw9IiNFNTcyMDAiLz48cGF0aCBkPSJNMTAxLjM3MSA3Mi43MDlsLTUuMDIzLTE4LjkwMWMyLjg3NC0xLjgzMiA0Ljc4Ni01LjA0IDQuNzg2LTguNzAxIDAtNS43LTQuNjItMTAuMzItMTAuMzItMTAuMzItNS42OTkgMC0xMC4zMTkgNC42Mi0xMC4zMTkgMTAuMzIgMCA1LjY4MiA0LjU5MiAxMC4yODkgMTAuMjY3IDEwLjMxN0w5NS44IDc0LjM3OGMtMTkuNjA5IDYuNTEtNDAuODg1IDIwLjc0Mi00MC44ODUgNTEuODguNDM2IDQ1LjAxIDU5LjU3MiA4NS4yNjcgNzMuMTg2IDg1LjI2N1Y2OC44OTJzLTEyLjI1Mi0uMDYyLTI2LjcyOSAzLjgxN3ptMTAuMzk1IDkyLjA5Yy04LjEzOCAxMC4yLTUyLjczNS0yNS44OC00NS4xNTQtNTEuNjQ1IDMuMDAyLTEyLjE0NSAxMy4xOS0xNy42MTIgMjEuNTExLTE2LjI4IDMwLjM1IDYuMTc1IDM1LjI2IDQ5LjM2OSAyMy42NDMgNjcuOTI2em0tMTguODItMzkuNDZhOS4zOTkgOS4zOTkgMCAwIDAtOS4zOTkgOS4zOTggOS4zOTkgOS4zOTkgMCAwIDAgOS40IDkuNCA5LjM5OSA5LjM5OSAwIDAgMCA5LjM5OC05LjQgOS4zOTkgOS4zOTkgMCAwIDAtOS4zOTktOS4zOTl6bS0yLjgxIDguNjcxYTIuMzc0IDIuMzc0IDAgMSAxIDAtNC43NDggMi4zNzQgMi4zNzQgMCAwIDEgMCA0Ljc0OHoiIGZpbGw9IiNGRjdGMDAiLz48L3N2Zz4=)](https://platformio.org/)
+[![Arduino](https://img.shields.io/badge/Arduino-00878F?logo=arduino&logoColor=fff)](https://www.arduino.cc/)
 [![No Maintenance Intended](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/) 
 
 Open source *ASCOM* and *INDI* driven automated flat panel for astrophotography. 
@@ -19,7 +19,7 @@ Open source *ASCOM* and *INDI* driven automated flat panel for astrophotography.
 
 ## Introduction
 
-This project is an open source initiative, under the MIT license, by *Le Telescope*. This is the v2 of a fully automated and drivable motorized flat panel/dust cap. The device is nicknamed FFFPV2. Don't ask why! If you still want to know, see the  [misc. section](#miscellaneous) of this readme.
+This project is an open source initiative, under the MIT license, by *Le Telescope*. This is the v2 of a fully automated and drivable motorized flat panel/dust cap. The device is nicknamed FFFP. Don't ask why! If you still want to know, see the  [misc. section](#miscellaneous) of this readme.
 
 This project should contain all you need to build your own *ASCOM* and/or *INDI* driven Flat Panel. 
 
@@ -175,7 +175,7 @@ The firmware needs to be uploaded using Visual Studio Code/PlateformIO . [Platef
 
 #### Upload the firware
 
-1. Open the [firmware project](./firmware/fff) from Visula Strudio Code/Plateform-IO. 
+1. Open the [firmware project](./firmware/fffp) from Visula Strudio Code/Plateform-IO. 
 
 2. Connect the board via US. 
    
@@ -191,12 +191,12 @@ The output should look something like:
 
 Once the firware is uploaded, do not disconnect the board yet. Still from the Arduino IDE open the "Serial Monitor". Once connected, in the console type:
 
-``` sh
+``` console
 COMMAND:PING
 ```
 the board should answer
 
-``` sh
+``` console
 RESULT:PONG
 ```
 
@@ -228,13 +228,13 @@ At first boot the LEDs will flash to indicate that it needs to be calibrated.
 
 Then from the IDE connect to the board and using the Arduino serial monitor send (type) the "command" 
 
-``` sh
+``` console
 COMMAND:COVER_CALIBRATION_RUN
 ``` 
 
 The device should perform its calibration procedure and reply with 
 
-``` sh
+``` console
 RESULT:COVER_CALIBRATION_RUN@OK
 ```
 
@@ -248,7 +248,7 @@ You can either used the installer to install the ASCOM driver or build it from s
 
 The installer is pined on each release [releases page](https://github.com/letelescope/ascom-flat-panel/releases/). 
 
-1. From the wanted release, download the file "FFFPv1_Setup.exe". 
+1. From the wanted release, download the file "FFFP_Setup.exe". 
 
 2. "Double-click" on the downloaded file to launch it. 
 
@@ -267,9 +267,9 @@ To build it from source please check the relevant section of the "developpement 
 
 #### Driver validation
 
-Once install is complete, one can use the ASCOM profile explorer tool to check that this was installed properly. From the ASCOM profile explorer check that the *ASCOM Le Telescope FFFPV1 CoverCalibrator* is listed in the Cover Calibrators. 
+Once install is complete, one can use the ASCOM profile explorer tool to check that this was installed properly. From the ASCOM profile explorer check that the *ASCOM CoverCalibrator Drvier for Le Telescope FFFP* is listed in the Cover Calibrators. 
 
-![ASCOM Le Telescope FFFPV1 CoverCalibrator](./.static/profile-explorer.png) 
+![ASCOM  CoverCalibrator Drvier for Le Telescope FFFP](./.static/profile-explorer.png) 
 
 ### INDI Driver
 
@@ -286,12 +286,12 @@ To avoid mass troubleshooting, one can test each component fairly separately. Be
 
 Once the firware is uploaded, one should already have tested that the seeduino was responsive. If not, reconnect the board via USB. From the Arduino IDE, open the "Serial Monitor". Once connected, in the console type:
 
-``` sh
+``` console
 COMMAND:PING
 ```
 the board should answer
 
-``` sh
+``` console
 RESULT:PONG
 ```
 If that's not the case, please make sure that you uploaded the (correct version of the) firmware firt. 
@@ -302,12 +302,12 @@ If that is indeed the case, congrats you are ready to test more "interesting" fe
 
 From the "Serial Monitor", in the console type the following command to adjust the LED panel brightness level:
 
-``` sh
+``` console
 COMMAND:BRIGHTNESS_SET@1024
 ```
 the board should answer in the console
 
-``` sh
+``` console
 RESULT:BRIGHTNESS_SET@1024
 ```
 In parallel, if it is connected to the board, the light panel should have been turned on. Feel free to change the value (number after the '@') to adjust the brightness. Max allowed value is 2047 and min value is 0. 
@@ -323,34 +323,34 @@ Congrats the variable light panel is functionnal.
 
 When turned on, the panel should be closed. To open it, from the "Serial Monitor", in the console type the following command:
 
-``` sh
+``` console
 COMMAND:COVER_OPEN
 ```
 the panel should start moving and the board should answer in the console
 
-``` sh
+``` console
 RESULT:COVER_OPEN@OK
 ```
 
 Once open to close it simply type in the consle
 
-``` sh
+``` console
 COMMAND:COVER_CLOSE
 ```
 the panel should start moving and the board should answer in the console
 
-``` sh
+``` console
 RESULT:COVER_CLOSE@OK
 ```
 
 Finally at any given time, to know the status of the mecanical panel type 
 
-``` sh
+``` console
 COMMAND:COVER_GET_STATE
 ```
 the panel should start moving and the board should answer in the console
 
-```
+``` console
 RESULT:COVER_GET@{panel.cover}
 ```
 
@@ -360,9 +360,9 @@ Congrats the motorized cover is functionnal.
 
 ### Driver "unit testing"
 
-After install completion, one should already have used the ASCOM profile explorer tool to check that this was installed properly. If that's not the case from the ASCOM profile explorer check that the *ASCOM Le Telescope FFFPV1 CoverCalibrator* is listed in the Cover Calibrators. 
+After install completion, one should already have used the ASCOM profile explorer tool to check that this was installed properly. If that's not the case from the ASCOM profile explorer check that the *ASCOM CoverCalibrator Drvier for Le Telescope FFFP* is listed in the Cover Calibrators. 
 
-![ASCOM Le Telescope FFFPV1 CoverCalibrator](./.static/profile-explorer.png) 
+![ASCOM CoverCalibrator Drvier for Le Telescope FFFP](./.static/profile-explorer.png) 
 
 1. Then check that the driver is instiable using the ASCOM diagnostic tools
    
@@ -397,7 +397,7 @@ Let's connect to the flat panel.
 
 In the equipment tab, from the flat panel section:
 
-1. Select the *ASCOM Le Telescope FFFPV1 CoverCalibrator*.
+1. Select the *ASCOM CoverCalibrator Drvier for Le Telescope FFFP*.
 2. Click the gear icon and select the correct COM Port. 
 3. Hit OK to save the configuration.
    ![N.I.N.A Flat Panel equipement section](./.static/NINA-flat-panel.png)
@@ -460,7 +460,7 @@ The firware is entirely buildable and uploadable using the Arduino IDE
 ##### Pre-requisites 
 
 - [Download](https://code.visualstudio.com/download) and install the Visual Studio Code or the IDE of your choice
-- [Download](https://platformio.org/install/ide) and install the PlatformIO extension for Visual Studio Code
+- [Download](https://platformio.org/install/ide) PlatformIO IDE and/or install the PlatformIO extension for Visual Studio Code
 - No need to download and configure the Seeduino XIAO board for PlateformIO as this is already done in the [platformio.ini](./firmware/fffp_firmware/platformio.ini) file of the firmware project.
 - No need to download and install the official Adafruit SleepyDog library  as this is already done in the [platformio.ini](./firmware/fffp_firmware/platformio.ini). This is used to properly handle disconnection. 
 
@@ -515,13 +515,13 @@ The firmware needs to be calibrated. At first boot the leds will flash to indica
 Then from the IDE connect to the board and using the Arduino serial monitor send (type) the "command" 
 
 
-```
+``` console
 COMMAND:COVER_CALIBRATION_RUN
 ``` 
 
 The device should perform its calibration procedure and reply with 
 
-```
+``` console
 RESULT:COVER_CALIBRATION_RUN@OK
 ```
 
@@ -533,21 +533,21 @@ The ASCOM driver is a C# .Net project that have been first created using the ASC
 
 ##### Pre-requisites 
  
-- [ASCOM 6](https://github.com/ASCOMInitiative/ASCOMPlatform/releases/tag/v6.6SP2Release) plateform
+- [ASCOM 7](https://github.com/ASCOMInitiative/ASCOMPlatform/releases/tag/v7.1.1) plateform
 - [Visual Studio 2022](https://visualstudio.microsoft.com/fr/vs/). Comunity edition is totally fine. 
 - A fully functional [ASCOM developper environement](https://ascom-standards.org/COMDeveloper/Index.htm) . Especiall, you may want to add the ASCOM "extensions" to Visual Studio.
 
 
 ##### Compile and register the driver
 
-1) Open the ["solution"](./drivers/ASCOM/ASCOM_6_Driver/ASCOM_6_Driver.sln) from Visual Studio 2022
+1) Open the ["solution"](./drivers/ASCOM/ASCOM_7_Driver/ASCOM_7_Driver.sln) from Visual Studio 2022
 
-2) Compile the project using "Ctrl + Shift + B". The result in the console shoudl look something like
+2) Compile the project using "Ctrl + Shift + B". The result in the console should look something like
   
    ``` console
    Génération démarrée à 14:12...
-   1>------ Début de la génération : Projet : ASCOM_6_Driver, Configuration : Debug Any CPU ------
-   1>  ASCOM_6_Driver -> D:\Documents\Perso\Astro\diy\ascom-flat-panel\ASCOM_drivers\ASCOM_6_Driver\bin\Debug\ASCOM.LeTelescopeFFFPV1.exe
+   1>------ Début de la génération : Projet : ASCOM_7_Driver, Configuration : Debug Any CPU ------
+   1>  ASCOM_6_Driver -> D:\Documents\Perso\Astro\diy\ascom-flat-panel\ASCOM_drivers\ASCOM_7_Driver\bin\Debug\ASCOM.LeTelescopeFFFPV1.exe
    ========== Build : 1 réussite(s), 0 échec(s), 0 à jour, 0 ignorée(s) ==========
    ========== Build s’est terminée à 14:12 et a duré 10,405 secondes ==========
    ```
@@ -555,7 +555,7 @@ The ASCOM driver is a C# .Net project that have been first created using the ASC
 3) The first time you compile the server you must "register it" on the ASCOM plateform. Open an "elevated" command prompt (with admin priviledges) at the folder where the local server executable is located. Run the local server exe with the /regserver parameter which will create the entry that appears in the ASCOM Chooser. 
   
    ``` console
-   .\ASCOM.LeTelescopeFFFPV1.exe /regserver
+   .\ASCOM.LeTelescopeFFFP.exe /regserver
    ```
 
    **This registration only needs to be done once*.
