@@ -4,8 +4,9 @@
 [![GitHub release](https://img.shields.io/github/v/release/letelescope/ascom-flat-panel?include_prereleases)](https://github.com/letelescope/ascom-flat-panel/releases)
 [![Licence](https://img.shields.io/github/license/letelescope/ascom-flat-panel)](https://github.com/letelescope/ascom-flat-panel/blob/main/LICENSE)
 [![ASCOM plateform](https://img.shields.io/badge/ASCOM_standards-012056)](https://ascom-standards.org/)
-[![FreeCAD](https://img.shields.io/badge/FreeCAD-da464b)](https://www.freecad.org/)
-[![KiCAD](https://img.shields.io/badge/KiCAD-314cb0)](https://www.kicad.org/)
+[![designed with FreeCAD](https://img.shields.io/badge/designed%20with-FreeCAD-da464b)](https://www.freecad.org/)
+[![routed with KiCAD](https://img.shields.io/badge/routed%20with-KiCAD-314cb0)](https://www.kicad.org/)
+[![Build with PlatformIO](https://img.shields.io/badge/build%20with-PlatformIO-orange?logo=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB3aWR0aD0iMjUwMCIgaGVpZ2h0PSIyNTAwIiB2aWV3Qm94PSIwIDAgMjU2IDI1NiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCI+PHBhdGggZD0iTTEyOCAwQzkzLjgxIDAgNjEuNjY2IDEzLjMxNCAzNy40OSAzNy40OSAxMy4zMTQgNjEuNjY2IDAgOTMuODEgMCAxMjhjMCAzNC4xOSAxMy4zMTQgNjYuMzM0IDM3LjQ5IDkwLjUxQzYxLjY2NiAyNDIuNjg2IDkzLjgxIDI1NiAxMjggMjU2YzM0LjE5IDAgNjYuMzM0LTEzLjMxNCA5MC41MS0zNy40OUMyNDIuNjg2IDE5NC4zMzQgMjU2IDE2Mi4xOSAyNTYgMTI4YzAtMzQuMTktMTMuMzE0LTY2LjMzNC0zNy40OS05MC41MUMxOTQuMzM0IDEzLjMxNCAxNjIuMTkgMCAxMjggMCIgZmlsbD0iI0ZGN0YwMCIvPjxwYXRoIGQ9Ik0yNDkuMzg2IDEyOGMwIDY3LjA0LTU0LjM0NyAxMjEuMzg2LTEyMS4zODYgMTIxLjM4NkM2MC45NiAyNDkuMzg2IDYuNjEzIDE5NS4wNCA2LjYxMyAxMjggNi42MTMgNjAuOTYgNjAuOTYgNi42MTQgMTI4IDYuNjE0YzY3LjA0IDAgMTIxLjM4NiA1NC4zNDYgMTIxLjM4NiAxMjEuMzg2IiBmaWxsPSIjRkZGIi8+PHBhdGggZD0iTTE2MC44NjkgNzQuMDYybDUuMTQ1LTE4LjUzN2M1LjI2NC0uNDcgOS4zOTItNC44ODYgOS4zOTItMTAuMjczIDAtNS43LTQuNjItMTAuMzItMTAuMzItMTAuMzJzLTEwLjMyIDQuNjItMTAuMzIgMTAuMzJjMCAzLjc1NSAyLjAxMyA3LjAzIDUuMDEgOC44MzdsLTUuMDUgMTguMTk1Yy0xNC40MzctMy42Ny0yNi42MjUtMy4zOS0yNi42MjUtMy4zOWwtMi4yNTggMS4wMXYxNDAuODcybDIuMjU4Ljc1M2MxMy42MTQgMCA3My4xNzctNDEuMTMzIDczLjMyMy04NS4yNyAwLTMxLjYyNC0yMS4wMjMtNDUuODI1LTQwLjU1NS01Mi4xOTd6TTE0Ni41MyAxNjQuOGMtMTEuNjE3LTE4LjU1Ny02LjcwNi02MS43NTEgMjMuNjQzLTY3LjkyNSA4LjMyLTEuMzMzIDE4LjUwOSA0LjEzNCAyMS41MSAxNi4yNzkgNy41ODIgMjUuNzY2LTM3LjAxNSA2MS44NDUtNDUuMTUzIDUxLjY0NnptMTguMjE2LTM5Ljc1MmE5LjM5OSA5LjM5OSAwIDAgMC05LjM5OSA5LjM5OSA5LjM5OSA5LjM5OSAwIDAgMCA5LjQgOS4zOTkgOS4zOTkgOS4zOTkgMCAwIDAgOS4zOTgtOS40IDkuMzk5IDkuMzk5IDAgMCAwLTkuMzk5LTkuMzk4em0yLjgxIDguNjcyYTIuMzc0IDIuMzc0IDAgMSAxIDAtNC43NDkgMi4zNzQgMi4zNzQgMCAwIDEgMCA0Ljc0OXoiIGZpbGw9IiNFNTcyMDAiLz48cGF0aCBkPSJNMTAxLjM3MSA3Mi43MDlsLTUuMDIzLTE4LjkwMWMyLjg3NC0xLjgzMiA0Ljc4Ni01LjA0IDQuNzg2LTguNzAxIDAtNS43LTQuNjItMTAuMzItMTAuMzItMTAuMzItNS42OTkgMC0xMC4zMTkgNC42Mi0xMC4zMTkgMTAuMzIgMCA1LjY4MiA0LjU5MiAxMC4yODkgMTAuMjY3IDEwLjMxN0w5NS44IDc0LjM3OGMtMTkuNjA5IDYuNTEtNDAuODg1IDIwLjc0Mi00MC44ODUgNTEuODguNDM2IDQ1LjAxIDU5LjU3MiA4NS4yNjcgNzMuMTg2IDg1LjI2N1Y2OC44OTJzLTEyLjI1Mi0uMDYyLTI2LjcyOSAzLjgxN3ptMTAuMzk1IDkyLjA5Yy04LjEzOCAxMC4yLTUyLjczNS0yNS44OC00NS4xNTQtNTEuNjQ1IDMuMDAyLTEyLjE0NSAxMy4xOS0xNy42MTIgMjEuNTExLTE2LjI4IDMwLjM1IDYuMTc1IDM1LjI2IDQ5LjM2OSAyMy42NDMgNjcuOTI2em0tMTguODItMzkuNDZhOS4zOTkgOS4zOTkgMCAwIDAtOS4zOTkgOS4zOTggOS4zOTkgOS4zOTkgMCAwIDAgOS40IDkuNCA5LjM5OSA5LjM5OSAwIDAgMCA5LjM5OC05LjQgOS4zOTkgOS4zOTkgMCAwIDAtOS4zOTktOS4zOTl6bS0yLjgxIDguNjcxYTIuMzc0IDIuMzc0IDAgMSAxIDAtNC43NDggMi4zNzQgMi4zNzQgMCAwIDEgMCA0Ljc0OHoiIGZpbGw9IiNGRjdGMDAiLz48L3N2Zz4=)](https://platformio.org/)
 [![Arduino](https://img.shields.io/badge/Arduino-00878F?logo=arduino&logoColor=fff)](https://www.arduino.cc/)
 [![No Maintenance Intended](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/) 
 
@@ -18,11 +19,11 @@ Open source *ASCOM* and *INDI* driven automated flat panel for astrophotography.
 
 ## Introduction
 
-This project is an open source initiative, under the MIT license, by *Le Telescope*. This is the v1 of a fully automated and drivable motorized flat panel/dust cap. The device is nicknamed FFFPV1. Don't ask why! If you still want to know, see the  [misc. section](#miscellaneous) of this readme.
+This project is an open source initiative, under the MIT license, by *Le Telescope*. This is the v2 of a fully automated and drivable motorized flat panel/dust cap. The device is nicknamed FFFP. Don't ask why! If you still want to know, see the  [misc. section](#miscellaneous) of this readme.
 
 This project should contain all you need to build your own *ASCOM* and/or *INDI* driven Flat Panel. 
 
-- [firmware](./firmware/fffpv1_firmware/): Firware of the programble chip used to control the panel and its cover
+- [firmware](./firmware/fffp_firmware/): Firware of the programble chip used to control the panel and its cover
 - [drivers](./drivers/): Implementation of the drivers
   - [ASCOM](./drivers/ASCOM/) : Implementation of the *ASCOM* driver 
   - [INDI](./drivers/indi/) : Implementation of the *INDI* driver
@@ -74,10 +75,12 @@ Very few pre-requisites are necessary in order to build the flat panel. More pre
 
 - have access to a 3D printer, to print the mechanical assembly parts
 - have some soldering skills and a soldering kit, to solder the components to the custom PCB
-- install the arduino IDE, to upload the firmware
+- install PlateformIO, to upload the firmware
 - love "diy-ing", because you may need to want/need to tweaks things a bit to make it work in your setup. 
   
-And that's it ! For instance you won't need software developpement skills as both the driver and the firmware are usable as is. Moreover, the ASCOM driver installer is already pre-compiled and made available to the download. Unfortunaltely one cannot make an "installer" for the arduino firware. Yet using the Arduino IDE to upload the firmware is a matter of three clicks. 
+And that's it ! For instance you won't need software developpement skills as both the driver and the firmware are usable as is. Moreover, the ASCOM driver installer is already pre-compiled and made available to the download. Unfortunaltely one cannot make an "installer" for the arduino firware. Yet using PlaterfomIO to upload the firmware is a matter of three clicks. 
+
+> We chose PlatformIO instead of ArduinoIDE due to recent concerns about Arduino's Open Source commitment under Qualcomm, and ,icing on the cake, PlatformIO provides superior dependency and library management.
 
 ### Bill of material 
 
@@ -100,6 +103,8 @@ And choose the release you want. The latest should be the "better".
 We recommend that you use one of these released version as they are coherent and tested. Be careful some release are labelled "pre-release" and should be used with caution. Those are developpement, beta and alpha version. Use it at you own risk like all the material on this repository. But even more in this case :D. 
 
 In the same spirit, we do not recommend you use the "head" of the main branch (or any other branch) of this repository as this is work in progress and hence is not guaranteed to be stable or even usable...
+
+> If you already have an FFFPV1, please note that both drivers and firmware **should** be backward compatible. You can use the latest version of both the ASCOM driver with your FFFPV1 without any issue and vice-versa: upload the new firmware on your FFFPV1 device and still use the legacy v1 driver. Yet we recommend you use the latest version of the driver, the firmware, the electronic circuit and the assembly as they all have been improved coherently.
 
 ### Electronic circuit
 
@@ -166,17 +171,17 @@ If you want to modify the PCB layout, you have two options depending on the comp
 
 #### Pre-requisite
 
-The firmware needs to be uploaded using the Arduino IDE. [Arduino IDE setup section](#pre-requisites-1) of this documentation to set it. 
+The firmware needs to be uploaded using Visual Studio Code/PlateformIO . [PlateformIO setup section](#pre-requisites-1) of this documentation to set it. 
 
 #### Upload the firware
 
-1. Open the file [firmware source file](./firmware/fffpv1_firmware/fffpv1_firmware.ino) from the Arduino IDE. 
+1. Open the [firmware project](./firmware/fffp) from Visula Strudio Code/Plateform-IO. 
 
 2. Connect the board via US. 
    
 3. Select the board.
    
-4. Click the "arrow" at the top left to compile and upload the firmware on the board. 
+4. Click the "arrow" at the bottom to compile and upload the firmware on the board. 
 
 The output should look something like: 
 
@@ -186,12 +191,12 @@ The output should look something like:
 
 Once the firware is uploaded, do not disconnect the board yet. Still from the Arduino IDE open the "Serial Monitor". Once connected, in the console type:
 
-``` sh
+``` console
 COMMAND:PING
 ```
 the board should answer
 
-``` sh
+``` console
 RESULT:PONG
 ```
 
@@ -223,13 +228,13 @@ At first boot the LEDs will flash to indicate that it needs to be calibrated.
 
 Then from the IDE connect to the board and using the Arduino serial monitor send (type) the "command" 
 
-``` sh
+``` console
 COMMAND:COVER_CALIBRATION_RUN
 ``` 
 
 The device should perform its calibration procedure and reply with 
 
-``` sh
+``` console
 RESULT:COVER_CALIBRATION_RUN@OK
 ```
 
@@ -243,7 +248,7 @@ You can either used the installer to install the ASCOM driver or build it from s
 
 The installer is pined on each release [releases page](https://github.com/letelescope/ascom-flat-panel/releases/). 
 
-1. From the wanted release, download the file "FFFPv1_Setup.exe". 
+1. From the wanted release, download the file "FFFP_Setup.exe". 
 
 2. "Double-click" on the downloaded file to launch it. 
 
@@ -262,9 +267,9 @@ To build it from source please check the relevant section of the "developpement 
 
 #### Driver validation
 
-Once install is complete, one can use the ASCOM profile explorer tool to check that this was installed properly. From the ASCOM profile explorer check that the *ASCOM Le Telescope FFFPV1 CoverCalibrator* is listed in the Cover Calibrators. 
+Once install is complete, one can use the ASCOM profile explorer tool to check that this was installed properly. From the ASCOM profile explorer check that the *ASCOM CoverCalibrator Drvier for Le Telescope FFFP* is listed in the Cover Calibrators. 
 
-![ASCOM Le Telescope FFFPV1 CoverCalibrator](./.static/profile-explorer.png) 
+![ASCOM  CoverCalibrator Drvier for Le Telescope FFFP](./.static/profile-explorer.png) 
 
 ### INDI Driver
 
@@ -281,12 +286,12 @@ To avoid mass troubleshooting, one can test each component fairly separately. Be
 
 Once the firware is uploaded, one should already have tested that the seeduino was responsive. If not, reconnect the board via USB. From the Arduino IDE, open the "Serial Monitor". Once connected, in the console type:
 
-``` sh
+``` console
 COMMAND:PING
 ```
 the board should answer
 
-``` sh
+``` console
 RESULT:PONG
 ```
 If that's not the case, please make sure that you uploaded the (correct version of the) firmware firt. 
@@ -297,12 +302,12 @@ If that is indeed the case, congrats you are ready to test more "interesting" fe
 
 From the "Serial Monitor", in the console type the following command to adjust the LED panel brightness level:
 
-``` sh
+``` console
 COMMAND:BRIGHTNESS_SET@1024
 ```
 the board should answer in the console
 
-``` sh
+``` console
 RESULT:BRIGHTNESS_SET@1024
 ```
 In parallel, if it is connected to the board, the light panel should have been turned on. Feel free to change the value (number after the '@') to adjust the brightness. Max allowed value is 2047 and min value is 0. 
@@ -318,34 +323,34 @@ Congrats the variable light panel is functionnal.
 
 When turned on, the panel should be closed. To open it, from the "Serial Monitor", in the console type the following command:
 
-``` sh
+``` console
 COMMAND:COVER_OPEN
 ```
 the panel should start moving and the board should answer in the console
 
-``` sh
+``` console
 RESULT:COVER_OPEN@OK
 ```
 
 Once open to close it simply type in the consle
 
-``` sh
+``` console
 COMMAND:COVER_CLOSE
 ```
 the panel should start moving and the board should answer in the console
 
-``` sh
+``` console
 RESULT:COVER_CLOSE@OK
 ```
 
 Finally at any given time, to know the status of the mecanical panel type 
 
-``` sh
+``` console
 COMMAND:COVER_GET_STATE
 ```
 the panel should start moving and the board should answer in the console
 
-```
+``` console
 RESULT:COVER_GET@{panel.cover}
 ```
 
@@ -355,9 +360,9 @@ Congrats the motorized cover is functionnal.
 
 ### Driver "unit testing"
 
-After install completion, one should already have used the ASCOM profile explorer tool to check that this was installed properly. If that's not the case from the ASCOM profile explorer check that the *ASCOM Le Telescope FFFPV1 CoverCalibrator* is listed in the Cover Calibrators. 
+After install completion, one should already have used the ASCOM profile explorer tool to check that this was installed properly. If that's not the case from the ASCOM profile explorer check that the *ASCOM CoverCalibrator Drvier for Le Telescope FFFP* is listed in the Cover Calibrators. 
 
-![ASCOM Le Telescope FFFPV1 CoverCalibrator](./.static/profile-explorer.png) 
+![ASCOM CoverCalibrator Drvier for Le Telescope FFFP](./.static/profile-explorer.png) 
 
 1. Then check that the driver is instiable using the ASCOM diagnostic tools
    
@@ -382,7 +387,7 @@ Great ! If you read this, at this stage, the firware, the driver and the mecanic
 
 ## Usage
 
-The FFFPV1 should be now be fully usable and drivable from N.I.N.A. 
+The FFFP should be now be fully usable and drivable from N.I.N.A. 
 
 ### Flat-Panel Connection
 
@@ -392,7 +397,7 @@ Let's connect to the flat panel.
 
 In the equipment tab, from the flat panel section:
 
-1. Select the *ASCOM Le Telescope FFFPV1 CoverCalibrator*.
+1. Select the *ASCOM CoverCalibrator Drvier for Le Telescope FFFP*.
 2. Click the gear icon and select the correct COM Port. 
 3. Hit OK to save the configuration.
    ![N.I.N.A Flat Panel equipement section](./.static/NINA-flat-panel.png)
@@ -454,27 +459,132 @@ The firware is entirely buildable and uploadable using the Arduino IDE
  
 ##### Pre-requisites 
 
-- [Download](https://www.arduino.cc/en/software/) and install the Arduino IDE
-- [Downlaod](https://wiki.seeedstudio.com/Seeeduino-XIAO/#software) and configure the Seeduino XIAO board for the Arduino IDE
-- From the Arduino IDE [download](https://docs.arduino.cc/libraries/adafruit-sleepydog-library/) and install the official Adafruit SleepyDog library. This is used to properly handle disconnection. 
+- [Download](https://code.visualstudio.com/download) and install the Visual Studio Code or the IDE of your choice
+- [Download](https://platformio.org/install/ide) PlatformIO IDE and/or install the PlatformIO extension for Visual Studio Code
+- No need to download and configure the Seeduino XIAO board for PlateformIO as this is already done in the [platformio.ini](./firmware/fffp_firmware/platformio.ini) file of the firmware project.
+- No need to download and install the official Adafruit SleepyDog library  as this is already done in the [platformio.ini](./firmware/fffp_firmware/platformio.ini). This is used to properly handle disconnection. 
 
 ##### Compile and upload the firmware
 
-1) Using the Arduino IDE, open the [fffpv1_firmware.ino](./firmware/seeeduino/fffpv1_firmware.ino)
+1) Using PlateformIO IDE, open the [project](./firmware/fffp_firmware/)
 
-2) Click "verify" to compile the firmware. The output should be something like 
-   ```
-   d:/appdata/local/arduino15/packages/seeeduino/tools/arm-none-eabi-gcc/7-2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/bin/ld.exe: warning: changing start of section .bss by 4 bytes
-   d:/appdata/local/arduino15/packages/seeeduino/tools/arm-none-eabi-gcc/7-2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/bin/ld.exe: warning: changing start of section .bss by 4 bytes
-   d:/appdata/local/arduino15/packages/seeeduino/tools/arm-none-eabi-gcc/7-2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/bin/ld.exe: warning: changing start of section .bss by 4 bytes
-   d:/appdata/local/arduino15/packages/seeeduino/tools/arm-none-eabi-gcc/7-2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/bin/ld.exe: warning: changing start of section .bss by 4 bytes
-   d:/appdata/local/arduino15/packages/seeeduino/tools/arm-none-eabi-gcc/7-2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/bin/ld.exe: warning: changing start of section .bss by 4 bytes
-   Sketch uses 41324 bytes (15%) of program storage space. Maximum is 262144 bytes.
+2) Click "PlateformIO: Build" to compile the firmware. The output should be something like 
+   ``` console
+   Processing seeed_xiao (platform: atmelsam; board: seeed_xiao; framework: arduino)
+   --------------------------------------------------------------------------------------------------------------------------------------------------
+   Verbose mode can be enabled via `-v, --verbose` option
+   CONFIGURATION: https://docs.platformio.org/page/boards/atmelsam/seeed_xiao.html
+   PLATFORM: Atmel SAM (8.3.0) > Seeeduino XIAO
+   HARDWARE: SAMD21G18A 48MHz, 32KB RAM, 256KB Flash
+   DEBUG: Current (atmel-ice) External (atmel-ice, blackmagic, jlink)
+   PACKAGES:
+    - framework-arduino-samd-seeed @ 1.8.5
+    - framework-cmsis @ 2.50400.181126 (5.4.0)
+    - framework-cmsis-atmel @ 1.2.2
+    - toolchain-gccarmnoneeabi @ 1.70201.0 (7.2.1)
+   LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+   LDF Modes: Finder ~ chain, Compatibility ~ soft
+   Found 20 compatible libraries
+   Scanning dependencies...
+   Dependency Graph
+   |-- Servo @ 1.3.0
+   |-- Adafruit SleepyDog Library @ 1.6.5
+   |-- FF_Flat_Panel
+   |-- FlashStorage @ 0.5.0
+   |-- SAMD21_PWM
+   Building in release mode
+   Compiling .pio\build\seeed_xiao\src\main.cpp.o
+   Compiling .pio\build\seeed_xiao\libae5\Servo\avr\Servo.cpp.o
+   Compiling .pio\build\seeed_xiao\libae5\Servo\esp32\Servo.cpp.o
+   Compiling .pio\build\seeed_xiao\libae5\Servo\mbed\Servo.cpp.o
+   Compiling .pio\build\seeed_xiao\libae5\Servo\megaavr\Servo.cpp.o
+   Compiling .pio\build\seeed_xiao\libae5\Servo\nrf52\Servo.cpp.o
+   Compiling .pio\build\seeed_xiao\libae5\Servo\renesas\Servo.cpp.o
+   Compiling .pio\build\seeed_xiao\libae5\Servo\sam\Servo.cpp.o
+   Compiling .pio\build\seeed_xiao\libae5\Servo\samd\Servo.cpp.o
+   Compiling .pio\build\seeed_xiao\libae5\Servo\stm32f4\Servo.cpp.o
+   Compiling .pio\build\seeed_xiao\libae5\Servo\xmc\Servo.cpp.o
+   Compiling .pio\build\seeed_xiao\libae5\Servo\zephyr\Servo.cpp.o
+   Compiling .pio\build\seeed_xiao\lib2bf\Adafruit SleepyDog Library\Adafruit_SleepyDog.cpp.o
+   Compiling .pio\build\seeed_xiao\lib2bf\Adafruit SleepyDog Library\utility\WatchdogAVR.cpp.o
+   Compiling .pio\build\seeed_xiao\lib2bf\Adafruit SleepyDog Library\utility\WatchdogESP32.cpp.o
+   Compiling .pio\build\seeed_xiao\lib2bf\Adafruit SleepyDog Library\utility\WatchdogESP8266.cpp.o
+   Compiling .pio\build\seeed_xiao\lib2bf\Adafruit SleepyDog Library\utility\WatchdogKinetisK.cpp.o
+   Compiling .pio\build\seeed_xiao\lib2bf\Adafruit SleepyDog Library\utility\WatchdogKinetisL.cpp.o
+   Compiling .pio\build\seeed_xiao\lib2bf\Adafruit SleepyDog Library\utility\WatchdogNRF.cpp.o
+   Compiling .pio\build\seeed_xiao\lib2bf\Adafruit SleepyDog Library\utility\WatchdogRP2040.cpp.o
+   Compiling .pio\build\seeed_xiao\lib2bf\Adafruit SleepyDog Library\utility\WatchdogSAMD.cpp.o
+   Compiling .pio\build\seeed_xiao\libc78\FlashStorage\FlashStorage.cpp.o
+   Archiving .pio\build\seeed_xiao\libae5\libServo.a
+   Compiling .pio\build\seeed_xiao\FrameworkArduinoVariant\variant.cpp.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\IPAddress.cpp.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\IPv6Address.cpp.o
+   Archiving .pio\build\seeed_xiao\lib2bf\libAdafruit SleepyDog Library.a
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\Print.cpp.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\Reset.cpp.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\Retarget.cpp.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\SERCOM.cpp.o
+   Archiving .pio\build\seeed_xiao\libc78\libFlashStorage.a
+   Archiving .pio\build\seeed_xiao\libFrameworkArduinoVariant.a
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\Stream.cpp.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\StreamString.cpp.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\Tone.cpp.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\USB\CDC.cpp.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\USB\PluggableUSB.cpp.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\USB\SAMD21_USBDevice.cpp.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\USB\USBCore.cpp.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\USB\samd21_host.c.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\Uart.cpp.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\WInterrupts.c.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\WMath.cpp.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\WString.cpp.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\abi.cpp.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\avr\dtostrf.c.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\base64.cpp.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\cbuf.cpp.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\cortex_handlers.c.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\delay.c.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\hooks.c.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\itoa.c.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\libb64\cdecode.c.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\libb64\cencode.c.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\main.cpp.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\math_helper.c.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\new.cpp.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\pulse.c.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\pulse_asm.S.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\startup.c.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\wiring.c.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\wiring_analog.c.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\wiring_digital.c.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\wiring_private.c.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\wiring_pwm.cpp.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\wiring_shift.c.o
+   C:\Users\fgautier\.platformio\packages\framework-arduino-samd-seeed\cores\arduino\wiring_analog.c:35:12: warning: '_dacResolution' defined but not used [-Wunused-variable]
+    static int _dacResolution = 10;
+               ^~~~~~~~~~~~~~
+   C:\Users\fgautier\.platformio\packages\framework-arduino-samd-seeed\cores\arduino\wiring_pwm.cpp: In function 'void noPwm(uint32_t)':
+   C:\Users\fgautier\.platformio\packages\framework-arduino-samd-seeed\cores\arduino\wiring_pwm.cpp:374:13: warning: unused variable 'tcChannel' [-Wunused-variable]
+        uint8_t tcChannel = GetTCChannelNumber(pinDesc.ulPWMChannel);
+                ^~~~~~~~~
+   Archiving .pio\build\seeed_xiao\libFrameworkArduino.a
+   Linking .pio\build\seeed_xiao\firmware.elf
+   c:/users/fgautier/.platformio/packages/toolchain-gccarmnoneeabi/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/bin/ld.exe: warning: changing start of section .bss by 4 bytes
+   c:/users/fgautier/.platformio/packages/toolchain-gccarmnoneeabi/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/bin/ld.exe: warning: changing start of section .bss by 4 bytes
+   c:/users/fgautier/.platformio/packages/toolchain-gccarmnoneeabi/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/bin/ld.exe: warning: changing start of section .bss by 4 bytes
+   c:/users/fgautier/.platformio/packages/toolchain-gccarmnoneeabi/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/bin/ld.exe: warning: changing start of section .bss by 4 bytes
+   c:/users/fgautier/.platformio/packages/toolchain-gccarmnoneeabi/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/bin/ld.exe: warning: changing start of section .bss by 4 bytes
+   Checking size .pio\build\seeed_xiao\firmware.elf
+   Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
+   RAM:   [=         ]   9.4% (used 3064 bytes from 32768 bytes)
+   Flash: [==        ]  15.2% (used 39768 bytes from 262144 bytes)
+   Building .pio\build\seeed_xiao\firmware.bin
+   ========================================================== [SUCCESS] Took 7.97 seconds ==========================================================
    ```
 
    Don't worry to much about the warnings. Those are only warnings and can be safely igonered c.f. [arduino forum](https://forum.arduino.cc/t/web-ide-error-changing-start-of-section-by-4-bytes/1218049) and [adafruit forum](https://forums.adafruit.com/viewtopic.php?t=189483#p917530) .
 
-3) Connect the Seeeduino and click upload to test it
+1) Connect the Seeeduino and  "PlateformIO: Build"to test it
 
 ##### Warning - Firmware calibrarion
 
@@ -486,13 +596,13 @@ The firmware needs to be calibrated. At first boot the leds will flash to indica
 Then from the IDE connect to the board and using the Arduino serial monitor send (type) the "command" 
 
 
-```
+``` console
 COMMAND:COVER_CALIBRATION_RUN
 ``` 
 
 The device should perform its calibration procedure and reply with 
 
-```
+``` console
 RESULT:COVER_CALIBRATION_RUN@OK
 ```
 
@@ -504,29 +614,29 @@ The ASCOM driver is a C# .Net project that have been first created using the ASC
 
 ##### Pre-requisites 
  
-- [ASCOM 6](https://github.com/ASCOMInitiative/ASCOMPlatform/releases/tag/v6.6SP2Release) plateform
+- [ASCOM 7](https://github.com/ASCOMInitiative/ASCOMPlatform/releases/tag/v7.1.1) plateform
 - [Visual Studio 2022](https://visualstudio.microsoft.com/fr/vs/). Comunity edition is totally fine. 
 - A fully functional [ASCOM developper environement](https://ascom-standards.org/COMDeveloper/Index.htm) . Especiall, you may want to add the ASCOM "extensions" to Visual Studio.
 
 
 ##### Compile and register the driver
 
-1) Open the ["solution"](./drivers/ASCOM/ASCOM_6_Driver/ASCOM_6_Driver.sln) from Visual Studio 2022
+1) Open the ["solution"](./drivers/ASCOM/ASCOM_7_Driver/ASCOM_7_Driver.sln) from Visual Studio 2022
 
-2) Compile the project using "Ctrl + Shift + B". The result in the console shoudl look something like
+2) Compile the project using "Ctrl + Shift + B". The result in the console should look something like
   
-   ``` sh
+   ``` console
    Génération démarrée à 14:12...
-   1>------ Début de la génération : Projet : ASCOM_6_Driver, Configuration : Debug Any CPU ------
-   1>  ASCOM_6_Driver -> D:\Documents\Perso\Astro\diy\ascom-flat-panel\ASCOM_drivers\ASCOM_6_Driver\bin\Debug\ASCOM.LeTelescopeFFFPV1.exe
+   1>------ Début de la génération : Projet : ASCOM_7_Driver, Configuration : Debug Any CPU ------
+   1>  ASCOM_6_Driver -> D:\Documents\Perso\Astro\diy\ascom-flat-panel\ASCOM_drivers\ASCOM_7_Driver\bin\Debug\ASCOM.LeTelescopeFFFPV1.exe
    ========== Build : 1 réussite(s), 0 échec(s), 0 à jour, 0 ignorée(s) ==========
    ========== Build s’est terminée à 14:12 et a duré 10,405 secondes ==========
    ```
 
-3) The first time you compile the server you must "register it" on the ASCOM plateform. Open a c"elevated" ommand prompt (with admin priviledges) at the folder where the local server executable is located. Run the local server exe with the /regserver parameter which will create the entry that appears in the ASCOM Chooser. 
+3) The first time you compile the server you must "register it" on the ASCOM plateform. Open an "elevated" command prompt (with admin priviledges) at the folder where the local server executable is located. Run the local server exe with the /regserver parameter which will create the entry that appears in the ASCOM Chooser. 
   
-   ```
-   .\ASCOM.LeTelescopeFFFPV1.exe /regserver
+   ``` console
+   .\ASCOM.LeTelescopeFFFP.exe /regserver
    ```
 
    **This registration only needs to be done once*.
@@ -556,7 +666,7 @@ The indi driver is in its **really** early developement phase. It should no be u
 
 in the [indi](./drivers/indi/indi_driver/) directory, from VSCode integrated terminal or anyother terminal run
 
-```sh
+``` console
 mkdir build
 cd build
 cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Debug ../
@@ -566,13 +676,13 @@ sudo make install
 
 or 
 
-``` sh
+``` console
 ./make-install.sh
 ```
 
 The output should be something along the lines of:
 
-``` sh
+``` console
 -- The C compiler identification is GNU 11.4.0
 -- The CXX compiler identification is GNU 11.4.0
 -- Detecting C compiler ABI info

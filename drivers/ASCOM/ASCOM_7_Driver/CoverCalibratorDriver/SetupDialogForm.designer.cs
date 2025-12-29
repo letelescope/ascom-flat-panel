@@ -1,5 +1,5 @@
 //
-// SetupDialogForm for LeTelescopeFFFPV1
+// SetupDialogForm for LeTelescopeFFFP
 //
 // Copyright(C) 2025 - Present, Le Télescope - Ivry sur Seine - All Rights Reserved
 // Licensed under the MIT License. See the accompanying LICENSE file for terms.
@@ -11,7 +11,7 @@
 //   - Florian Thibaud
 //   - Florian Gautier		
 //
-namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
+namespace ASCOM.LeTelescopeFFFP.CoverCalibrator
 {
     partial class SetupDialogForm
     {
@@ -201,7 +201,7 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
             this.Name = "SetupDialogForm";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "LeTelescopeFFFPV1 Setup";
+            this.Text = "LeTelescopeFFFP Setup";
             this.Load += new System.EventHandler(this.SetupDialogForm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.picASCOM)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.leTelescopeLogoBox)).EndInit();

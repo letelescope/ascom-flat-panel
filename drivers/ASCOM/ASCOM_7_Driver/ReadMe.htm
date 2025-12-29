@@ -165,10 +165,10 @@
                 <li>
                     To support debugging, the driver will create three log files in a Documents\ASCOM\Logs yyyy-mm-dd folder.
                     <ol>
-                        <li><b>ASCOM.LeTelescopeFFFPV1.Driver.xxx</b> - One log per instance of the COM driver class. (Can be enabled / disabled through the Driver setup dialogue.)</li>
-                        <li><b>ASCOM.LeTelescopeFFFPV1.Hardware.xxx</b> - One log from the shared hardware class containing information from all instances of the COM driver. (Can be enabled / disabled through the Driver setup dialogue.)</li>
+                        <li><b>ASCOM.LeTelescopeFFFP.Driver.xxx</b> - One log per instance of the COM driver class. (Can be enabled / disabled through the Driver setup dialogue.)</li>
+                        <li><b>ASCOM.LeTelescopeFFFP.Hardware.xxx</b> - One log from the shared hardware class containing information from all instances of the COM driver. (Can be enabled / disabled through the Driver setup dialogue.)</li>
                         <li>
-                            <b>ASCOM.LeTelescopeFFFPV1.LocalServer.xxx</b> - One log for the local server executable itself. (After the driver is running stably, this log can be disabled if required
+                            <b>ASCOM.LeTelescopeFFFP.LocalServer.xxx</b> - One log for the local server executable itself. (After the driver is running stably, this log can be disabled if required
                             by editing the TL.Enabled statement near the top of the LocalServer.cs file.)
                         </li>
                     </ol>
@@ -226,16 +226,20 @@
     <H3>Notes</H3>
     <UL>
         <LI>
-            <P STYLE="margin-bottom: 0cm">
+            <P>
                 if required, a serial port is already provided (see SharedResources.cs) as <FONT FACE="Lucida Console, Courier New, Courier, monospace">SharedResources.SharedSerial</FONT>.
                 If you don't need the serial port you can remove the public static SharedSerial property, the m_SharedSerial member in the private data region, and the line in main that initializes it.
             </P>
         </LI>
         <LI>
-            <P>
-                You may want to add controls and/or status information to the main form frmMain of the local server. Please resist the temptation to turn the local server's main form into a graphical device control
-                panel. A better approach is to create a separate application that connects to the served driver(s).
-            </P>
+            <p>
+                If you want to control or report status information about devices hosted by the local server the best approach is to create a separate application that connects to the served driver(s).
+            </p>
+        </LI>
+        <LI>
+            <p>
+                If you only want to display status information, a simpler option is to add a form to the local server that uses a timed loop to poll driver(s) and update the status information.
+            </p>
         </LI>
     </UL>
     <H3>

@@ -48,53 +48,60 @@
 // - https://github.com/jlecomte/ascom-wireless-flat-panel
 // - https://github.com/jlecomte/ascom-telescope-cover-v2
 //
-// Implements:	ASCOM CoverCalibrator interface version: 1
+// Implements:	ASCOM CoverCalibrator interface version: 2
 // Authors:	    Florian Thibaud	
 //              Florian Gautier
 //
-
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using System.Windows.Forms;
+using ASCOM;
 using ASCOM.DeviceInterface;
 using ASCOM.LocalServer;
 using ASCOM.Utilities;
 
-namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
+namespace ASCOM.LeTelescopeFFFP.CoverCalibrator
 {
     //
     // This code is mostly a presentation layer for the functionality in the CoverCalibratorHardware class. You should not need to change the contents of this file very much, if at all.
     // Most customisation will be in the CoverCalibratorHardware class, which is shared by all instances of the driver, and which must handle all aspects of communicating with your device.
     //
-    // Your driver's DeviceID is ASCOM.LeTelescopeFFFPV1.CoverCalibrator
+    // Your driver's DeviceID is ASCOM.LeTelescopeFFFP.CoverCalibrator
     //
-    // The COM Guid attribute sets the CLSID for ASCOM.LeTelescopeFFFPV1.CoverCalibrator
-    // The COM ClassInterface/None attribute prevents an empty interface called _LeTelescopeFFFPV1 from being created and used as the [default] interface
+    // The COM Guid attribute sets the CLSID for ASCOM.LeTelescopeFFFP.CoverCalibrator
+    // The COM ClassInterface/None attribute prevents an empty interface called _LeTelescopeFFFP from being created and used as the [default] interface
     //
 
     /// <summary>
-    /// ASCOM CoverCalibrator Driver for LeTelescopeFFFPV1.
+    /// ASCOM CoverCalibrator Driver for LeTelescopeFFFP.
     /// </summary>
     [ComVisible(true)]
-    [Guid("39142191-33f4-4cd6-ae5d-b0b4b35e2231")]
-    [ProgId("ASCOM.LeTelescope.FFFPV1.CoverCalibrator")]
-    [ServedClassName("ASCOM Le Telescope FFFPV1 CoverCalibrator")] // Driver description that appears in the Chooser, customise as required
+    [Guid("b3b51730-c69f-43fd-b260-1772ea5dbd96")]
+    [ProgId("ASCOM.LeTelescopeFFFP.CoverCalibrator")]
+    [ServedClassName("ASCOM CoverCalibrator Driver for LeTelescope FFFP")] // Driver description that appears in the Chooser, customise as required
     [ClassInterface(ClassInterfaceType.None)]
-    public class CoverCalibrator : ReferenceCountedObjectBase, ICoverCalibratorV1, IDisposable
+    public class CoverCalibrator : ReferenceCountedObjectBase, ICoverCalibratorV2, IDisposable
     {
         internal static string DriverProgId; // ASCOM DeviceID (COM ProgID) for this driver, the value is retrieved from the ServedClassName attribute in the class initialiser.
         internal static string DriverDescription; // The value is retrieved from the ServedClassName attribute in the class initialiser.
 
-        // connectedState holds the connection state from this driver instance's perspective, as opposed to the local server's perspective, which may be different because of other client connections.
+        // connectedState and connectingState holds the states from this driver instance's perspective, as opposed to the local server's perspective, which may be different because of other client connections.
         internal bool connectedState; // The connected state from this driver's perspective)
+        internal bool connectingState; // The connecting state from this driver's perspective)
+        internal Exception connectionException = null; // Record any exception thrown if the driver encounters an error when connecting to the hardware using Connect() or Disconnect
+
         internal TraceLogger tl; // Trace logger object to hold diagnostic information just for this instance of the driver, as opposed to the local server's log, which includes activity from all driver instances.
         private bool disposedValue;
+
+        private Guid uniqueId; // A unique ID for this instance of the driver
 
         #region Initialisation and Dispose
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="LeTelescopeFFFPV1"/> class. Must be public to successfully register for COM.
+        /// Initializes a new instance of the <see cref="LeTelescopeFFFP"/> class. Must be public to successfully register for COM.
         /// </summary>
         public CoverCalibrator()
         {
@@ -112,7 +119,7 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
                 // By default all driver logging will appear in Hardware log file
                 // If you would like each instance of the driver to have its own log file as well, uncomment the lines below
 
-                tl = new TraceLogger("", "LeTelescopeFFFPV1.Driver"); // Remove the leading ASCOM. from the ProgId because this will be added back by TraceLogger.
+                tl = new TraceLogger("", "LeTelescopeFFFP.Driver"); // Remove the leading ASCOM. from the ProgId because this will be added back by TraceLogger.
                 SetTraceState();
 
                 // Initialise the hardware if required
@@ -123,13 +130,15 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
 
                 connectedState = false; // Initialise connected to false
 
+                // Create a unique ID to identify this driver instance
+                uniqueId = Guid.NewGuid();
 
                 LogMessage("CoverCalibrator", "Completed initialisation");
             }
             catch (Exception ex)
             {
                 LogMessage("CoverCalibrator", $"Initialisation exception: {ex}");
-                MessageBox.Show($"{ex.Message}", "Exception creating ASCOM.LeTelescopeFFFPV1.CoverCalibrator", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"{ex.Message}", "Exception creating ASCOM.LeTelescopeFFFP.CoverCalibrator", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -221,7 +230,7 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
 
         #endregion
 
-        // PUBLIC COM INTERFACE ICoverCalibratorV1 IMPLEMENTATION
+        // PUBLIC COM INTERFACE ICoverCalibratorV2 IMPLEMENTATION
 
         #region Common properties and methods.
 
@@ -382,6 +391,53 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         }
 
         /// <summary>
+        /// Connect to the device asynchronously using Connecting as the completion variable
+        /// </summary>
+        public void Connect()
+        {
+            try
+            {
+                if (connectedState)
+                {
+                    LogMessage("Connect", "Device already connected, ignoring method");
+                    return;
+                }
+
+                // Initialise connection variables
+                connectionException = null; // Clear any previous exception
+                connectingState = true;
+
+                // Start a task to connect to the hardware and then set the connected state to true
+                _ = Task.Run(() =>
+                {
+                    try
+                    {
+                        LogMessage("Connect Task", "Starting connection");
+                        CoverCalibratorHardware.SetConnected(uniqueId, true);
+                        connectedState = true;
+                        LogMessage("Connect Task", "Connection completed");
+                    }
+                    catch (Exception ex)
+                    {
+                        // Something went wrong so save the returned exception to return through Connecting and log the event.
+                        connectionException = ex;
+                        LogMessage("Connect Task", $"The connect task threw an exception: {ex.Message}\r\n{ex}");
+                    }
+                    finally
+                    {
+                        connectingState = false;
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                LogMessage("Connect", $"Threw an exception: \r\n{ex}");
+                throw;
+            }
+            LogMessage("Connect", $"Connect completed OK");
+        }
+
+        /// <summary>
         /// Set True to connect to the device hardware. Set False to disconnect from the device hardware.
         /// You can also read the property to check whether it is connected. This reports the current hardware state.
         /// </summary>
@@ -414,23 +470,89 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
 
                     if (value)
                     {
-                        LogMessage("Connected Set", "Connecting to device");
-                        CoverCalibratorHardware.Connected = true;
+                        LogMessage("Connected Set", "Connecting to device...");
+                        CoverCalibratorHardware.SetConnected(uniqueId, true);
+                        LogMessage("Connected Set", "Connected OK");
                         connectedState = true;
                     }
                     else
                     {
-                        LogMessage("Connected Set", "Disconnecting from device");
-                        CoverCalibratorHardware.Connected = false;
                         connectedState = false;
+                        LogMessage("Connected Set", "Disconnecting from device...");
+                        CoverCalibratorHardware.SetConnected(uniqueId, false);
+                        LogMessage("Connected Set", "Disconnected OK");
                     }
                 }
                 catch (Exception ex)
                 {
-                    LogMessage("Connected Set", $"Threw an exception: \r\n{ex}");
+                    LogMessage("Connected Set", $"Threw an exception: {ex.Message}\r\n{ex}");
                     throw;
                 }
             }
+        }
+
+        /// <summary>
+        /// Completion variable for the asynchronous Connect() and Disconnect()  methods
+        /// </summary>
+        public bool Connecting
+        {
+            get
+            {
+                // Return any exception returned by the Connect() or Disconnect() methods
+                if (!(connectionException is null))
+                    throw connectionException;
+
+                // Otherwise return the current connecting state
+                return connectingState;
+            }
+        }
+
+        /// <summary>
+        /// Disconnect from the device asynchronously using Connecting as the completion variable
+        /// </summary>
+        public void Disconnect()
+        {
+            try
+            {
+                if (!connectedState)
+                {
+                    LogMessage("Disconnect", "Device already disconnected, ignoring method");
+                    return;
+                }
+
+                // Initialise connection variables
+                connectionException = null; // Clear any previous exception
+                connectingState = true;
+
+                // Start a task to connect to the hardware and then set the connected state to true
+                _ = Task.Run(() =>
+                {
+                    try
+                    {
+                        LogMessage("Disconnect Task", "Calling Connected");
+                        CoverCalibratorHardware.SetConnected(uniqueId, false);
+                        connectedState = false;
+                        LogMessage("Disconnect Task", "Disconnection completed");
+                    }
+                    catch (Exception ex)
+                    {
+                        // Something went wrong so save the returned exception to return through Connecting and log the event.
+                        connectionException = ex;
+                        LogMessage("Disconnect Task", $"The disconnect task threw an exception: {ex.Message}\r\n{ex}");
+                    }
+                    finally
+                    {
+                        connectingState = false;
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                LogMessage("Disconnect", $"Threw an exception: {ex.Message}\r\n{ex}");
+                throw;
+            }
+
+            LogMessage("Disconnect", $"Disconnect completed OK");
         }
 
         /// <summary>
@@ -571,6 +693,28 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         }
 
         /// <summary>
+        /// Completion variable for OpenCover, CloseCover and HaltCover
+        /// </summary>
+        public bool CoverMoving
+        {
+            get
+            {
+                try
+                {
+                    CheckConnected("CoverMoving");
+                    bool coverMoving = CoverCalibratorHardware.CoverMoving;
+                    LogMessage("CoverMoving", $"{coverMoving}");
+                    return coverMoving;
+                }
+                catch (Exception ex)
+                {
+                    LogMessage("CoverMoving", $"Threw an exception: {ex.Message}\r\n{ex}");
+                    throw;
+                }
+            }
+        }
+
+        /// <summary>
         /// Initiates cover opening if a cover is present
         /// </summary>
         public void OpenCover()
@@ -644,6 +788,28 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
                 catch (Exception ex)
                 {
                     LogMessage("CalibratorState", $"Threw an exception: \r\n{ex}");
+                    throw;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Completion variable for CalibratorOn and CalibratorOff
+        /// </summary>
+        public bool CalibratorChanging
+        {
+            get
+            {
+                try
+                {
+                    CheckConnected("CalibratorChanging");
+                    bool calibratorChanging = CoverCalibratorHardware.CalibratorChanging;
+                    LogMessage("CalibratorChanging", $"{calibratorChanging}");
+                    return calibratorChanging;
+                }
+                catch (Exception ex)
+                {
+                    LogMessage("CalibratorChanging", $"Threw an exception: {ex.Message} \r\n\n{ex}");
                     throw;
                 }
             }
@@ -729,6 +895,39 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
             {
                 LogMessage("CalibratorOff", $"Threw an exception: \r\n{ex}");
                 throw;
+            }
+        }
+
+        /// <summary>
+        /// Return the cover calibrator's device state
+        /// </summary>
+        public IStateValueCollection DeviceState
+        {
+            get
+            {
+                try
+                {
+                    CheckConnected("DeviceState");
+
+                    // Create an array list to hold the IStateValue entries
+                    List<IStateValue> deviceState = new List<IStateValue>();
+
+                    // Add one entry for each operational state, if possible
+                    try { deviceState.Add(new StateValue(nameof(ICoverCalibratorV2.Brightness), Brightness)); } catch { }
+                    try { deviceState.Add(new StateValue(nameof(ICoverCalibratorV2.CalibratorState), CalibratorState)); } catch { }
+                    try { deviceState.Add(new StateValue(nameof(ICoverCalibratorV2.CalibratorChanging), CalibratorChanging)); } catch { }
+                    try { deviceState.Add(new StateValue(nameof(ICoverCalibratorV2.CoverState), CoverState)); } catch { }
+                    try { deviceState.Add(new StateValue(nameof(ICoverCalibratorV2.CoverMoving), CoverMoving)); } catch { }
+                    try { deviceState.Add(new StateValue(DateTime.Now)); } catch { }
+
+                    // Return the overall device state
+                    return new StateValueCollection(deviceState);
+                }
+                catch (Exception ex)
+                {
+                    LogMessage("DeviceState", $"Threw an exception: {ex.Message}\r\n{ex}");
+                    throw;
+                }
             }
         }
 

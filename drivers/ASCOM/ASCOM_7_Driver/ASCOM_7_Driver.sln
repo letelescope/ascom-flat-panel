@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.13.35919.96 d17.13
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASCOM_6_Driver", "ASCOM_6_Driver.csproj", "{C708E487-E3A9-4073-A545-294B88674225}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASCOM_7_Driver", "ASCOM_7_Driver.csproj", "{C708E487-E3A9-4073-A545-294B88674225}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,6 +20,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {66980CBD-D60B-4088-B4DB-78C892991D28}
+		SolutionGuid = {D4E57C74-4BEC-45EE-91E0-A8A6ADEE864C}
 	EndGlobalSection
 EndGlobal

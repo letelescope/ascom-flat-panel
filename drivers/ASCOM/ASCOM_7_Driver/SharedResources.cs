@@ -32,12 +32,12 @@ namespace ASCOM.LocalServer
         private static readonly object lockObject = new object();
 
         // Shared serial port. This will allow multiple drivers to use one single serial port.
-        private static Serial sharedSerial = new Serial
+        private static Serial sharedSerial = new Serial      // Shared serial port
         {
             Speed = SerialSpeed.ps57600,
             Connected = false,
         };
-        private static int serialConnectionCount = 0;     // counter for the number of connections to the serial port
+    private static int serialConnectionCount = 0;     // counter for the number of connections to the serial port
 
         // Public access to shared resources
 
@@ -117,10 +117,9 @@ namespace ASCOM.LocalServer
         public static string SendMessage(string message)
         {
             var line_message = message.EndsWith(MESSAGE_TERMINATOR) ? message : message + MESSAGE_TERMINATOR;
-;
             lock (lockObject)
             {
-                SharedSerial.Transmit(line_message);
+                SharedSerial.Transmit(message);
                 return SharedSerial.ReceiveTerminated(MESSAGE_TERMINATOR);
             }
         }
@@ -132,7 +131,7 @@ namespace ASCOM.LocalServer
         /// Needs error handling, the port name etc. needs to be set up first, this could be done by the driver checking Connected and if it's false setting up the port before setting connected to true.
         /// It could also be put here.
         /// </remarks>
-        public static bool SerialConnected
+        public static bool Connected
         {
             set
             {
@@ -159,24 +158,21 @@ namespace ASCOM.LocalServer
             get { return SharedSerial.Connected; }
         }
 
-        #endregion
-
-
         public static string SerialPortName
         {
-            get 
-            { 
-                return SharedSerial.PortName; 
-            }
-            set 
+            get
             {
-                lock (lockObject) 
+                return SharedSerial.PortName;
+            }
+            set
+            {
+                lock (lockObject)
                 {
                     if (serialConnectionCount == 0 && !sharedSerial.Connected)
                     {
                         SharedSerial.PortName = value;
                     }
-                    else 
+                    else
                     {
                         throw new DriverException($"Can't set serial to port {value}. Serial already connected on Port {SharedSerial.PortName}");
                     }
@@ -187,7 +183,8 @@ namespace ASCOM.LocalServer
         public static void ValidateDevice(string message, string expected_result)
         {
 
-            if (!SerialConnected) {
+            if (!Connected)
+            {
                 throw new DriverException($"Validation impossible device not connected");
             }
 
@@ -196,17 +193,21 @@ namespace ASCOM.LocalServer
             try
             {
                 actual_result = SendMessage(message);
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
 
                 throw new DriverException($"Sending validating message {message} failed", e);
             }
 
-            if (actual_result.Trim() != expected_result.Trim()) 
+            if (actual_result.Trim() != expected_result.Trim())
             {
-                try { SerialConnected = false; } catch { }
+                try { Connected = false; } catch { }
                 throw new DriverException($"Incorrect device. '{message}' : actual result {actual_result} - {expected_result}");
             }
         }
+        #endregion
+
     }
+
 }

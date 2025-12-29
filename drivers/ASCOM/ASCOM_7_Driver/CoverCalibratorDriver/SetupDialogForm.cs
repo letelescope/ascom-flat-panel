@@ -17,7 +17,7 @@ using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using ASCOM.Utilities;
 
-namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
+namespace ASCOM.LeTelescopeFFFP.CoverCalibrator
 {
     [ComVisible(false)] // Form not registered for COM!
     public partial class SetupDialogForm : Form

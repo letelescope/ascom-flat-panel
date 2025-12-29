@@ -1,75 +1,35 @@
-﻿//
-// ASCOM CoverCalibrator hardware class for LeTelescopeFFFPV1
+﻿// TODO fill in this information for your driver, then remove this line!
 //
-// Copyright(C) 2025 - Present, Le Télescope - Ivry sur Seine - All Rights Reserved
-// Licensed under the MIT License. See the accompanying LICENSE file for terms.
+// ASCOM CoverCalibrator hardware class for LeTelescopeFFFP
 //
-// Description:	 The base layout of this class has been generated using the Visual Studio Code ASCOM 6 driver template.
+// Description:	 <To be completed by driver developer>
 //
-// The CoverCalibrator hardware class is responsible for the actual interaction with the flat panel Hardware/Firmware
-//
-// In this scenario a flat panel is made of two things
-//   - A light panel with variable brightness, called calibrator in this driver
-//   - A motorized cover
-//
-// The firmware updates the state of the flat panel upon instructions of the ASCOM driver. The communication protocol 
-// is serial based. The serial connection is established via USB. Here is a a summary of the protocol 
-//  - Both the driver and the flat panel (and hence this firmware) exchange single line messages.
-//  - A message is structured as TYPE:MESSAGE, where TYPE is in "COMMAND, RESULT, ERROR" and MESSAGE is alaphanumerical with spaces and "@"
-//
-// This Driver only emmits incoming "COMMAND" messages. This kind of message is stuctured as 
-//  
-// COMMAND:NAME[@ARGS]
-//
-// where NAME is [A - Z_] + and ARGS are optional and their nature may depend on the command. For instance for a COMMAND:BRIGHTNESS_SET @ARGS message the ARGS
-// are mandatory and should consists of a single "int"
-//
-// This firware reponse with 
-// - either a RESULT:CMD_NAME@MSG   if operation succeeded
-// - or an ERROR:ERR_MESSAGE @DETAILS if anything went wrong
-//
-// 
-// In a nutshell
-//  --------------                           ------------
-// |              |                         |            |
-// |              | COMMAND:CMD_NAME[@ARGS] | Flat Panel |
-// | ASCOM driver | --------------------->  | (firmware) |
-// |              | < --------------------  |            |
-//  --------------   RESULT:CMD_NAME @MSG    ------------
-//                          or
-//                 ERROR:ERR_MESSAGE @DETAILS
-//
-// The protocol, the implementation of both the driver and the firmware, the electronics and the 3D models
-// are heavily inspired by the the work  of Dark Sky Geek (https://github.com/jlecomte/) especially 
-// - https://github.com/jlecomte/ascom-flat-panel
-// - https://github.com/jlecomte/ascom-wireless-flat-panel
-// - https://github.com/jlecomte/ascom-telescope-cover-v2
-//
-// We delegate synchronisation to the SharedResources class that handles the shared serial client.
-//
-// This should prevent any race condition and dead locks. More involved patterns may be implemented but we
-// prefer to keep it simple stupid ragarding the fact that the load put by the softwares using this driver
-// should be quite low. For the same reason we do not implement any cache mechanism. 
-//
-// Implements:	ASCOM CoverCalibrator interface version: 1
-//
-// 
-// Authors:
-//   - Florian Thibaud
-//   - Florian Gautier		
-//
+// Implements:	ASCOM CoverCalibrator interface version: <To be completed by driver developer>
+// Author:		(XXX) Your N. Here <your@email.here>
+
+// TODO: Customise the SetConnected and InitialiseHardware methods as needed for your hardware
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Windows.Forms;
 using ASCOM.DeviceInterface;
 using ASCOM.LocalServer;
 using ASCOM.Utilities;
 
-namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
+namespace ASCOM.LeTelescopeFFFP.CoverCalibrator
 {
+    //
+    // TODO Customise the InitialiseHardware() method with code to set up a communication path to your hardware and validate that the hardware exists
+    //
+    // TODO Customise the SetConnected() method with code to connect to and disconnect from your hardware
+    // NOTE You should not need to customise the code in the Connecting, Connect() and Disconnect() members as these are already fully implemented and call SetConnected() when appropriate.
+    //
+    // TODO Replace the not implemented exceptions with code to implement the functions or throw the appropriate ASCOM exceptions.
+    //
+
     /// <summary>
-    /// ASCOM CoverCalibrator hardware class for LeTelescopeFFFPV1.
+    /// ASCOM CoverCalibrator hardware class for LeTelescopeFFFP.
     /// </summary>
     [HardwareClass()] // Class attribute flag this as a device hardware class that needs to be disposed by the local server when it exits.
     internal static class CoverCalibratorHardware
@@ -111,8 +71,11 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         private static string DriverProgId = ""; // ASCOM DeviceID (COM ProgID) for this driver, the value is set by the driver's class initialiser.
         private static string DriverDescription = ""; // The value is set by the driver's class initialiser.
         internal static string comPort; // COM port name (if required)
+        private static bool connectedState; // Local server's connected state
         private static bool runOnce = false; // Flag to enable "one-off" activities only to run once.
         internal static TraceLogger tl; // Local server's trace logger object for diagnostic log with information that you specify
+
+        private static List<Guid> uniqueIds = new List<Guid>(); // List of driver instance unique IDs
 
         /// <summary>
         /// Initializes a new instance of the device Hardware class.
@@ -123,7 +86,7 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
             {
                 // Create the hardware trace logger in the static initialiser.
                 // All other initialisation should go in the InitialiseHardware method.
-                tl = new TraceLogger("", "LeTelescopeFFFPV1.Hardware");
+                tl = new TraceLogger("", "LeTelescopeFFFP.Hardware");
 
                 // DriverProgId has to be set here because it used by ReadProfile to get the TraceState flag.
                 DriverProgId = CoverCalibrator.DriverProgId; // Get this device's ProgID so that it can be used to read the Profile configuration values
@@ -136,7 +99,7 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
             catch (Exception ex)
             {
                 try { LogMessage("CoverCalibratorHardware", $"Initialisation exception: {ex}"); } catch { }
-                MessageBox.Show($"{ex.Message}", "Exception creating ASCOM.LeTelescopeFFFPV1.CoverCalibrator", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"CoverCalibratorHardware - {ex.Message}\r\n{ex}", $"Exception creating {CoverCalibrator.DriverProgId}", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 throw;
             }
         }
@@ -150,7 +113,9 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
             // This method will be called every time a new ASCOM client loads your driver
             LogMessage("InitialiseHardware", $"Start.");
 
-            // Make sure that "one off" activities are only undertaken once
+            // Add any code that you want to run every time a client connects to your driver here
+
+            // Add any code that you only want to run when the first client connects in the if (runOnce == false) block below
             if (runOnce == false)
             {
                 LogMessage("InitialiseHardware", $"Starting one-off initialisation.");
@@ -159,16 +124,19 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
 
                 LogMessage("InitialiseHardware", $"ProgID: {DriverProgId}, Description: {DriverDescription}");
 
+                connectedState = false; // Initialise connected to false
+
                 LogMessage("InitialiseHardware", "Completed basic initialisation");
 
                 // Add your own "one off" device initialisation here e.g. validating existence of hardware and setting up communications
+                // If you are using a serial COM port you will find the COM port name selected by the user through the setup dialogue in the comPort variable.
 
                 LogMessage("InitialiseHardware", $"One-off initialisation complete.");
                 runOnce = true; // Set the flag to ensure that this code is not run again
             }
         }
 
-        // PUBLIC COM INTERFACE ICoverCalibratorV1 IMPLEMENTATION
+        // PUBLIC COM INTERFACE ICoverCalibratorV2 IMPLEMENTATION
 
         #region Common properties and methods.
 
@@ -310,64 +278,105 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         }
 
         /// <summary>
-        /// Set True to connect to the device hardware. Set False to disconnect from the device hardware.
-        /// You can also read the property to check whether it is connected. This reports the current hardware state.
+        /// Synchronously connects to or disconnects from the hardware
         /// </summary>
-        /// <value><c>true</c> if connected to the hardware; otherwise, <c>false</c>.</value>
-        public static bool Connected
+        /// <param name="uniqueId">Driver's unique ID</param>
+        /// <param name="newState">New state: Connected or Disconnected</param>
+        public static void SetConnected(Guid uniqueId, bool newState)
         {
-            get
+            // Check whether we are connecting or disconnecting
+            if (newState) // We are connecting
             {
-                LogMessage("Connected", $"Get {IsConnected}");
-                return IsConnected;
+                // Check whether this driver instance has already connected
+                if (uniqueIds.Contains(uniqueId)) // Instance already connected
+                {
+                    // Ignore the request, the unique ID is already in the list
+                    LogMessage("SetConnected", $"Ignoring request to connect because the device is already connected.");
+                }
+                else // Instance not already connected, so connect it
+                {
+                    // Check whether this is the first connection to the hardware
+                    if (uniqueIds.Count == 0) // This is the first connection to the hardware so initiate the hardware connection
+                    {
+                        //
+                        // Add hardware connect logic here
+                        //
+                        LogMessage("SetConnected", $"Connecting to device on port {comPort}");
+
+                        try
+                        {
+                            SharedResources.SerialPortName = comPort;
+                            SharedResources.Connected = true;
+
+                            var ping_command_msg = CommandBuilder(CMD_PING);
+                            var ping_expected_result_msg = ExpectedResultPrefixBuilder(CMD_PING) + PING_RSLT_PONG;
+                            SharedResources.ValidateDevice(ping_command_msg, ping_expected_result_msg);
+
+                        }
+                        catch (Exception e)
+                        {
+                            LogMessage("SetConnected", $"Connection to port {comPort} failed: {e.Message}");
+                            throw new DriverException($"Connection to port {comPort} failed", e);
+                        }
+
+                        LogMessage("SetConnected", $"Connected to device on port {comPort}");
+                    }
+                    else // Other device instances are connected so the hardware is already connected
+                    {
+                        // Since the hardware is already connected no action is required
+                        LogMessage("SetConnected", $"Hardware already connected.");
+                    }
+
+                    // The hardware either "already was" or "is now" connected, so add the driver unique ID to the connected list
+                    uniqueIds.Add(uniqueId);
+                    LogMessage("SetConnected", $"Unique id {uniqueId} added to the connection list.");
+                }
             }
-            set
+            else // We are disconnecting
             {
-                LogMessage("Connected", $"Set {value}");
-                if (value == IsConnected)
+                // Check whether this driver instance has already disconnected
+                if (!uniqueIds.Contains(uniqueId)) // Instance not connected so ignore request
                 {
-                    return;
+                    // Ignore the request, the unique ID is not in the list
+                    LogMessage("SetConnected", $"Ignoring request to disconnect because the device is already disconnected.");
                 }
-
-                if (value)
+                else // Instance currently connected so disconnect it
                 {
-                    LogMessage("Connected Set", $"Connecting to device on port {comPort}");
+                    // Remove the driver unique ID to the connected list
+                    uniqueIds.Remove(uniqueId);
+                    LogMessage("SetConnected", $"Unique id {uniqueId} removed from the connection list.");
 
-                    try
+                    // Check whether there are now any connected driver instances 
+                    if (uniqueIds.Count == 0) // There are no connected driver instances so disconnect from the hardware
                     {
-                        SharedResources.SerialPortName = comPort;
-                        SharedResources.SerialConnected = true;
+                        LogMessage("SetConnected", $"Disconnecting from port {comPort}");
+                        var disconnect_command_msg = CommandBuilder(CMD_DISCONNECT);
+                        var disconnect_expected_result_msg = ExpectedResultPrefixBuilder(CMD_DISCONNECT) + GENERIC_RSLT_OK;
 
-                        var ping_command_msg = CommandBuilder(CMD_PING);
-                        var ping_expected_result_msg = ExpectedResultPrefixBuilder(CMD_PING) + PING_RSLT_PONG;
-                        SharedResources.ValidateDevice(ping_command_msg,ping_expected_result_msg);
+                        var actual_rslt = SharedResources.SendMessage(disconnect_command_msg);
 
+                        SharedResources.Connected = false;
+
+                        if (!disconnect_expected_result_msg.Trim().Equals(actual_rslt.Trim()))
+                        {
+                            LogMessage("SetConnected", $"Failed disconnecting from port {comPort}, device may be in a dangling state");
+                            LogMessage("SetConnected", $"Disconnect command actual result {actual_rslt}, expected {disconnect_expected_result_msg}");
+                            throw new DriverException($"Connection to port {comPort} failed,device may be in a dangling state");
+                        }
                     }
-                    catch (Exception e)
+                    else // Other device instances are connected so do not disconnect the hardware
                     {
-                        LogMessage("Connected Set", $"Connection to port {comPort} failed: {e.Message}");  
-                        throw new DriverException($"Connection to port {comPort} failed", e);
+                        // No action is required
+                        LogMessage("SetConnected", $"Hardware already connected.");
                     }
-
-                    LogMessage("Connected Set", $"Connected to device on port {comPort}");
-
                 }
-                else
-                {
-                    LogMessage("Connected Set", $"Disconnecting from port {comPort}");
-                    var disconnect_command_msg = CommandBuilder(CMD_DISCONNECT);
-                    var disconnect_expected_result_msg = ExpectedResultPrefixBuilder(CMD_DISCONNECT) + GENERIC_RSLT_OK;
+            }
 
-                    var actual_rslt = SharedResources.SendMessage(disconnect_command_msg);
-
-                    SharedResources.SerialConnected = false;
-
-                    if (actual_rslt != disconnect_command_msg) {
-                        LogMessage("Connected Set", $"Failed disconnecting from port {comPort}, device may be in a dangling state");
-                        throw new DriverException($"Connection to port {comPort} failed,device may be in a dangling state");
-                    }
-
-                }
+            // Log the current connected state
+            LogMessage("SetConnected", $"Currently connected driver ids:");
+            foreach (Guid id in uniqueIds)
+            {
+                LogMessage("SetConnected", $" ID {id} is connected");
             }
         }
 
@@ -377,6 +386,7 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         /// <value>The description.</value>
         public static string Description
         {
+            // TODO customise this device description if required
             get
             {
                 LogMessage("Description Get", DriverDescription);
@@ -392,7 +402,8 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
             get
             {
                 Version version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
-                string driverInfo = $"Le Telescope FFFPV1 ASCOM CoverCalibrator driver . Version: {version.Major}.{version.Minor}";
+                // TODO customise this driver description if required
+                string driverInfo = $"Le Telescope FFFP ASCOM CoverCalibrator driver . Version: {version.Major}.{version.Minor}";
                 LogMessage("DriverInfo Get", driverInfo);
                 return driverInfo;
             }
@@ -420,8 +431,8 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
             // set by the driver wizard
             get
             {
-                LogMessage("InterfaceVersion Get", "1");
-                return Convert.ToInt16("1");
+                LogMessage("InterfaceVersion Get", "2");
+                return Convert.ToInt16("2");
             }
         }
 
@@ -430,9 +441,10 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         /// </summary>
         public static string Name
         {
+            // TODO customise this device name as required
             get
             {
-                string name = "Le Telescope FFFPV1 ASCOM driver";
+                string name = "Le Telescope FFFP ASCOM driver";
                 LogMessage("Name Get", name);
                 return name;
             }
@@ -441,7 +453,6 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         #endregion
 
         #region ICoverCalibrator Implementation
-
 
         /// <summary>
         /// Returns the state of the device cover, if present, otherwise returns "NotPresent"
@@ -466,6 +477,24 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
                     default:
                         LogMessage(identifier, "{response}: Unknown cover status");
                         return CoverStatus.Unknown;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Completion variable for OpenCover, CloseCover and HaltCover
+        /// </summary>
+        internal static bool CoverMoving
+        {
+            get
+            {
+                try
+                {
+                    return CoverState == CoverStatus.Moving;
+                }
+                catch (System.Exception)
+                {
+                    return false;
                 }
             }
         }
@@ -530,6 +559,24 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
                 CheckConnected($"{identifier}: Flat panel not connected");
                 LogMessage(identifier, "Calibrator is ready");
                 return CalibratorStatus.Ready;
+            }
+        }
+
+        /// <summary>
+        /// Completion variable for CalibratorOn and CalibratorOff
+        /// </summary>
+        internal static bool CalibratorChanging
+        {
+            get
+            {
+                try
+                {
+                    return CalibratorState == CalibratorStatus.NotReady;
+                }
+                catch (System.Exception)
+                {
+                    return false;
+                }
             }
         }
 
@@ -627,6 +674,8 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
 
         #region Private properties and methods
 
+        // Useful methods that can be used as required to help with driver development
+
         /// <summary>
         /// Send a command via Serial and wait for the firmware response
         /// </summary>
@@ -693,20 +742,29 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
         }
 
 
-        // Useful methods that can be used as required to help with driver development
-
         /// <summary>
         /// Returns true if there is a valid connection to the driver hardware
         /// </summary>
         private static bool IsConnected
         {
-            // DO NOT Synchronize this getter as it is used in syncrhonized function and we may end in 
-            // a deadlock situation.
             get
             {
-                return SharedResources.SerialConnected;
+                return SharedResources.Connected;
             }
         }
+
+        private static void validateDevice(String identifier)
+        {
+            LogMessage(identifier, $"Validate device using ping command");
+            string ping_rslt = SendCommand(identifier: identifier, command: CMD_PING);
+            if (ping_rslt != PING_RSLT_PONG)
+            {
+                LogMessage(identifier, $"Incorrect devive: Ping answer: actual {ping_rslt} - expected {PING_RSLT_PONG}");
+                throw new DriverException($"Incorrect devive: Ping answer: actual {ping_rslt} - expected {PING_RSLT_PONG}");
+            }
+            LogMessage(identifier, $"Device OK");
+        }
+
 
         /// <summary>
         /// Use this function to throw an exception if we aren't connected to the hardware
@@ -731,17 +789,6 @@ namespace ASCOM.LeTelescopeFFFPV1.CoverCalibrator
                 tl.Enabled = Convert.ToBoolean(driverProfile.GetValue(DriverProgId, traceStateProfileName, string.Empty, traceStateDefault));
                 comPort = driverProfile.GetValue(DriverProgId, comPortProfileName, string.Empty, comPortDefault);
             }
-        }
-
-        private static void validateDevice(String identifier) {
-            LogMessage(identifier, $"Validate device using ping command");
-            string ping_rslt = SendCommand(identifier: identifier, command: CMD_PING);
-            if (ping_rslt != PING_RSLT_PONG) 
-            {
-                LogMessage(identifier, $"Incorrect devive: Ping answer: actual {ping_rslt} - expected {PING_RSLT_PONG}");
-                throw new DriverException($"Incorrect devive: Ping answer: actual {ping_rslt} - expected {PING_RSLT_PONG}");
-            }
-            LogMessage(identifier, $"Device OK");
         }
 
         /// <summary>
