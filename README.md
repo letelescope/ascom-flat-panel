@@ -80,8 +80,8 @@ Very few pre-requisites are necessary in order to build the flat panel. More pre
   
 And that's it ! For instance you won't need software developpement skills as both the driver and the firmware are usable as is. Moreover, the ASCOM driver installer is already pre-compiled and made available to the download. Unfortunaltely one cannot make an "installer" for the arduino firware. Yet using PlaterfomIO to upload the firmware is a matter of three clicks. 
 
-> We choose PlateformIO over ArduinoIDE mostly because of the recent politycal move from Qualcomm/Arduino to go away from Open Source, that contradicts the spirit of what we try to achieve here. Moreover it is way easier to manage dependencies and libraries
-> 
+> We chose PlatformIO instead of ArduinoIDE due to recent concerns about Arduino's Open Source commitment under Qualcomm, and ,icing on the cake, PlatformIO provides superior dependency and library management.
+
 ### Bill of material 
 
 [TODO] ADD BILL OF MATERIAL 
