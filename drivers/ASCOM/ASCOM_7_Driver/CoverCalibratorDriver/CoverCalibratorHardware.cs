@@ -315,7 +315,7 @@ namespace ASCOM.LeTelescopeFFFP.CoverCalibrator
                         }
                         catch (Exception e)
                         {
-                            LogMessage("Connected Set", $"Connection to port {comPort} failed: {e.Message}");
+                            LogMessage("SetConnected", $"Connection to port {comPort} failed: {e.Message}");
                             throw new DriverException($"Connection to port {comPort} failed", e);
                         }
 
@@ -349,7 +349,7 @@ namespace ASCOM.LeTelescopeFFFP.CoverCalibrator
                     // Check whether there are now any connected driver instances 
                     if (uniqueIds.Count == 0) // There are no connected driver instances so disconnect from the hardware
                     {
-                        LogMessage("Connected Set", $"Disconnecting from port {comPort}");
+                        LogMessage("SetConnected", $"Disconnecting from port {comPort}");
                         var disconnect_command_msg = CommandBuilder(CMD_DISCONNECT);
                         var disconnect_expected_result_msg = ExpectedResultPrefixBuilder(CMD_DISCONNECT) + GENERIC_RSLT_OK;
 
@@ -357,9 +357,10 @@ namespace ASCOM.LeTelescopeFFFP.CoverCalibrator
 
                         SharedResources.Connected = false;
 
-                        if (actual_rslt != disconnect_command_msg)
+                        if (!disconnect_expected_result_msg.Trim().Equals(actual_rslt.Trim()))
                         {
                             LogMessage("SetConnected", $"Failed disconnecting from port {comPort}, device may be in a dangling state");
+                            LogMessage("SetConnected", $"Disconnect command actual result {actual_rslt}, expected {disconnect_expected_result_msg}");
                             throw new DriverException($"Connection to port {comPort} failed,device may be in a dangling state");
                         }
                     }

@@ -13,7 +13,7 @@ AppSupportURL=https://ascomtalk.groups.io/g/Help
 AppUpdatesURL=https://ascom-standards.org/
 VersionInfoVersion=2.0.0
 MinVersion=6.1.7601
-DefaultDirName="{cf}\ASCOM\CoverCalibrator"
+DefaultDirName="{commoncf}\ASCOM\CoverCalibrator\ASCOM.LeTelescopeFFFP"
 DisableDirPage=yes
 DisableProgramGroupPage=yes
 DisableWelcomePage=No
@@ -25,13 +25,13 @@ SolidCompression=yes
 WizardImageFile=".\WizardImage.bmp"
 LicenseFile="..\..\..\LICENSE"
 ; {cf}\ASCOM\Uninstall\CoverCalibrator folder created by Platform, always
-UninstallFilesDir="{cf}\ASCOM\Uninstall\CoverCalibrator\FFFP"
+UninstallFilesDir="{commoncf}\ASCOM\Uninstall\CoverCalibrator\FFFP"
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Dirs]
-Name: "{cf}\ASCOM\Uninstall\CoverCalibrator\FFFP"
+Name: "{commoncf}\ASCOM\Uninstall\CoverCalibrator\FFFP"
 ; TODO: Add subfolders below {app} as needed (e.g. Name: "{app}\MyFolder")
 
 [Files]

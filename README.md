@@ -387,7 +387,7 @@ Great ! If you read this, at this stage, the firware, the driver and the mecanic
 
 ## Usage
 
-The FFFPV1 should be now be fully usable and drivable from N.I.N.A. 
+The FFFP should be now be fully usable and drivable from N.I.N.A. 
 
 ### Flat-Panel Connection
 

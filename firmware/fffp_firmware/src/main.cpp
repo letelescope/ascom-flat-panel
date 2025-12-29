@@ -129,7 +129,7 @@ constexpr auto COMMAND_PING = "PING";
 constexpr auto RESULT_PING = "PONG";
 
 constexpr auto COMMAND_INFO = "INFO";
-constexpr auto RESULT_INFO = "Le Télescope - Ivry sur Seine - Flat Panel Firmware v1.0";
+constexpr auto RESULT_INFO = "Le Telescope - Ivry sur Seine - Flat Panel Firmware v2.0";
 
 constexpr auto COMMAND_BRIGHTNESS_GET = "BRIGHTNESS_GET";
 constexpr auto COMMAND_BRIGHTNESS_SET = "BRIGHTNESS_SET";
@@ -150,7 +150,7 @@ constexpr auto RESULT_COVER_CALIBRATION_RUN = "0K";
 constexpr auto COMMAND_COVER_CALIBRATION_GET = "COVER_CALIBRATION_GET";
 
 constexpr auto COMMAND_DISCONNECT = "DISCONNECT";
-constexpr auto RESULT_DISCONNECT = "0K";
+constexpr auto RESULT_DISCONNECT = "OK";
 
 constexpr auto COMMAND_UNKNOWN = "UNKNOWN";
 
