@@ -552,7 +552,7 @@ The ASCOM driver is a C# .Net project that have been first created using the ASC
    ========== Build s’est terminée à 14:12 et a duré 10,405 secondes ==========
    ```
 
-3) The first time you compile the server you must "register it" on the ASCOM plateform. Open a c"elevated" ommand prompt (with admin priviledges) at the folder where the local server executable is located. Run the local server exe with the /regserver parameter which will create the entry that appears in the ASCOM Chooser. 
+3) The first time you compile the server you must "register it" on the ASCOM plateform. Open an "elevated" command prompt (with admin priviledges) at the folder where the local server executable is located. Run the local server exe with the /regserver parameter which will create the entry that appears in the ASCOM Chooser. 
   
    ``` console
    .\ASCOM.LeTelescopeFFFPV1.exe /regserver
