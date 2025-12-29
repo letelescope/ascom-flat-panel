@@ -471,39 +471,120 @@ The firware is entirely buildable and uploadable using the Arduino IDE
 2) Click "PlateformIO: Build" to compile the firmware. The output should be something like 
    ``` console
    Processing seeed_xiao (platform: atmelsam; board: seeed_xiao; framework: arduino)
-   ---------------------------------------------------------------------------------------------------------------
+   --------------------------------------------------------------------------------------------------------------------------------------------------
    Verbose mode can be enabled via `-v, --verbose` option
    CONFIGURATION: https://docs.platformio.org/page/boards/atmelsam/seeed_xiao.html
    PLATFORM: Atmel SAM (8.3.0) > Seeeduino XIAO
    HARDWARE: SAMD21G18A 48MHz, 32KB RAM, 256KB Flash
    DEBUG: Current (atmel-ice) External (atmel-ice, blackmagic, jlink)
-   PACKAGES: 
-    - framework-arduino-samd-seeed @ 1.8.5 
-    - framework-cmsis @ 2.50400.181126 (5.4.0) 
-    - framework-cmsis-atmel @ 1.2.2 
+   PACKAGES:
+    - framework-arduino-samd-seeed @ 1.8.5
+    - framework-cmsis @ 2.50400.181126 (5.4.0)
+    - framework-cmsis-atmel @ 1.2.2
     - toolchain-gccarmnoneeabi @ 1.70201.0 (7.2.1)
    LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
    LDF Modes: Finder ~ chain, Compatibility ~ soft
-   Found 19 compatible libraries
+   Found 20 compatible libraries
    Scanning dependencies...
    Dependency Graph
    |-- Servo @ 1.3.0
    |-- Adafruit SleepyDog Library @ 1.6.5
-   |-- FFFP
+   |-- FF_Flat_Panel
    |-- FlashStorage @ 0.5.0
-   |-- SAMD21-PWM
+   |-- SAMD21_PWM
    Building in release mode
    Compiling .pio\build\seeed_xiao\src\main.cpp.o
+   Compiling .pio\build\seeed_xiao\libae5\Servo\avr\Servo.cpp.o
+   Compiling .pio\build\seeed_xiao\libae5\Servo\esp32\Servo.cpp.o
+   Compiling .pio\build\seeed_xiao\libae5\Servo\mbed\Servo.cpp.o
+   Compiling .pio\build\seeed_xiao\libae5\Servo\megaavr\Servo.cpp.o
+   Compiling .pio\build\seeed_xiao\libae5\Servo\nrf52\Servo.cpp.o
+   Compiling .pio\build\seeed_xiao\libae5\Servo\renesas\Servo.cpp.o
+   Compiling .pio\build\seeed_xiao\libae5\Servo\sam\Servo.cpp.o
+   Compiling .pio\build\seeed_xiao\libae5\Servo\samd\Servo.cpp.o
+   Compiling .pio\build\seeed_xiao\libae5\Servo\stm32f4\Servo.cpp.o
+   Compiling .pio\build\seeed_xiao\libae5\Servo\xmc\Servo.cpp.o
+   Compiling .pio\build\seeed_xiao\libae5\Servo\zephyr\Servo.cpp.o
+   Compiling .pio\build\seeed_xiao\lib2bf\Adafruit SleepyDog Library\Adafruit_SleepyDog.cpp.o
+   Compiling .pio\build\seeed_xiao\lib2bf\Adafruit SleepyDog Library\utility\WatchdogAVR.cpp.o
+   Compiling .pio\build\seeed_xiao\lib2bf\Adafruit SleepyDog Library\utility\WatchdogESP32.cpp.o
+   Compiling .pio\build\seeed_xiao\lib2bf\Adafruit SleepyDog Library\utility\WatchdogESP8266.cpp.o
+   Compiling .pio\build\seeed_xiao\lib2bf\Adafruit SleepyDog Library\utility\WatchdogKinetisK.cpp.o
+   Compiling .pio\build\seeed_xiao\lib2bf\Adafruit SleepyDog Library\utility\WatchdogKinetisL.cpp.o
+   Compiling .pio\build\seeed_xiao\lib2bf\Adafruit SleepyDog Library\utility\WatchdogNRF.cpp.o
+   Compiling .pio\build\seeed_xiao\lib2bf\Adafruit SleepyDog Library\utility\WatchdogRP2040.cpp.o
+   Compiling .pio\build\seeed_xiao\lib2bf\Adafruit SleepyDog Library\utility\WatchdogSAMD.cpp.o
+   Compiling .pio\build\seeed_xiao\libc78\FlashStorage\FlashStorage.cpp.o
+   Archiving .pio\build\seeed_xiao\libae5\libServo.a
+   Compiling .pio\build\seeed_xiao\FrameworkArduinoVariant\variant.cpp.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\IPAddress.cpp.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\IPv6Address.cpp.o
+   Archiving .pio\build\seeed_xiao\lib2bf\libAdafruit SleepyDog Library.a
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\Print.cpp.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\Reset.cpp.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\Retarget.cpp.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\SERCOM.cpp.o
+   Archiving .pio\build\seeed_xiao\libc78\libFlashStorage.a
+   Archiving .pio\build\seeed_xiao\libFrameworkArduinoVariant.a
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\Stream.cpp.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\StreamString.cpp.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\Tone.cpp.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\USB\CDC.cpp.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\USB\PluggableUSB.cpp.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\USB\SAMD21_USBDevice.cpp.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\USB\USBCore.cpp.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\USB\samd21_host.c.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\Uart.cpp.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\WInterrupts.c.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\WMath.cpp.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\WString.cpp.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\abi.cpp.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\avr\dtostrf.c.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\base64.cpp.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\cbuf.cpp.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\cortex_handlers.c.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\delay.c.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\hooks.c.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\itoa.c.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\libb64\cdecode.c.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\libb64\cencode.c.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\main.cpp.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\math_helper.c.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\new.cpp.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\pulse.c.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\pulse_asm.S.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\startup.c.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\wiring.c.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\wiring_analog.c.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\wiring_digital.c.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\wiring_private.c.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\wiring_pwm.cpp.o
+   Compiling .pio\build\seeed_xiao\FrameworkArduino\wiring_shift.c.o
+   C:\Users\fgautier\.platformio\packages\framework-arduino-samd-seeed\cores\arduino\wiring_analog.c:35:12: warning: '_dacResolution' defined but not used [-Wunused-variable]
+    static int _dacResolution = 10;
+               ^~~~~~~~~~~~~~
+   C:\Users\fgautier\.platformio\packages\framework-arduino-samd-seeed\cores\arduino\wiring_pwm.cpp: In function 'void noPwm(uint32_t)':
+   C:\Users\fgautier\.platformio\packages\framework-arduino-samd-seeed\cores\arduino\wiring_pwm.cpp:374:13: warning: unused variable 'tcChannel' [-Wunused-variable]
+        uint8_t tcChannel = GetTCChannelNumber(pinDesc.ulPWMChannel);
+                ^~~~~~~~~
+   Archiving .pio\build\seeed_xiao\libFrameworkArduino.a
+   Linking .pio\build\seeed_xiao\firmware.elf
+   c:/users/fgautier/.platformio/packages/toolchain-gccarmnoneeabi/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/bin/ld.exe: warning: changing start of section .bss by 4 bytes
+   c:/users/fgautier/.platformio/packages/toolchain-gccarmnoneeabi/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/bin/ld.exe: warning: changing start of section .bss by 4 bytes
+   c:/users/fgautier/.platformio/packages/toolchain-gccarmnoneeabi/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/bin/ld.exe: warning: changing start of section .bss by 4 bytes
+   c:/users/fgautier/.platformio/packages/toolchain-gccarmnoneeabi/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/bin/ld.exe: warning: changing start of section .bss by 4 bytes
+   c:/users/fgautier/.platformio/packages/toolchain-gccarmnoneeabi/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/bin/ld.exe: warning: changing start of section .bss by 4 bytes
    Checking size .pio\build\seeed_xiao\firmware.elf
    Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
    RAM:   [=         ]   9.4% (used 3064 bytes from 32768 bytes)
    Flash: [==        ]  15.2% (used 39768 bytes from 262144 bytes)
-   ======================================== [SUCCESS] Took 53.63 seconds ========================================
+   Building .pio\build\seeed_xiao\firmware.bin
+   ========================================================== [SUCCESS] Took 7.97 seconds ==========================================================
    ```
 
    Don't worry to much about the warnings. Those are only warnings and can be safely igonered c.f. [arduino forum](https://forum.arduino.cc/t/web-ide-error-changing-start-of-section-by-4-bytes/1218049) and [adafruit forum](https://forums.adafruit.com/viewtopic.php?t=189483#p917530) .
 
-3) Connect the Seeeduino and  "PlateformIO: Build"to test it
+1) Connect the Seeeduino and  "PlateformIO: Build"to test it
 
 ##### Warning - Firmware calibrarion
 
