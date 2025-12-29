@@ -542,7 +542,7 @@ The ASCOM driver is a C# .Net project that have been first created using the ASC
 
 2) Compile the project using "Ctrl + Shift + B". The result in the console shoudl look something like
   
-   ``` sh
+   ``` console
    Génération démarrée à 14:12...
    1>------ Début de la génération : Projet : ASCOM_6_Driver, Configuration : Debug Any CPU ------
    1>  ASCOM_6_Driver -> D:\Documents\Perso\Astro\diy\ascom-flat-panel\ASCOM_drivers\ASCOM_6_Driver\bin\Debug\ASCOM.LeTelescopeFFFPV1.exe
@@ -552,7 +552,7 @@ The ASCOM driver is a C# .Net project that have been first created using the ASC
 
 3) The first time you compile the server you must "register it" on the ASCOM plateform. Open a c"elevated" ommand prompt (with admin priviledges) at the folder where the local server executable is located. Run the local server exe with the /regserver parameter which will create the entry that appears in the ASCOM Chooser. 
   
-   ```
+   ``` console
    .\ASCOM.LeTelescopeFFFPV1.exe /regserver
    ```
 
@@ -583,7 +583,7 @@ The indi driver is in its **really** early developement phase. It should no be u
 
 in the [indi](./drivers/indi/indi_driver/) directory, from VSCode integrated terminal or anyother terminal run
 
-```sh
+``` console
 mkdir build
 cd build
 cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Debug ../
@@ -593,13 +593,13 @@ sudo make install
 
 or 
 
-``` sh
+``` console
 ./make-install.sh
 ```
 
 The output should be something along the lines of:
 
-``` sh
+``` console
 -- The C compiler identification is GNU 11.4.0
 -- The CXX compiler identification is GNU 11.4.0
 -- Detecting C compiler ABI info
