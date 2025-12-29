@@ -76,7 +76,7 @@
   <ItemGroup>
     <Compile Include="ClassFactory.cs" />
     <Compile Include="CoverCalibratorDriver\CoverCalibratorDriver.cs" />
-    <Compile Include="CoverCalibratorDriver\CoverCalibratorHardware..cs" />
+    <Compile Include="CoverCalibratorDriver\CoverCalibratorHardware.cs" />
     <Compile Include="GarbageCollection.cs" />
     <Compile Include="LocalServer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
