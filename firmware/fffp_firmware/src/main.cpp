@@ -62,8 +62,8 @@
 #include <Servo.h>
 #include <FlashStorage.h>
 #include <Adafruit_SleepyDog.h>
-#include <samd21-pwm.h>
-#include <fffp.h>
+#include <Samd21_PulseWidthModulation.h>
+#include <FF_FlatPanel.h>
 
 /************************************************
  *     Types, Objects, and data structures      *
