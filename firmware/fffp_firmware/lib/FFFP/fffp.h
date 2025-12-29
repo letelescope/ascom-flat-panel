@@ -5,25 +5,25 @@
  ***********************************************/
 
 /*
- * Messages/Protocol related types 
+ * Messages/Protocol related types
  */
 
-//Represents a command message payload right after parsing, before decoding.
+// Represents a command message payload right after parsing, before decoding.
 
-
-
-struct msg_cmd_payload {
+struct msg_cmd_payload
+{
   String name;
   String args;
 };
 
-//Defines the behavior of a command. Each command 
-// - may perform an action that will modify the flat panel firware state
-// - may be given args as a String. It is the responsability of the command to check the correctness of the given input
+// Defines the behavior of a command. Each command
+//  - may perform an action that will modify the flat panel firware state
+//  - may be given args as a String. It is the responsability of the command to check the correctness of the given input
 typedef void (*cmd_handler_ptr)(String);
 
-//Main command data structure. A command has a name, and holds a pointer to a function that will perform the action. 
-struct command_t {
+// Main command data structure. A command has a name, and holds a pointer to a function that will perform the action.
+struct command_t
+{
   const char *name;
   cmd_handler_ptr handle;
 };
