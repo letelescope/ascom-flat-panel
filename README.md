@@ -7,6 +7,7 @@
 [![FreeCAD](https://img.shields.io/badge/FreeCAD-da464b)](https://www.freecad.org/)
 [![KiCAD](https://img.shields.io/badge/KiCAD-314cb0)](https://www.kicad.org/)
 [![Arduino](https://img.shields.io/badge/Arduino-00878F?logo=arduino&logoColor=fff)](https://www.arduino.cc/)
+[![Build with PlatformIO](https://img.shields.io/badge/build%20with-PlatformIO-orange?logo=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB3aWR0aD0iMjUwMCIgaGVpZ2h0PSIyNTAwIiB2aWV3Qm94PSIwIDAgMjU2IDI1NiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCI+PHBhdGggZD0iTTEyOCAwQzkzLjgxIDAgNjEuNjY2IDEzLjMxNCAzNy40OSAzNy40OSAxMy4zMTQgNjEuNjY2IDAgOTMuODEgMCAxMjhjMCAzNC4xOSAxMy4zMTQgNjYuMzM0IDM3LjQ5IDkwLjUxQzYxLjY2NiAyNDIuNjg2IDkzLjgxIDI1NiAxMjggMjU2YzM0LjE5IDAgNjYuMzM0LTEzLjMxNCA5MC41MS0zNy40OUMyNDIuNjg2IDE5NC4zMzQgMjU2IDE2Mi4xOSAyNTYgMTI4YzAtMzQuMTktMTMuMzE0LTY2LjMzNC0zNy40OS05MC41MUMxOTQuMzM0IDEzLjMxNCAxNjIuMTkgMCAxMjggMCIgZmlsbD0iI0ZGN0YwMCIvPjxwYXRoIGQ9Ik0yNDkuMzg2IDEyOGMwIDY3LjA0LTU0LjM0NyAxMjEuMzg2LTEyMS4zODYgMTIxLjM4NkM2MC45NiAyNDkuMzg2IDYuNjEzIDE5NS4wNCA2LjYxMyAxMjggNi42MTMgNjAuOTYgNjAuOTYgNi42MTQgMTI4IDYuNjE0YzY3LjA0IDAgMTIxLjM4NiA1NC4zNDYgMTIxLjM4NiAxMjEuMzg2IiBmaWxsPSIjRkZGIi8+PHBhdGggZD0iTTE2MC44NjkgNzQuMDYybDUuMTQ1LTE4LjUzN2M1LjI2NC0uNDcgOS4zOTItNC44ODYgOS4zOTItMTAuMjczIDAtNS43LTQuNjItMTAuMzItMTAuMzItMTAuMzJzLTEwLjMyIDQuNjItMTAuMzIgMTAuMzJjMCAzLjc1NSAyLjAxMyA3LjAzIDUuMDEgOC44MzdsLTUuMDUgMTguMTk1Yy0xNC40MzctMy42Ny0yNi42MjUtMy4zOS0yNi42MjUtMy4zOWwtMi4yNTggMS4wMXYxNDAuODcybDIuMjU4Ljc1M2MxMy42MTQgMCA3My4xNzctNDEuMTMzIDczLjMyMy04NS4yNyAwLTMxLjYyNC0yMS4wMjMtNDUuODI1LTQwLjU1NS01Mi4xOTd6TTE0Ni41MyAxNjQuOGMtMTEuNjE3LTE4LjU1Ny02LjcwNi02MS43NTEgMjMuNjQzLTY3LjkyNSA4LjMyLTEuMzMzIDE4LjUwOSA0LjEzNCAyMS41MSAxNi4yNzkgNy41ODIgMjUuNzY2LTM3LjAxNSA2MS44NDUtNDUuMTUzIDUxLjY0NnptMTguMjE2LTM5Ljc1MmE5LjM5OSA5LjM5OSAwIDAgMC05LjM5OSA5LjM5OSA5LjM5OSA5LjM5OSAwIDAgMCA5LjQgOS4zOTkgOS4zOTkgOS4zOTkgMCAwIDAgOS4zOTgtOS40IDkuMzk5IDkuMzk5IDAgMCAwLTkuMzk5LTkuMzk4em0yLjgxIDguNjcyYTIuMzc0IDIuMzc0IDAgMSAxIDAtNC43NDkgMi4zNzQgMi4zNzQgMCAwIDEgMCA0Ljc0OXoiIGZpbGw9IiNFNTcyMDAiLz48cGF0aCBkPSJNMTAxLjM3MSA3Mi43MDlsLTUuMDIzLTE4LjkwMWMyLjg3NC0xLjgzMiA0Ljc4Ni01LjA0IDQuNzg2LTguNzAxIDAtNS43LTQuNjItMTAuMzItMTAuMzItMTAuMzItNS42OTkgMC0xMC4zMTkgNC42Mi0xMC4zMTkgMTAuMzIgMCA1LjY4MiA0LjU5MiAxMC4yODkgMTAuMjY3IDEwLjMxN0w5NS44IDc0LjM3OGMtMTkuNjA5IDYuNTEtNDAuODg1IDIwLjc0Mi00MC44ODUgNTEuODguNDM2IDQ1LjAxIDU5LjU3MiA4NS4yNjcgNzMuMTg2IDg1LjI2N1Y2OC44OTJzLTEyLjI1Mi0uMDYyLTI2LjcyOSAzLjgxN3ptMTAuMzk1IDkyLjA5Yy04LjEzOCAxMC4yLTUyLjczNS0yNS44OC00NS4xNTQtNTEuNjQ1IDMuMDAyLTEyLjE0NSAxMy4xOS0xNy42MTIgMjEuNTExLTE2LjI4IDMwLjM1IDYuMTc1IDM1LjI2IDQ5LjM2OSAyMy42NDMgNjcuOTI2em0tMTguODItMzkuNDZhOS4zOTkgOS4zOTkgMCAwIDAtOS4zOTkgOS4zOTggOS4zOTkgOS4zOTkgMCAwIDAgOS40IDkuNCA5LjM5OSA5LjM5OSAwIDAgMCA5LjM5OC05LjQgOS4zOTkgOS4zOTkgMCAwIDAtOS4zOTktOS4zOTl6bS0yLjgxIDguNjcxYTIuMzc0IDIuMzc0IDAgMSAxIDAtNC43NDggMi4zNzQgMi4zNzQgMCAwIDEgMCA0Ljc0OHoiIGZpbGw9IiNGRjdGMDAiLz48L3N2Zz4=)](https://platformio.org/)
 [![No Maintenance Intended](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/) 
 
 Open source *ASCOM* and *INDI* driven automated flat panel for astrophotography. 
@@ -22,7 +23,7 @@ This project is an open source initiative, under the MIT license, by *Le Telesco
 
 This project should contain all you need to build your own *ASCOM* and/or *INDI* driven Flat Panel. 
 
-- [firmware](./firmware/fffpv1_firmware/): Firware of the programble chip used to control the panel and its cover
+- [firmware](./firmware/fffp_firmware/): Firware of the programble chip used to control the panel and its cover
 - [drivers](./drivers/): Implementation of the drivers
   - [ASCOM](./drivers/ASCOM/) : Implementation of the *ASCOM* driver 
   - [INDI](./drivers/indi/) : Implementation of the *INDI* driver
@@ -74,11 +75,13 @@ Very few pre-requisites are necessary in order to build the flat panel. More pre
 
 - have access to a 3D printer, to print the mechanical assembly parts
 - have some soldering skills and a soldering kit, to solder the components to the custom PCB
-- install the arduino IDE, to upload the firmware
+- install PlateformIO, to upload the firmware
 - love "diy-ing", because you may need to want/need to tweaks things a bit to make it work in your setup. 
   
-And that's it ! For instance you won't need software developpement skills as both the driver and the firmware are usable as is. Moreover, the ASCOM driver installer is already pre-compiled and made available to the download. Unfortunaltely one cannot make an "installer" for the arduino firware. Yet using the Arduino IDE to upload the firmware is a matter of three clicks. 
+And that's it ! For instance you won't need software developpement skills as both the driver and the firmware are usable as is. Moreover, the ASCOM driver installer is already pre-compiled and made available to the download. Unfortunaltely one cannot make an "installer" for the arduino firware. Yet using PlaterfomIO to upload the firmware is a matter of three clicks. 
 
+> We choose PlateformIO over ArduinoIDE mostly because of the recent politycal move from Qualcomm/Arduino to go away from Open Source, that contradicts the spirit of what we try to achieve here. Moreover it is way easier to manage dependencies and libraries
+> 
 ### Bill of material 
 
 [TODO] ADD BILL OF MATERIAL 
@@ -166,11 +169,11 @@ If you want to modify the PCB layout, you have two options depending on the comp
 
 #### Pre-requisite
 
-The firmware needs to be uploaded using the Arduino IDE. [Arduino IDE setup section](#pre-requisites-1) of this documentation to set it. 
+The firmware needs to be uploaded using Visual Studio Code/PlateformIO . [PlateformIO setup section](#pre-requisites-1) of this documentation to set it. 
 
 #### Upload the firware
 
-1. Open the file [firmware source file](./firmware/fffpv1_firmware/fffpv1_firmware.ino) from the Arduino IDE. 
+1. Open the [firmware project](./firmware/fff) from Visula Strudio Code/Plateform-IO. 
 
 2. Connect the board via US. 
    
@@ -454,27 +457,51 @@ The firware is entirely buildable and uploadable using the Arduino IDE
  
 ##### Pre-requisites 
 
-- [Download](https://www.arduino.cc/en/software/) and install the Arduino IDE
-- [Downlaod](https://wiki.seeedstudio.com/Seeeduino-XIAO/#software) and configure the Seeduino XIAO board for the Arduino IDE
-- From the Arduino IDE [download](https://docs.arduino.cc/libraries/adafruit-sleepydog-library/) and install the official Adafruit SleepyDog library. This is used to properly handle disconnection. 
+- [Download](https://code.visualstudio.com/download) and install the Visual Studio Code or the IDE of your choice
+- [Download](https://platformio.org/install/ide) and install the PlatformIO extension for Visual Studio Code
+- No need to download and configure the Seeduino XIAO board for PlateformIO as this is already done in the [platformio.ini](./firmware/fffp_firmware/platformio.ini) file of the firmware project.
+- No need to download and install the official Adafruit SleepyDog library  as this is already done in the [platformio.ini](./firmware/fffp_firmware/platformio.ini). This is used to properly handle disconnection. 
 
 ##### Compile and upload the firmware
 
-1) Using the Arduino IDE, open the [fffpv1_firmware.ino](./firmware/seeeduino/fffpv1_firmware.ino)
+1) Using PlateformIO IDE, open the [project](./firmware/fffp_firmware/)
 
-2) Click "verify" to compile the firmware. The output should be something like 
-   ```
-   d:/appdata/local/arduino15/packages/seeeduino/tools/arm-none-eabi-gcc/7-2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/bin/ld.exe: warning: changing start of section .bss by 4 bytes
-   d:/appdata/local/arduino15/packages/seeeduino/tools/arm-none-eabi-gcc/7-2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/bin/ld.exe: warning: changing start of section .bss by 4 bytes
-   d:/appdata/local/arduino15/packages/seeeduino/tools/arm-none-eabi-gcc/7-2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/bin/ld.exe: warning: changing start of section .bss by 4 bytes
-   d:/appdata/local/arduino15/packages/seeeduino/tools/arm-none-eabi-gcc/7-2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/bin/ld.exe: warning: changing start of section .bss by 4 bytes
-   d:/appdata/local/arduino15/packages/seeeduino/tools/arm-none-eabi-gcc/7-2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/bin/ld.exe: warning: changing start of section .bss by 4 bytes
-   Sketch uses 41324 bytes (15%) of program storage space. Maximum is 262144 bytes.
+2) Click "PlateformIO: Build" to compile the firmware. The output should be something like 
+   ``` console
+   Processing seeed_xiao (platform: atmelsam; board: seeed_xiao; framework: arduino)
+   ---------------------------------------------------------------------------------------------------------------
+   Verbose mode can be enabled via `-v, --verbose` option
+   CONFIGURATION: https://docs.platformio.org/page/boards/atmelsam/seeed_xiao.html
+   PLATFORM: Atmel SAM (8.3.0) > Seeeduino XIAO
+   HARDWARE: SAMD21G18A 48MHz, 32KB RAM, 256KB Flash
+   DEBUG: Current (atmel-ice) External (atmel-ice, blackmagic, jlink)
+   PACKAGES: 
+    - framework-arduino-samd-seeed @ 1.8.5 
+    - framework-cmsis @ 2.50400.181126 (5.4.0) 
+    - framework-cmsis-atmel @ 1.2.2 
+    - toolchain-gccarmnoneeabi @ 1.70201.0 (7.2.1)
+   LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+   LDF Modes: Finder ~ chain, Compatibility ~ soft
+   Found 19 compatible libraries
+   Scanning dependencies...
+   Dependency Graph
+   |-- Servo @ 1.3.0
+   |-- Adafruit SleepyDog Library @ 1.6.5
+   |-- FFFP
+   |-- FlashStorage @ 0.5.0
+   |-- SAMD21-PWM
+   Building in release mode
+   Compiling .pio\build\seeed_xiao\src\main.cpp.o
+   Checking size .pio\build\seeed_xiao\firmware.elf
+   Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
+   RAM:   [=         ]   9.4% (used 3064 bytes from 32768 bytes)
+   Flash: [==        ]  15.2% (used 39768 bytes from 262144 bytes)
+   ======================================== [SUCCESS] Took 53.63 seconds ========================================
    ```
 
    Don't worry to much about the warnings. Those are only warnings and can be safely igonered c.f. [arduino forum](https://forum.arduino.cc/t/web-ide-error-changing-start-of-section-by-4-bytes/1218049) and [adafruit forum](https://forums.adafruit.com/viewtopic.php?t=189483#p917530) .
 
-3) Connect the Seeeduino and click upload to test it
+3) Connect the Seeeduino and  "PlateformIO: Build"to test it
 
 ##### Warning - Firmware calibrarion
 
