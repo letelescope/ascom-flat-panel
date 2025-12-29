@@ -81,7 +81,7 @@ namespace ASCOM.LeTelescopeFFFP.CoverCalibrator
     [ComVisible(true)]
     [Guid("b3b51730-c69f-43fd-b260-1772ea5dbd96")]
     [ProgId("ASCOM.LeTelescopeFFFP.CoverCalibrator")]
-    [ServedClassName("ASCOM CoverCalibrator Driver for LeTelescopeFFFP")] // Driver description that appears in the Chooser, customise as required
+    [ServedClassName("ASCOM CoverCalibrator Driver for LeTelescope FFFP")] // Driver description that appears in the Chooser, customise as required
     [ClassInterface(ClassInterfaceType.None)]
     public class CoverCalibrator : ReferenceCountedObjectBase, ICoverCalibratorV2, IDisposable
     {
