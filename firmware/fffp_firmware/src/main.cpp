@@ -165,7 +165,7 @@ constexpr auto ERROR_SERVO_NOT_CALIBRATED = "SERVO_NOT_CALIBRATED@Run command CO
 
 #define NB_COMMANDS 11
 // Keeps the record of allowed/known commands
-constexpr command_t allowed_cmds[NB_COMMANDS] = {{COMMAND_PING, &cmd_ping},
+const command_t allowed_cmds[NB_COMMANDS] = {{COMMAND_PING, &cmd_ping},
                                                  {COMMAND_INFO, &cmd_info},
                                                  {COMMAND_BRIGHTNESS_GET, &cmd_brigthness_get},
                                                  {COMMAND_BRIGHTNESS_SET, &cmd_brightness_set},
