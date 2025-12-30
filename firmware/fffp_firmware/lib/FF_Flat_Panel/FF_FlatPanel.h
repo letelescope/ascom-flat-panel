@@ -51,7 +51,7 @@ void update_panel_cover();
  ***********************************************/
 void cmd_ping(const String args);
 void cmd_info(const String args);
-void cmd_brigthness_get(const String args);
+void cmd_brightness_get(const String args);
 void cmd_brightness_set(const String args);
 void cmd_brightness_reset(const String args);
 void cmd_cover_get_state(const String args);

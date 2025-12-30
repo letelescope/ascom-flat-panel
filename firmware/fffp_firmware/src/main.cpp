@@ -167,7 +167,7 @@ constexpr auto ERROR_SERVO_NOT_CALIBRATED = "SERVO_NOT_CALIBRATED@Run command CO
 // Keeps the record of allowed/known commands
 const command_t allowed_cmds[NB_COMMANDS] = {{COMMAND_PING, &cmd_ping},
                                                  {COMMAND_INFO, &cmd_info},
-                                                 {COMMAND_BRIGHTNESS_GET, &cmd_brigthness_get},
+                                                 {COMMAND_BRIGHTNESS_GET, &cmd_brightness_get},
                                                  {COMMAND_BRIGHTNESS_SET, &cmd_brightness_set},
                                                  {COMMAND_BRIGHTNESS_RESET, &cmd_brightness_reset},
                                                  {COMMAND_COVER_GET_STATE, &cmd_cover_get_state},
@@ -307,7 +307,7 @@ void setup()
   else
   {
     // Close the cover, in case it is not completely closed.
-    // To make sure that `_closeçcover` does not have an undefined behavior,
+    // To make sure that `_close_cover` does not have an undefined behavior,
     // we initialize the `panel.state` variable to `OPEN`, just in case.
     // That variable will be updated in the `_close_cover` function,
     // and then again once the cover has completely closed.
@@ -547,7 +547,7 @@ void cmd_info(const String args)
  *                    current value of the  brightness member of the panle "panle_state_t" struct.
  * Serial error     : Never
  */
-void cmd_brigthness_get(const String args)
+void cmd_brightness_get(const String args)
 {
   serialize_result(COMMAND_BRIGHTNESS_GET, String(panel.brightness));
 }
