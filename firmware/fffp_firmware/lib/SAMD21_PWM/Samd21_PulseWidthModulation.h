@@ -25,6 +25,8 @@
  * Heavily inspired, or more accurately shamelessly ripped, from the work of Khoih Hoang https://github.com/khoih-prog
  * More precisely SAMD_PWM  https://github.com/khoih-prog/SAMD_PWM/ . We do not use the library as we do not wnat to patch Arduino core.
  */
+#pragma once
+
 #include "wiring_private.h"
 
 #define INVALID_SAMD_PIN 255
