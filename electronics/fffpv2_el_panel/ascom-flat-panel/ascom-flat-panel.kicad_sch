@@ -737,149 +737,6 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "CustomSymbols:EL_INVERTER"
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(property "Reference" "U"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Value" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Footprint" "CustomFootprints:DFR052 DC regulator"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Datasheet" "https://www.dfrobot.com/product-2584.html"
-				(at 0.508 6.35 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Description" "EL INVERTER"
-				(at 0.254 8.89 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "ki_keywords" "Regulator"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(symbol "EL_INVERTER_0_1"
-				(rectangle
-					(start -10.16 3.81)
-					(end 8.89 -3.81)
-					(stroke
-						(width 0)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-			)
-			(symbol "EL_INVERTER_1_1"
-				(pin input line
-					(at -12.7 2.54 0)
-					(length 2.54)
-					(name "V+IN"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin input line
-					(at -12.7 -2.54 0)
-					(length 2.54)
-					(name "V-IN"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin input line
-					(at 11.43 2.54 180)
-					(length 2.54)
-					(name "V+OUT"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "3"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin input line
-					(at 11.43 -2.54 180)
-					(length 2.54)
-					(name "V-OUT"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "4"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-			(embedded_fonts no)
-		)
 		(symbol "DarkSkyGeek_KiCad_Symbol_Library:FQP30N06L"
 			(pin_numbers
 				(hide yes)
@@ -2652,107 +2509,6 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "GND_4"
-			(power)
-			(pin_numbers
-				(hide yes)
-			)
-			(pin_names
-				(offset 0)
-				(hide yes)
-			)
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(property "Reference" "#PWR"
-				(at 0 -6.35 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Value" "GND"
-				(at 0 -3.81 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Footprint" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Datasheet" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_keywords" "global power"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(symbol "GND_4_0_1"
-				(polyline
-					(pts
-						(xy 0 0) (xy 0 -1.27) (xy 1.27 -1.27) (xy 0 -2.54) (xy -1.27 -1.27) (xy 0 -1.27)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-			)
-			(symbol "GND_4_1_1"
-				(pin power_in line
-					(at 0 0 270)
-					(length 0)
-					(name "~"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-			(embedded_fonts no)
-		)
 		(symbol "Seeeduino:XIAO-SAMD21-DIP"
 			(pin_names
 				(offset 1.016)
@@ -3463,12 +3219,6 @@
 		(uuid "7410fe1e-9317-4922-b091-28a4f736e44d")
 	)
 	(junction
-		(at 99.06 137.16)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "87c1b2ff-56dd-4735-bc6f-78964b54acc8")
-	)
-	(junction
 		(at 232.41 91.44)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -3479,6 +3229,12 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "c620494d-b66f-4a29-8940-e040cb12cc6d")
+	)
+	(junction
+		(at 99.06 137.16)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "d1de4481-9142-458c-83bb-9a411a09d0d6")
 	)
 	(wire
 		(pts
@@ -3732,26 +3488,6 @@
 	)
 	(wire
 		(pts
-			(xy 99.06 142.24) (xy 105.41 142.24)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "5d16b3c7-9d78-4f6e-9504-ca4925053fa2")
-	)
-	(wire
-		(pts
-			(xy 129.54 137.16) (xy 132.08 137.16)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "61c7284a-0365-4977-b3fc-16f7482ccc0b")
-	)
-	(wire
-		(pts
 			(xy 157.48 119.38) (xy 157.48 132.08)
 		)
 		(stroke
@@ -3802,16 +3538,6 @@
 	)
 	(wire
 		(pts
-			(xy 129.54 142.24) (xy 132.08 142.24)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "8076c70f-1661-4862-9dd3-0cf806f4d093")
-	)
-	(wire
-		(pts
 			(xy 105.41 63.5) (xy 115.57 63.5)
 		)
 		(stroke
@@ -3832,6 +3558,16 @@
 	)
 	(wire
 		(pts
+			(xy 99.06 137.16) (xy 111.76 137.16)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "90c3ea2f-d628-4efd-9461-30967d033f6d")
+	)
+	(wire
+		(pts
 			(xy 54.61 59.69) (xy 63.5 59.69)
 		)
 		(stroke
@@ -3839,16 +3575,6 @@
 			(type default)
 		)
 		(uuid "92f5832b-1490-42fe-92de-69c508403e13")
-	)
-	(wire
-		(pts
-			(xy 99.06 137.16) (xy 105.41 137.16)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "92f7083d-8783-4e76-9305-87829f983a94")
 	)
 	(wire
 		(pts
@@ -4284,9 +4010,9 @@
 			)
 		)
 	)
-	(global_label "EL_PANEL+"
+	(global_label "EL_DRIVER+"
 		(shape output)
-		(at 132.08 137.16 0)
+		(at 111.76 137.16 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -4296,7 +4022,7 @@
 		)
 		(uuid "5b0499d2-d5db-44a0-bf38-463c61730fac")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 145.6485 137.16 0)
+			(at 126.1147 137.16 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4368,28 +4094,6 @@
 					(size 1.27 1.27)
 				)
 				(justify right)
-				(hide yes)
-			)
-		)
-	)
-	(global_label "EL_PANEL-"
-		(shape output)
-		(at 132.08 142.24 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid "afbfddfd-1197-4f45-8cef-b4bd54d8906d")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 145.6485 142.24 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
 				(hide yes)
 			)
 		)
@@ -4501,79 +4205,6 @@
 				)
 				(justify right)
 				(hide yes)
-			)
-		)
-	)
-	(symbol
-		(lib_id "CustomSymbols:EL_INVERTER")
-		(at 118.11 139.7 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "07463f0b-34b5-47e7-98ad-5e7fa7b0466c")
-		(property "Reference" "U4"
-			(at 117.475 125.73 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "~"
-			(at 117.475 128.27 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "CustomFootprints:DFR052 DC regulator"
-			(at 118.11 139.7 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "https://www.dfrobot.com/product-2584.html"
-			(at 117.475 130.81 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "EL INVERTER"
-			(at 117.475 133.35 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "4"
-			(uuid "df2a4dd0-096e-46d2-9263-1d6cd90b9498")
-		)
-		(pin "1"
-			(uuid "41a3981c-71ad-4bab-a811-b8a9323460ed")
-		)
-		(pin "2"
-			(uuid "d197c868-d238-47ba-8b92-cf0a4237ff68")
-		)
-		(pin "3"
-			(uuid "8b05b4b4-d48f-4059-b1ea-f59fc27b47bc")
-		)
-		(instances
-			(project ""
-				(path "/c93103f3-9ac9-4319-baa6-df31525a6c92"
-					(reference "U4")
-					(unit 1)
-				)
 			)
 		)
 	)
@@ -4703,73 +4334,6 @@
 			(project "ascom-flat-panel"
 				(path "/c93103f3-9ac9-4319-baa6-df31525a6c92"
 					(reference "#PWR018")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_name "GND_4")
-		(lib_id "power:GND")
-		(at 99.06 142.24 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "14bf7fe5-4e03-4e18-8574-057788dd30aa")
-		(property "Reference" "#PWR019"
-			(at 99.06 148.59 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "GND"
-			(at 99.06 147.32 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 99.06 142.24 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 99.06 142.24 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 99.06 142.24 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "7cae2538-af13-4120-ac17-3048dabd9a71")
-		)
-		(instances
-			(project ""
-				(path "/c93103f3-9ac9-4319-baa6-df31525a6c92"
-					(reference "#PWR019")
 					(unit 1)
 				)
 			)
