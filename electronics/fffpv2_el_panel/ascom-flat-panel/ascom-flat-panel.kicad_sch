@@ -4802,7 +4802,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Capacitor_THT:C_Disc_D3.0mm_W1.6mm_P2.50mm"
 			(at 68.2752 149.86 0)
 			(effects
 				(font
@@ -5144,7 +5144,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Package_DIP:DIP-8_W7.62mm"
 			(at 160.02 139.7 0)
 			(effects
 				(font
@@ -7490,7 +7490,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Package_DIP:DIP-8_W7.62mm"
 			(at 91.44 137.16 0)
 			(effects
 				(font
@@ -7560,7 +7560,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "d52189c7-7704-4ded-a534-d60d0271fb38")
-		(property "Reference" "Rf"
+		(property "Reference" "Rf1"
 			(at 91.44 123.19 90)
 			(effects
 				(font
@@ -7612,7 +7612,7 @@
 		(instances
 			(project "ascom-flat-panel"
 				(path "/c93103f3-9ac9-4319-baa6-df31525a6c92"
-					(reference "Rf")
+					(reference "Rf1")
 					(unit 1)
 				)
 			)
@@ -7627,7 +7627,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "ecb1529c-f47f-4bcb-bdb7-283d242831cf")
-		(property "Reference" "Rin"
+		(property "Reference" "Rin1"
 			(at 75.692 145.288 0)
 			(effects
 				(font
@@ -7680,7 +7680,7 @@
 		(instances
 			(project "ascom-flat-panel"
 				(path "/c93103f3-9ac9-4319-baa6-df31525a6c92"
-					(reference "Rin")
+					(reference "Rin1")
 					(unit 1)
 				)
 			)
