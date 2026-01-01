@@ -1,0 +1,5 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "DFR0952_DC_DC_ChatGPT")(type "KiCad")(uri "${KIPRJMOD}/DFR0952_DC_DC_ChatGPT.kicad_sym")(options "")(descr ""))
+  (lib (name "CustomSymbols")(type "KiCad")(uri "${KIPRJMOD}/CustomSymbols.kicad_sym")(options "")(descr ""))
+)
