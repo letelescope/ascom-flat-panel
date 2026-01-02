@@ -3405,16 +3405,6 @@
 	)
 	(wire
 		(pts
-			(xy 67.31 171.45) (xy 74.93 171.45)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "36964312-ede3-4641-820a-b36117444195")
-	)
-	(wire
-		(pts
 			(xy 237.49 35.56) (xy 255.27 35.56)
 		)
 		(stroke
@@ -3452,6 +3442,26 @@
 			(type default)
 		)
 		(uuid "45225116-bc21-42d9-b0c2-660e499ff017")
+	)
+	(wire
+		(pts
+			(xy 72.39 173.99) (xy 72.39 171.45)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "48e2389c-021c-4509-a251-249cc435aeb3")
+	)
+	(wire
+		(pts
+			(xy 72.39 171.45) (xy 74.93 171.45)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "507bbef2-c678-4171-891f-e3de98d1b7f6")
 	)
 	(wire
 		(pts
@@ -3495,7 +3505,7 @@
 	)
 	(wire
 		(pts
-			(xy 67.31 168.91) (xy 74.93 168.91)
+			(xy 72.39 168.91) (xy 74.93 168.91)
 		)
 		(stroke
 			(width 0)
@@ -3939,28 +3949,6 @@
 			)
 		)
 	)
-	(global_label "EL PANEL CONTROL CIRCUIT"
-		(shape input)
-		(at 67.31 171.45 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "3b19389b-962a-47c7-b194-f4cf67615eb7")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 37.5338 171.45 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-				(hide yes)
-			)
-		)
-	)
 	(global_label "SERVO GND"
 		(shape input)
 		(at 237.744 33.02 180)
@@ -4117,7 +4105,7 @@
 	)
 	(global_label "EL_DRIVER+"
 		(shape input)
-		(at 67.31 168.91 180)
+		(at 72.39 168.91 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -4127,7 +4115,7 @@
 		)
 		(uuid "838cfa0e-2545-44ff-bb71-5eb1818082ff")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 52.9553 168.91 0)
+			(at 58.0353 168.91 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7375,6 +7363,70 @@
 			(project "ascom-flat-panel"
 				(path "/c93103f3-9ac9-4319-baa6-df31525a6c92"
 					(reference "#PWR011")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 72.39 173.99 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "f741a212-1a06-45a4-98af-597410d5361d")
+		(property "Reference" "#PWR06"
+			(at 72.39 180.34 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 72.39 178.054 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 72.39 173.99 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 72.39 173.99 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 72.39 173.99 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "ac2ca97d-ef3a-4fa6-a1df-7689e32b6966")
+		)
+		(instances
+			(project "ascom-flat-panel"
+				(path "/c93103f3-9ac9-4319-baa6-df31525a6c92"
+					(reference "#PWR06")
 					(unit 1)
 				)
 			)
