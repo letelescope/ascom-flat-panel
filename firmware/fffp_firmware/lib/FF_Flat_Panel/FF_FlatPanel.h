@@ -51,6 +51,8 @@ void update_panel_cover();
  ***********************************************/
 void cmd_ping(const String args);
 void cmd_info(const String args);
+void cmd_version(const String args);
+void cmd_max_brightness(const String args);
 void cmd_brightness_get(const String args);
 void cmd_brightness_set(const String args);
 void cmd_brightness_reset(const String args);
@@ -76,6 +78,7 @@ void serialize_error(String error);
 void cond_serialize_error(String error, bool verbose);
 bool has_only_zeros(String num);
 void set_brightness();
+String full_version();
 int powerUpServo();
 void powerDownServo();
 int get_current_servo_pos();
