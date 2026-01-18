@@ -72,7 +72,6 @@ namespace ASCOM.LeTelescopeFFFP.CoverCalibrator
         // Expected restults
         private const string GENERIC_RSLT_OK = "OK";
         private const string PING_RSLT_PONG = "PONG";
-        private const int MAX_BRIGHTNESS = 2047; // Maybe could be given by the hardware for better flexibility
         private const int MIN_BRIGNTESS = 0;
 
 
@@ -615,7 +614,7 @@ namespace ASCOM.LeTelescopeFFFP.CoverCalibrator
                     throw new InvalidOperationException($"Invalid response {response} from device. Hardware may be in a weird state");
                 }
 
-                if (brightness < MIN_BRIGNTESS || brightness > MAX_BRIGHTNESS)
+                if (brightness < MIN_BRIGNTESS || brightness > panelMaxBrightness)
                 {
                     LogMessage(identifier, $"Invalid response {response} from device. Hardware may be in a weird state");
                     throw new InvalidOperationException($"Invalid response {response} from device. Hardware may be in a weird state");
@@ -632,8 +631,8 @@ namespace ASCOM.LeTelescopeFFFP.CoverCalibrator
         {
             get
             {
-                LogMessage("MaxBrightness Get", $"{MAX_BRIGHTNESS}");
-                return MAX_BRIGHTNESS;
+                LogMessage("MaxBrightness Get", $"{panelMaxBrightness}");
+                return panelMaxBrightness;
             }
         }
 
@@ -645,10 +644,10 @@ namespace ASCOM.LeTelescopeFFFP.CoverCalibrator
         {
             var identifier = "CalibratorOn";
 
-            if (Brightness < MIN_BRIGNTESS && Brightness > MAX_BRIGHTNESS)
+            if (Brightness < MIN_BRIGNTESS && Brightness > panelMaxBrightness)
             {
-                LogMessage(identifier, $"Invalid brightness {Brightness}. Should be an int ranging from {MIN_BRIGNTESS} to {MAX_BRIGHTNESS}");
-                throw new InvalidOperationException($"Invalid brightness {Brightness}. Should be an int ranging from {MIN_BRIGNTESS} to {MAX_BRIGHTNESS}");
+                LogMessage(identifier, $"Invalid brightness {Brightness}. Should be an int ranging from {MIN_BRIGNTESS} to {panelMaxBrightness}");
+                throw new InvalidOperationException($"Invalid brightness {Brightness}. Should be an int ranging from {MIN_BRIGNTESS} to {panelMaxBrightness}");
 
             }
 
