@@ -413,7 +413,7 @@ namespace ASCOM.LeTelescopeFFFP.CoverCalibrator
             {
                 Version version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
                 // TODO customise this driver description if required
-                string driverInfo = $"Le Telescope FFFP ASCOM CoverCalibrator driver . Version: {version.Major}.{version.Minor}";
+                string driverInfo = $"Le Telescope FFFP ASCOM CoverCalibrator driver.\nVersion: {version.Major}.{version.Minor}. Firmware version: {firmwareVersion}";
                 LogMessage("DriverInfo Get", driverInfo);
                 return driverInfo;
             }
