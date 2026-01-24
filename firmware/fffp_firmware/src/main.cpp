@@ -333,6 +333,18 @@ void setup()
   analogWriteResolution(10); // Set DAC resolution to 10 bits
 #endif
 
+  // initializing panel brig
+  panel.brightness = 0;
+  set_brightness();
+
+  panel.servo_position = 0;
+  panel.position_convergence_counter = 0;
+  panel.last_step_time = 0L;
+  panel.last_cal_check_time = 0L;
+
+  // Read servo calibration data oin Flash storage:
+  panel.calibration = nvm_store.read();
+
   // start serial port at 57600 bps:
   Serial.begin(57600);
   // Let's wait for an actual connection on the serial port.
@@ -348,17 +360,6 @@ void setup()
   // Start pwm
   pwm_controller.startPWM();
 #endif
-
-  // initializing panel
-  panel.brightness = 0;
-  set_brightness();
-  panel.servo_position = 0;
-  panel.position_convergence_counter = 0;
-  panel.last_step_time = 0L;
-  panel.last_cal_check_time = 0L;
-
-  // Read servo calibration data oin Flash storage:
-  panel.calibration = nvm_store.read();
 
   // When there is no calibration data yet, we have to assume that the cover is closed...
   if (!is_panel_calibrated())
