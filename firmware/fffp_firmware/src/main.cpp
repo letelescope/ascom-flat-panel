@@ -316,6 +316,20 @@ FlashStorage(nvm_store, servo_cal_state_t);
  */
 void setup()
 {
+  // Make sure everything is off. 
+  // Reset all pins values
+  analogWrite(A0, 0);
+  analogWrite(A1, 0);
+  analogWrite(A2, 0);
+  analogWrite(A3, 0);
+  analogWrite(A4, 0);
+  analogWrite(A5, 0);
+  analogWrite(A6, 0);
+  analogWrite(A7, 0);
+  analogWrite(A8, 0);
+  analogWrite(A9, 0);
+  analogWrite(A10, 0);
+  
   // Make sure the RX, TX, and built-in LEDs don't turn on, they are very bright!
   // Even though the board is inside an enclosure, the light can be seen shining
   // through the small opening for the USB connector! Unfortunately, it is not
