@@ -97,6 +97,7 @@
   <ItemGroup>
     <Content Include="ASCOM.ico" />
     <Content Include="ASCOM.png" />
+    <Content Include="loading_wheel.gif" />
     <Content Include="ReadMe.htm" />
   </ItemGroup>
   <ItemGroup>

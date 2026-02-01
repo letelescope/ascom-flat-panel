@@ -40,7 +40,9 @@ Source: ".\bin\Release\ASCOM.LeTelescopeFFFP.exe"; DestDir: "{app}"
 ; Require a read-me HTML to appear after installation, maybe driver's Help doc
 Source: ".\ReadMe.htm"; DestDir: "{app}"; Flags: isreadme
 ; TODO: Add other files needed by your driver here (add subfolders above)
-
+Source: ".\ASCOM.png"; DestDir: "{app}"; 
+Source: ".\LogoLetelescope.png"; DestDir: "{app}"; 
+Source: ".\LogoGithub.png"; DestDir: "{app}"; 
 
 ; Only if driver is .NET
 [Run]

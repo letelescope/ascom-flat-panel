@@ -59,6 +59,7 @@ namespace ASCOM.LeTelescopeFFFP.CoverCalibrator
             this.version_rslt_lbl = new System.Windows.Forms.Label();
             this.maxbrightness_rslt_lbl = new System.Windows.Forms.Label();
             this.maxbrightness_lbl = new System.Windows.Forms.Label();
+            this.progress = new System.Windows.Forms.ProgressBar();
             ((System.ComponentModel.ISupportInitialize)(this.picASCOM)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.leTelescopeLogoBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gitHubLogoBox)).BeginInit();
@@ -69,10 +70,10 @@ namespace ASCOM.LeTelescopeFFFP.CoverCalibrator
             // 
             this.cmdOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.cmdOK.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.cmdOK.Location = new System.Drawing.Point(401, 174);
-            this.cmdOK.Margin = new System.Windows.Forms.Padding(4);
+            this.cmdOK.Location = new System.Drawing.Point(535, 214);
+            this.cmdOK.Margin = new System.Windows.Forms.Padding(5);
             this.cmdOK.Name = "cmdOK";
-            this.cmdOK.Size = new System.Drawing.Size(79, 28);
+            this.cmdOK.Size = new System.Drawing.Size(105, 34);
             this.cmdOK.TabIndex = 0;
             this.cmdOK.Text = "OK";
             this.cmdOK.UseVisualStyleBackColor = true;
@@ -82,10 +83,10 @@ namespace ASCOM.LeTelescopeFFFP.CoverCalibrator
             // 
             this.cmdCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.cmdCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.cmdCancel.Location = new System.Drawing.Point(401, 208);
-            this.cmdCancel.Margin = new System.Windows.Forms.Padding(4);
+            this.cmdCancel.Location = new System.Drawing.Point(535, 256);
+            this.cmdCancel.Margin = new System.Windows.Forms.Padding(5);
             this.cmdCancel.Name = "cmdCancel";
-            this.cmdCancel.Size = new System.Drawing.Size(79, 29);
+            this.cmdCancel.Size = new System.Drawing.Size(105, 36);
             this.cmdCancel.TabIndex = 1;
             this.cmdCancel.Text = "Cancel";
             this.cmdCancel.UseVisualStyleBackColor = true;
@@ -95,10 +96,10 @@ namespace ASCOM.LeTelescopeFFFP.CoverCalibrator
             // 
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-            this.label1.Location = new System.Drawing.Point(10, 9);
-            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label1.Location = new System.Drawing.Point(13, 11);
+            this.label1.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(347, 36);
+            this.label1.Size = new System.Drawing.Size(463, 44);
             this.label1.TabIndex = 2;
             this.label1.Text = "Le Telescope Flat Panel ASCOM driver";
             // 
@@ -107,10 +108,10 @@ namespace ASCOM.LeTelescopeFFFP.CoverCalibrator
             this.picASCOM.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.picASCOM.Cursor = System.Windows.Forms.Cursors.Hand;
             this.picASCOM.Image = ((System.Drawing.Image)(resources.GetObject("picASCOM.Image")));
-            this.picASCOM.Location = new System.Drawing.Point(3, 211);
-            this.picASCOM.Margin = new System.Windows.Forms.Padding(4);
+            this.picASCOM.Location = new System.Drawing.Point(4, 260);
+            this.picASCOM.Margin = new System.Windows.Forms.Padding(5);
             this.picASCOM.Name = "picASCOM";
-            this.picASCOM.Size = new System.Drawing.Size(24, 26);
+            this.picASCOM.Size = new System.Drawing.Size(32, 32);
             this.picASCOM.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.picASCOM.TabIndex = 3;
             this.picASCOM.TabStop = false;
@@ -120,10 +121,10 @@ namespace ASCOM.LeTelescopeFFFP.CoverCalibrator
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(32, 106);
-            this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label2.Location = new System.Drawing.Point(43, 130);
+            this.label2.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(58, 13);
+            this.label2.Size = new System.Drawing.Size(73, 16);
             this.label2.TabIndex = 5;
             this.label2.Text = "Comm Port";
             this.label2.TextAlign = System.Drawing.ContentAlignment.TopRight;
@@ -131,10 +132,10 @@ namespace ASCOM.LeTelescopeFFFP.CoverCalibrator
             // chkTrace
             // 
             this.chkTrace.AutoSize = true;
-            this.chkTrace.Location = new System.Drawing.Point(113, 213);
-            this.chkTrace.Margin = new System.Windows.Forms.Padding(4);
+            this.chkTrace.Location = new System.Drawing.Point(151, 262);
+            this.chkTrace.Margin = new System.Windows.Forms.Padding(5);
             this.chkTrace.Name = "chkTrace";
-            this.chkTrace.Size = new System.Drawing.Size(69, 17);
+            this.chkTrace.Size = new System.Drawing.Size(83, 20);
             this.chkTrace.TabIndex = 6;
             this.chkTrace.Text = "Trace on";
             this.chkTrace.UseVisualStyleBackColor = true;
@@ -142,10 +143,10 @@ namespace ASCOM.LeTelescopeFFFP.CoverCalibrator
             // comboBoxComPort
             // 
             this.comboBoxComPort.FormattingEnabled = true;
-            this.comboBoxComPort.Location = new System.Drawing.Point(113, 100);
-            this.comboBoxComPort.Margin = new System.Windows.Forms.Padding(4);
+            this.comboBoxComPort.Location = new System.Drawing.Point(151, 123);
+            this.comboBoxComPort.Margin = new System.Windows.Forms.Padding(5);
             this.comboBoxComPort.Name = "comboBoxComPort";
-            this.comboBoxComPort.Size = new System.Drawing.Size(176, 21);
+            this.comboBoxComPort.Size = new System.Drawing.Size(233, 24);
             this.comboBoxComPort.TabIndex = 7;
             this.comboBoxComPort.SelectedIndexChanged += new System.EventHandler(this.comboBoxComPort_SelectedIndexChanged);
             // 
@@ -154,10 +155,10 @@ namespace ASCOM.LeTelescopeFFFP.CoverCalibrator
             this.leTelescopeLogoBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.leTelescopeLogoBox.Cursor = System.Windows.Forms.Cursors.Hand;
             this.leTelescopeLogoBox.Image = ((System.Drawing.Image)(resources.GetObject("leTelescopeLogoBox.Image")));
-            this.leTelescopeLogoBox.Location = new System.Drawing.Point(424, 9);
-            this.leTelescopeLogoBox.Margin = new System.Windows.Forms.Padding(4);
+            this.leTelescopeLogoBox.Location = new System.Drawing.Point(565, 11);
+            this.leTelescopeLogoBox.Margin = new System.Windows.Forms.Padding(5);
             this.leTelescopeLogoBox.Name = "leTelescopeLogoBox";
-            this.leTelescopeLogoBox.Size = new System.Drawing.Size(56, 52);
+            this.leTelescopeLogoBox.Size = new System.Drawing.Size(75, 64);
             this.leTelescopeLogoBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.leTelescopeLogoBox.TabIndex = 8;
             this.leTelescopeLogoBox.TabStop = false;
@@ -168,10 +169,10 @@ namespace ASCOM.LeTelescopeFFFP.CoverCalibrator
             this.gitHubLogoBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.gitHubLogoBox.Cursor = System.Windows.Forms.Cursors.Hand;
             this.gitHubLogoBox.Image = ((System.Drawing.Image)(resources.GetObject("gitHubLogoBox.Image")));
-            this.gitHubLogoBox.Location = new System.Drawing.Point(35, 211);
-            this.gitHubLogoBox.Margin = new System.Windows.Forms.Padding(4);
+            this.gitHubLogoBox.Location = new System.Drawing.Point(47, 260);
+            this.gitHubLogoBox.Margin = new System.Windows.Forms.Padding(5);
             this.gitHubLogoBox.Name = "gitHubLogoBox";
-            this.gitHubLogoBox.Size = new System.Drawing.Size(28, 26);
+            this.gitHubLogoBox.Size = new System.Drawing.Size(37, 32);
             this.gitHubLogoBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.gitHubLogoBox.TabIndex = 9;
             this.gitHubLogoBox.TabStop = false;
@@ -182,18 +183,19 @@ namespace ASCOM.LeTelescopeFFFP.CoverCalibrator
             this.panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(24)))), ((int)(((byte)(28)))), ((int)(((byte)(42)))));
             this.panel1.Controls.Add(this.label1);
             this.panel1.Controls.Add(this.leTelescopeLogoBox);
-            this.panel1.Location = new System.Drawing.Point(-3, 0);
+            this.panel1.Location = new System.Drawing.Point(-4, 0);
+            this.panel1.Margin = new System.Windows.Forms.Padding(4);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(496, 82);
+            this.panel1.Size = new System.Drawing.Size(661, 101);
             this.panel1.TabIndex = 10;
             // 
             // buttonCheck
             // 
             this.buttonCheck.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonCheck.Location = new System.Drawing.Point(297, 98);
-            this.buttonCheck.Margin = new System.Windows.Forms.Padding(4);
+            this.buttonCheck.Location = new System.Drawing.Point(396, 121);
+            this.buttonCheck.Margin = new System.Windows.Forms.Padding(5);
             this.buttonCheck.Name = "buttonCheck";
-            this.buttonCheck.Size = new System.Drawing.Size(79, 28);
+            this.buttonCheck.Size = new System.Drawing.Size(105, 34);
             this.buttonCheck.TabIndex = 11;
             this.buttonCheck.Text = "Check";
             this.buttonCheck.UseVisualStyleBackColor = true;
@@ -202,11 +204,11 @@ namespace ASCOM.LeTelescopeFFFP.CoverCalibrator
             // version_lbl
             // 
             this.version_lbl.AutoSize = true;
-            this.version_lbl.Location = new System.Drawing.Point(45, 161);
-            this.version_lbl.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.version_lbl.Location = new System.Drawing.Point(60, 198);
+            this.version_lbl.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
             this.version_lbl.Name = "version_lbl";
             this.version_lbl.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.version_lbl.Size = new System.Drawing.Size(45, 13);
+            this.version_lbl.Size = new System.Drawing.Size(56, 16);
             this.version_lbl.TabIndex = 12;
             this.version_lbl.Text = "Version:";
             this.version_lbl.TextAlign = System.Drawing.ContentAlignment.TopRight;
@@ -214,10 +216,10 @@ namespace ASCOM.LeTelescopeFFFP.CoverCalibrator
             // FirmwareInfo
             // 
             this.FirmwareInfo.AutoSize = true;
-            this.FirmwareInfo.Location = new System.Drawing.Point(62, 129);
-            this.FirmwareInfo.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.FirmwareInfo.Location = new System.Drawing.Point(83, 159);
+            this.FirmwareInfo.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
             this.FirmwareInfo.Name = "FirmwareInfo";
-            this.FirmwareInfo.Size = new System.Drawing.Size(28, 13);
+            this.FirmwareInfo.Size = new System.Drawing.Size(31, 16);
             this.FirmwareInfo.TabIndex = 14;
             this.FirmwareInfo.Text = "Info:";
             this.FirmwareInfo.TextAlign = System.Drawing.ContentAlignment.TopRight;
@@ -225,53 +227,63 @@ namespace ASCOM.LeTelescopeFFFP.CoverCalibrator
             // info_rslt_lbl
             // 
             this.info_rslt_lbl.AutoSize = true;
-            this.info_rslt_lbl.Location = new System.Drawing.Point(110, 129);
-            this.info_rslt_lbl.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.info_rslt_lbl.Location = new System.Drawing.Point(147, 159);
+            this.info_rslt_lbl.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
             this.info_rslt_lbl.Name = "info_rslt_lbl";
-            this.info_rslt_lbl.Size = new System.Drawing.Size(10, 13);
+            this.info_rslt_lbl.Size = new System.Drawing.Size(11, 16);
             this.info_rslt_lbl.TabIndex = 15;
             this.info_rslt_lbl.Text = "-";
             // 
             // version_rslt_lbl
             // 
             this.version_rslt_lbl.AutoSize = true;
-            this.version_rslt_lbl.Location = new System.Drawing.Point(110, 161);
-            this.version_rslt_lbl.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.version_rslt_lbl.Location = new System.Drawing.Point(147, 198);
+            this.version_rslt_lbl.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
             this.version_rslt_lbl.Name = "version_rslt_lbl";
             this.version_rslt_lbl.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.version_rslt_lbl.Size = new System.Drawing.Size(10, 13);
+            this.version_rslt_lbl.Size = new System.Drawing.Size(11, 16);
             this.version_rslt_lbl.TabIndex = 16;
             this.version_rslt_lbl.Text = "-";
             // 
             // maxbrightness_rslt_lbl
             // 
             this.maxbrightness_rslt_lbl.AutoSize = true;
-            this.maxbrightness_rslt_lbl.Location = new System.Drawing.Point(110, 177);
-            this.maxbrightness_rslt_lbl.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.maxbrightness_rslt_lbl.Location = new System.Drawing.Point(147, 218);
+            this.maxbrightness_rslt_lbl.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
             this.maxbrightness_rslt_lbl.Name = "maxbrightness_rslt_lbl";
             this.maxbrightness_rslt_lbl.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.maxbrightness_rslt_lbl.Size = new System.Drawing.Size(10, 13);
+            this.maxbrightness_rslt_lbl.Size = new System.Drawing.Size(11, 16);
             this.maxbrightness_rslt_lbl.TabIndex = 18;
             this.maxbrightness_rslt_lbl.Text = "-";
             // 
             // maxbrightness_lbl
             // 
             this.maxbrightness_lbl.AutoSize = true;
-            this.maxbrightness_lbl.Location = new System.Drawing.Point(9, 177);
-            this.maxbrightness_lbl.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.maxbrightness_lbl.Location = new System.Drawing.Point(12, 218);
+            this.maxbrightness_lbl.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
             this.maxbrightness_lbl.Name = "maxbrightness_lbl";
             this.maxbrightness_lbl.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.maxbrightness_lbl.Size = new System.Drawing.Size(81, 13);
+            this.maxbrightness_lbl.Size = new System.Drawing.Size(100, 16);
             this.maxbrightness_lbl.TabIndex = 17;
             this.maxbrightness_lbl.Text = "Max brigthness:";
             this.maxbrightness_lbl.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
+            // progress
+            // 
+            this.progress.Location = new System.Drawing.Point(242, 259);
+            this.progress.Maximum = 60;
+            this.progress.Name = "progress";
+            this.progress.Size = new System.Drawing.Size(273, 23);
+            this.progress.TabIndex = 20;
+            this.progress.Visible = false;
+            // 
             // SetupDialogForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(493, 240);
+            this.ClientSize = new System.Drawing.Size(657, 295);
+            this.Controls.Add(this.progress);
             this.Controls.Add(this.maxbrightness_rslt_lbl);
             this.Controls.Add(this.maxbrightness_lbl);
             this.Controls.Add(this.version_rslt_lbl);
@@ -290,7 +302,7 @@ namespace ASCOM.LeTelescopeFFFP.CoverCalibrator
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(4);
+            this.Margin = new System.Windows.Forms.Padding(5);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "SetupDialogForm";
@@ -326,5 +338,6 @@ namespace ASCOM.LeTelescopeFFFP.CoverCalibrator
         private System.Windows.Forms.Label version_rslt_lbl;
         private System.Windows.Forms.Label maxbrightness_rslt_lbl;
         private System.Windows.Forms.Label maxbrightness_lbl;
+        private System.Windows.Forms.ProgressBar progress;
     }
 }

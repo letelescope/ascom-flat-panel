@@ -197,45 +197,56 @@ namespace ASCOM.LeTelescopeFFFP.CoverCalibrator
 
             string old_port = CoverCalibratorHardware.comPort;
 
-            buttonCheck.Enabled = false;
-            CoverCalibratorHardware.comPort = (string)comboBoxComPort.SelectedItem;
-            CoverCalibratorHardware.SetConnected(Guid, true);
-
-            string device_firmware_info;
-            string device_firmware_version;
-            int device_firmware_max_brightness;
             try
             {
-                device_firmware_info = CoverCalibratorHardware.FirmwareInfoFromDevice();
-                device_firmware_version = CoverCalibratorHardware.FirmwareVersionFromDevice();
-                device_firmware_max_brightness = CoverCalibratorHardware.FirmwareMaxBrightnessFromDevice();
 
+                progress.Visible = true;
+                buttonCheck.Enabled = false;
+                CoverCalibratorHardware.comPort = (string)comboBoxComPort.SelectedItem;
+                CoverCalibratorHardware.SetConnected(Guid, true);
+                progress.PerformStep();
+                string device_firmware_info;
+                string device_firmware_version;
+                int device_firmware_max_brightness;
+
+                device_firmware_info = CoverCalibratorHardware.FirmwareInfoFromDevice();
+                progress.PerformStep();
+                device_firmware_version = CoverCalibratorHardware.FirmwareVersionFromDevice();
+                progress.PerformStep();
+                device_firmware_max_brightness = CoverCalibratorHardware.FirmwareMaxBrightnessFromDevice();
+                progress.PerformStep();
+                info_rslt_lbl.Text = device_firmware_info.Replace(". Buil", ".\nBuil");
+                version_rslt_lbl.Text = device_firmware_version;
+                maxbrightness_rslt_lbl.Text = "" + device_firmware_max_brightness;
+
+
+                if (!checkEnableOk())
+                {
+                    CoverCalibratorHardware.comPort = old_port;
+                }
+                progress.PerformStep();
             }
             catch (Exception ex)
             {
                 tl.LogMessage("Check device", $"Sending info requests to device failed {ex}");
+                MessageBox.Show($"Sending information requests to device failed {ex}");
                 CoverCalibratorHardware.comPort = old_port;
-                CoverCalibratorHardware.SetConnected(Guid, false);
-                buttonCheck.Enabled = true;
-                return;
             }
-
-
-            info_rslt_lbl.Text = device_firmware_info.Replace(". Buil",".\nBuil");
-            version_rslt_lbl.Text = device_firmware_version;
-            maxbrightness_rslt_lbl.Text = "" + device_firmware_max_brightness;
-
-
-            if (!checkEnableOk())
+            finally
             {
-                CoverCalibratorHardware.comPort = old_port;
-                CoverCalibratorHardware.SetConnected(Guid, false);
-                buttonCheck.Enabled = true;
-                return;
+                buttonCheck.Enabled = true; 
+                try
+                {
+                    CoverCalibratorHardware.SetConnected(Guid, false);
+                    progress.PerformStep();
+                }
+                catch (Exception ex)
+                {
+                    tl.LogMessage("Check device", $"Failed disconnecting from device {ex}");
+                }
+                progress.Value = 0;
+                progress.Visible = false;
             }
-
-            CoverCalibratorHardware.SetConnected(Guid, false);
-            buttonCheck.Enabled = true;
 
         }
         private bool checkEnableOk()
