@@ -271,7 +271,7 @@ namespace ASCOM.LeTelescopeFFFP.CoverCalibrator
             // progress
             // 
             this.progress.Location = new System.Drawing.Point(242, 259);
-            this.progress.Maximum = 60;
+            this.progress.Maximum = 50;
             this.progress.Name = "progress";
             this.progress.Size = new System.Drawing.Size(273, 23);
             this.progress.TabIndex = 20;
