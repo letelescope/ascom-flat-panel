@@ -16,6 +16,7 @@
     .page-header .header-logos { display:flex; gap:12px; align-items:center }
     .page-header .header-logos img { height:72px; display:block }
     .header-logos img.github { filter: invert(1); }
+    .header-logos a:focus, a:active { outline:3px solid rgb(244, 244, 244); outline-offset:2px; }
 
     main h2 { font-size:16px; margin-bottom:6px; }
     main p:first-of-type { margin-bottom:12px; }
@@ -27,7 +28,7 @@
     .muted { color:#555; font-size:14px; text-align:center; }
     .muted a { color:#003366; }
     a { color:#0b66c3; text-decoration:underline; }
-    a:focus, a:active { outline:3px solid #ffbf47; outline-offset:2px; }
+    a:focus, a:active { outline:3px solid #003366; outline-offset:2px; }
 
     @media (max-width:560px){ .page-header{flex-direction:column;align-items:flex-start} .page-header .header-logos{margin-top:8px} }
   </style>
@@ -37,13 +38,13 @@
   <header class="page-header">
     <h1 class="header-title">Le Télescope FFFP</h1>
     <div class="header-logos">
-      <a href="https://letelescope.fr/">
+      <a href="https://letelescope.fr/" target="_blank" rel="noopener noreferrer">
         <img alt="Le Telescope" src="LogoLetelescope.png" width="72" height="72" loading="lazy" decoding="async">
       </a>
-      <a href="https://ascom-standards.org/">
+      <a href="https://ascom-standards.org/" target="_blank" rel="noopener noreferrer">
         <img alt="ASCOM standards" src="ASCOM.png" height="72" loading="lazy" decoding="async">
       </a>
-      <a href="https://github.com/letelescope/ascom-flat-panel">
+      <a href="https://github.com/letelescope/ascom-flat-panel" target="_blank" rel="noopener noreferrer">
         <img alt="GitHub repository" src="LogoGithub.png" width="72" height="72" class="github" loading="lazy" decoding="async">
       </a>
     </div>
@@ -65,15 +66,15 @@
   <h2>Notes</h2>
   <ul>
     <li>The installer is unsigned. Windows may show a warning about an unknown publisher — this is expected for community builds.</li>
-    <li>For firmware, electronics and full project documentation visit: <a href="https://github.com/letelescope/ascom-flat-panel">https://github.com/letelescope/ascom-flat-panel</a></li>
+    <li>For firmware, electronics and full project documentation visit: <a href="https://github.com/letelescope/ascom-flat-panel" target="_blank" rel="noopener noreferrer">https://github.com/letelescope/ascom-flat-panel</a></li>
   </ul>
 
-  <p class="muted">If you have any problems, open an issue on the project <a href="https://github.com/letelescope/ascom-flat-panel/issues">GitHub</a></p>
+  <p class="muted">If you have any problems, open an issue on the project <a href="https://github.com/letelescope/ascom-flat-panel/issues" target="_blank" rel="noopener noreferrer">GitHub</a></p>
 
   </main>
   <hr>
   <footer>
-    <p class="muted">Le Télescope — Ivry-sur-Seine • Version: 2.0.0.0 — <a href="https://github.com/letelescope/ascom-flat-panel/releases">Release notes</a></p>
+    <p class="muted">Le Télescope — Ivry-sur-Seine • Version: 2.0.0.0 — <a href="https://github.com/letelescope/ascom-flat-panel/releases" target="_blank" rel="noopener noreferrer">Release notes</a></p>
   </footer>
 </body>
 </html>
