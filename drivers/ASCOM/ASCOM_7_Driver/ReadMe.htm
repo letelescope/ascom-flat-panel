@@ -14,7 +14,13 @@
     .page-header { background-color: rgb(24,28,42); color: rgb(224,224,224); display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-radius:6px; margin-bottom:18px }
     .page-header .header-title { font-size:28px; margin:0; color: rgb(224,224,224); font-weight:normal }
     .page-header .header-logos { display:flex; gap:12px; align-items:center }
-    .page-header .header-logos img { height:48px; display:block }
+    .page-header .header-logos img { height:72px; display:block }
+    .header-logos img.github { filter: invert(1); }
+
+    main h2 { font-size:16px; margin-bottom:6px; }
+    main p:first-of-type { margin-bottom:12px; }
+    hr { margin-top:28px; }
+    footer p.muted { text-align:center; font-size:12px; margin-top:8px; }
 
     body { background-color: rgb(244, 244, 244); font-family: Arial, Helvetica, sans-serif; color:#222; max-width:760px; margin:24px auto; padding:18px; }
     p, li { color:#333; }
@@ -28,35 +34,35 @@
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to content</a>
-  <header class="page-header" role="banner">
+  <header class="page-header">
     <h1 class="header-title">Le Télescope FFFP</h1>
     <div class="header-logos">
       <a href="https://letelescope.fr/">
-        <img alt="Le Telescope" src="LogoLetelescope.png" width="72" height="72" style="height:72px; display:block;" loading="lazy" decoding="async">
+        <img alt="Le Telescope" src="LogoLetelescope.png" width="72" height="72" loading="lazy" decoding="async">
       </a>
       <a href="https://ascom-standards.org/">
-        <img alt="ASCOM standards" src="ASCOM.png" height="72" style="height:72px; display:block;" loading="lazy" decoding="async">
+        <img alt="ASCOM standards" src="ASCOM.png" height="72" loading="lazy" decoding="async">
       </a>
       <a href="https://github.com/letelescope/ascom-flat-panel">
-        <img alt="GitHub repository" src="LogoGithub.png" width="72" height="72" style="height:72px; filter: invert(1); display:block;" loading="lazy" decoding="async">
+        <img alt="GitHub repository" src="LogoGithub.png" width="72" height="72" class="github" loading="lazy" decoding="async">
       </a>
     </div>
   </header>
 
-  <main id="main-content" role="main">
+  <main id="main-content">
 
-  <h2 style="font-size:16px;margin-bottom:6px">ASCOM CoverCalibrator Driver installed</h2>
+  <h2>ASCOM CoverCalibrator Driver installed</h2>
   
-  <p style="margin-bottom:12px">Thank you for installing the <strong>ASCOM CoverCalibrator Driver for Le Telescope FFFP</strong>.</p>
+  <p>Thank you for installing the <strong>ASCOM CoverCalibrator Driver for Le Telescope FFFP</strong>.</p>
 
-  <h2 style="font-size:16px;margin-bottom:6px">Quick checks</h2>
+  <h2>Quick checks</h2>
   <ul>
     <li>Open the <strong>ASCOM Profile Explorer</strong> and confirm the driver is listed as <em>ASCOM CoverCalibrator Driver for Le Telescope FFFP</em>.</li>
     <li>Use the ASCOM <strong>Diagnostics</strong> tools to open the driver, review its properties and <strong>Connect</strong>.</li>
     <li>If needed, check logs in <code>%USERPROFILE%\Documents\ASCOM\Logs</code>.</li>
   </ul>
 
-  <h2 style="font-size:16px;margin-bottom:6px">Notes</h2>
+  <h2>Notes</h2>
   <ul>
     <li>The installer is unsigned. Windows may show a warning about an unknown publisher — this is expected for community builds.</li>
     <li>For firmware, electronics and full project documentation visit: <a href="https://github.com/letelescope/ascom-flat-panel">https://github.com/letelescope/ascom-flat-panel</a></li>
@@ -65,9 +71,9 @@
   <p class="muted">If you have any problems, open an issue on the project <a href="https://github.com/letelescope/ascom-flat-panel/issues">GitHub</a></p>
 
   </main>
-  <hr style="margin-top:28px">
-  <footer role="contentinfo">
-    <p class="muted" style="text-align:center;font-size:12px;margin-top:8px">Le Télescope — Ivry-sur-Seine • Version: 2.0.0.0 — <a href="https://github.com/letelescope/ascom-flat-panel/releases">Release notes</a></p>
+  <hr>
+  <footer>
+    <p class="muted">Le Télescope — Ivry-sur-Seine • Version: 2.0.0.0 — <a href="https://github.com/letelescope/ascom-flat-panel/releases">Release notes</a></p>
   </footer>
 </body>
 </html>
