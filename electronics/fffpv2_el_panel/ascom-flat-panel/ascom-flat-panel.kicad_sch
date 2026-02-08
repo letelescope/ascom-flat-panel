@@ -3812,6 +3812,12 @@
 		(uuid "00cddfee-750b-4757-a1ba-2f0429befd92")
 	)
 	(junction
+		(at 96.52 124.46)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "808099bd-4f2b-487c-9741-f49a2bdb9576")
+	)
+	(junction
 		(at 130.81 40.64)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -4103,7 +4109,7 @@
 	)
 	(wire
 		(pts
-			(xy 96.52 123.19) (xy 96.52 125.73)
+			(xy 96.52 123.19) (xy 96.52 124.46)
 		)
 		(stroke
 			(width 0)
@@ -4213,6 +4219,16 @@
 	)
 	(wire
 		(pts
+			(xy 96.52 124.46) (xy 96.52 125.73)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "9286935a-5c81-4d87-a1ba-e9950d24c32c")
+	)
+	(wire
+		(pts
 			(xy 73.66 55.88) (xy 82.55 55.88)
 		)
 		(stroke
@@ -4230,6 +4246,16 @@
 			(type default)
 		)
 		(uuid "94afd8e9-a018-43d1-a540-f5b3e6b798a1")
+	)
+	(wire
+		(pts
+			(xy 96.52 124.46) (xy 105.41 124.46)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "952fb76e-b9df-43ae-a47e-0224a7b97112")
 	)
 	(wire
 		(pts
@@ -4525,6 +4551,28 @@
 					(size 1.27 1.27)
 				)
 				(justify right)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "EL_DRIVER+"
+		(shape input)
+		(at 105.41 124.46 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "4c327905-b7fb-4c61-a5b7-0d963fe5c9f8")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 119.7647 124.46 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
 				(hide yes)
 			)
 		)
