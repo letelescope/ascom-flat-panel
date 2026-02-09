@@ -5992,7 +5992,7 @@
 	)
 	(gr_circle
 		(center 100 127.5)
-		(end 102 127.5)
+		(end 101.25 127.5)
 		(stroke
 			(width 0.05)
 			(type solid)
