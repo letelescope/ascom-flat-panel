@@ -37,9 +37,9 @@
         "other_text_thickness": 0.15,
         "other_text_upright": false,
         "pads": {
-          "drill": 0.8,
-          "height": 1.27,
-          "width": 2.54
+          "drill": 0.0,
+          "height": 1.5,
+          "width": 1.5
         },
         "silk_line_width": 0.15,
         "silk_text_italic": false,
@@ -80,7 +80,7 @@
           ""
         ],
         [
-          "silk_overlap|119010000|72390400|fa836cbb-f047-434f-acbf-9a8287b578be|74eb98d0-918a-44f9-a65e-99af24c92008",
+          "silk_overlap|119010000|73609600|fa836cbb-f047-434f-acbf-9a8287b578be|74eb98d0-918a-44f9-a65e-99af24c92008",
           ""
         ],
         [
@@ -600,7 +600,7 @@
       "plot": "",
       "pos_files": "",
       "specctra_dsn": "",
-      "step": "ascom-flat-panel.step",
+      "step": "C:/Users/florian/Desktop/ascom-flat-panel.step",
       "svg": "",
       "vrml": ""
     },
