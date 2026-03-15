@@ -1,0 +1,15 @@
+import FreeCAD as App
+
+doc = App.ActiveDocument
+
+for name in [
+    "SpiralPath",
+    "SpiralBinder",
+    "GrooveProfile",
+    "SpiralGroove"
+]:
+    obj = doc.getObject(name)
+    if obj:
+        doc.removeObject(name)
+
+doc.recompute()
