@@ -50,6 +50,7 @@ doc = App.ActiveDocument
 sheet = doc.getObjectsByLabel(sheetname)[0]
 Rmax = sheet.get('spiral_Rmax')
 turns = sheet.get('spiral_turns')
+pipe_thickness = sheet.get('pipe_thickness')
 rotateX = sheet.get('spiral_rotation')
 translateX = sheet.get('panel_body_thickness') - sheet.get('panel_bottom_thickness')
 print("translateX", translateX)
@@ -132,7 +133,7 @@ doc.recompute()
 sketch = body.newObject('Sketcher::SketchObject','GrooveProfile')
 sketch.AttachmentSupport = [(binder, "Edge1")]
 sketch.MapMode = "NormalToEdge"
-s = 0.8
+s = pipe_thickness
 sketch.addGeometry(Part.LineSegment(App.Vector(-s,-s/2,0),App.Vector(s,-s/2,0)))
 sketch.addGeometry(Part.LineSegment(App.Vector(s,-s/2,0),App.Vector(s,s/2,0)))
 sketch.addGeometry(Part.LineSegment(App.Vector(s,s/2,0),App.Vector(-s,s/2,0)))
@@ -154,3 +155,10 @@ sketch.ViewObject.Visibility = False
 
 #recalcul du modèle
 doc.recompute()
+
+print("Recap : ")
+V=12 #V
+R_per_m = sheet.get('wire_resistivity')  # Ω/m
+L = (spiral1.Length + spiral2.Length) / 1000
+R = R_per_m * L
+print(f"L={L:.2f} m | R={R:.1f} Ω | P={V**2 / R:.1f} W")
