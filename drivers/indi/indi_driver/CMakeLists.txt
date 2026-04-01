@@ -7,9 +7,11 @@
 # Authors:	    Florian Thibaud	
 #               Florian Gautier
 
+cmake_minimum_required(VERSION 3.28)
+
 # define the project name
-project(indi-ffpv1-flatpanel C CXX)
-cmake_minimum_required(VERSION 2.8)
+project(indi-letelescope-fffp-flatpanel C CXX)
+
 
 include(GNUInstallDirs)
 
@@ -17,7 +19,7 @@ include(GNUInstallDirs)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules/")
 
 # find our required packages
-find_package(INDI 1.8 REQUIRED)
+find_package(INDI REQUIRED)
 find_package(Nova REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(GSL REQUIRED)
@@ -34,8 +36,8 @@ configure_file(
 
 # do the replacement in the driver's xml file
 configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/indi_fffpv1_flatpanel.xml.cmake
-    ${CMAKE_CURRENT_BINARY_DIR}/indi_fffpv1_flatpanel.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/indi_letelescope_fffp_flatpanel.xml.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/indi_letelescope_fffp_flatpanel.xml
 )
 
 # set our include directories to look for header files
@@ -49,24 +51,24 @@ include(CMakeCommon)
 
 # tell cmake to build our executable
 add_executable(
-    indi_fffpv1_flatpanel
-    indi_fffpv1_flatpanel.cpp
+    indi_letelescope_fffp_flatpanel
+    indi_letelescope_fffp_flatpanel.cpp
 )
 
 # and link it to these libraries
 target_link_libraries(
-    indi_fffpv1_flatpanel
+    indi_letelescope_fffp_flatpanel
     ${INDI_LIBRARIES}
     ${NOVA_LIBRARIES}
     ${GSL_LIBRARIES}
 )
 
 # tell cmake where to install our executable
-install(TARGETS indi_fffpv1_flatpanel RUNTIME DESTINATION bin)
+install(TARGETS indi_letelescope_fffp_flatpanel RUNTIME DESTINATION bin)
 
 # and where to put the driver's xml file.
 install(
     FILES
-    ${CMAKE_CURRENT_BINARY_DIR}/indi_fffpv1_flatpanel.xml
+    ${CMAKE_CURRENT_BINARY_DIR}/indi_letelescope_fffp_flatpanel.xml
     DESTINATION ${INDI_DATA_DIR}
 )

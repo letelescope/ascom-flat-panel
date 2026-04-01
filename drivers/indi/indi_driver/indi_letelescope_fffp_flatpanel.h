@@ -1,5 +1,5 @@
 //
-// Indi AuxDevice, LightBox and DustCap driver for LeTelescopeFFFPV1
+// Indi AuxDevice, LightBox and DustCap driver for LeTelescopeFFFP
 //
 // Copyright(C) 2025 - Present, Le Télescope - Ivry sur Seine - All Rights Reserved
 // Licensed under the MIT License. See the accompanying LICENSE file for terms.
@@ -61,11 +61,11 @@ namespace Connection
     class Serial;
 }
 
-class FFFPV1FlatPanel : public INDI::DefaultDevice, public INDI::LightBoxInterface, public INDI::DustCapInterface
+class FFFPFlatPanel : public INDI::DefaultDevice, public INDI::LightBoxInterface, public INDI::DustCapInterface
 {
 public:
-    FFFPV1FlatPanel();
-    virtual ~FFFPV1FlatPanel() = default;
+    FFFPFlatPanel();
+    virtual ~FFFPFlatPanel() = default;
 
     virtual const char *getDefaultName() override;
 

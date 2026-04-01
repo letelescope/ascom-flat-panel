@@ -1,12 +1,12 @@
 //
-// Indi AuxDevice, LightBox and DustCap driver for LeTelescopeFFFPV1
+// Indi AuxDevice, LightBox and DustCap driver for LeTelescopeFFFP
 //
 // Copyright(C) 2025 - Present, Le Télescope - Ivry sur Seine - All Rights Reserved
 // Licensed under the MIT License. See the accompanying LICENSE file for terms.
 //
-// Description: Implemenation of the FFFPV1FlatPanel class.
+// Description: Implemenation of the FFFPFlatPanel class.
 //
-// The FFFPV1FlatPanel class represents a driver instance controlling flat panel Hardware/Firmware. 
+// The FFFPFlatPanel class represents a driver instance controlling flat panel Hardware/Firmware. 
 //
 // In this scenario a flat panel is made of two things
 //   - A light panel with variable brightness, called calibrator in this driver
@@ -56,24 +56,24 @@
 #include "libindi/connectionplugins/connectionserial.h"
 
 #include "config.h"
-#include "indi_fffpv1_flatpanel.h"
+#include "indi_letelescope_fffp_flatpanel.h"
 
-// We declare an auto pointer to FFFPV1FlatPanel.
-static std::unique_ptr<FFFPV1FlatPanel> mydriver(new FFFPV1FlatPanel());
+// We declare an auto pointer to FFFPFlatPanel.
+static std::unique_ptr<FFFPFlatPanel> mydriver(new FFFPFlatPanel());
 
-FFFPV1FlatPanel::FFFPV1FlatPanel() : 
+FFFPFlatPanel::FFFPFlatPanel() : 
     INDI::LightBoxInterface(this),//(this, true),
     INDI::DustCapInterface(this)
 {
     setVersion(CDRIVER_VERSION_MAJOR, CDRIVER_VERSION_MINOR);
 }
 
-const char *FFFPV1FlatPanel::getDefaultName()
+const char *FFFPFlatPanel::getDefaultName()
 {
-    return "Le Telescope FFFPV1 Flat Panel";
+    return "Le Telescope FFFP Flat Panel";
 }
 
-bool FFFPV1FlatPanel::initProperties()
+bool FFFPFlatPanel::initProperties()
 {
     // initialize the parent's properties first
     INDI::DefaultDevice::initProperties();
@@ -97,14 +97,14 @@ bool FFFPV1FlatPanel::initProperties()
     return true;
 }
 
-void FFFPV1FlatPanel::ISGetProperties(const char *dev)
+void FFFPFlatPanel::ISGetProperties(const char *dev)
 {
     INDI::DefaultDevice::ISGetProperties(dev);
 
     //isGetLightBoxProperties(dev);
 }
 
-bool FFFPV1FlatPanel::updateProperties()
+bool FFFPFlatPanel::updateProperties()
 {
     INDI::DefaultDevice::updateProperties();
 
@@ -125,7 +125,7 @@ bool FFFPV1FlatPanel::updateProperties()
     return true;
 }
 
-bool FFFPV1FlatPanel::ISNewNumber(const char *dev, const char *name, double values[], char *names[], int n)
+bool FFFPFlatPanel::ISNewNumber(const char *dev, const char *name, double values[], char *names[], int n)
 {
     // Make sure it is for us.
     if (dev != nullptr && strcmp(dev, getDeviceName()) == 0)
@@ -142,7 +142,7 @@ bool FFFPV1FlatPanel::ISNewNumber(const char *dev, const char *name, double valu
     return INDI::DefaultDevice::ISNewNumber(dev, name, values, names, n);
 }
 
-bool FFFPV1FlatPanel::ISNewSwitch(const char *dev, const char *name, ISState *states, char *names[], int n)
+bool FFFPFlatPanel::ISNewSwitch(const char *dev, const char *name, ISState *states, char *names[], int n)
 {
     // Make sure it is for us.
     if (dev != nullptr && strcmp(dev, getDeviceName()) == 0)
@@ -159,7 +159,7 @@ bool FFFPV1FlatPanel::ISNewSwitch(const char *dev, const char *name, ISState *st
     return INDI::DefaultDevice::ISNewSwitch(dev, name, states, names, n);
 }
 
-bool FFFPV1FlatPanel::ISNewText(const char *dev, const char *name, char *texts[], char *names[], int n)
+bool FFFPFlatPanel::ISNewText(const char *dev, const char *name, char *texts[], char *names[], int n)
 {
     // Make sure it is for us.
     if (dev != nullptr && strcmp(dev, getDeviceName()) == 0)
@@ -176,7 +176,7 @@ bool FFFPV1FlatPanel::ISNewText(const char *dev, const char *name, char *texts[]
     return INDI::DefaultDevice::ISNewText(dev, name, texts, names, n);
 }
 
-bool FFFPV1FlatPanel::ISSnoopDevice(XMLEle *root)
+bool FFFPFlatPanel::ISSnoopDevice(XMLEle *root)
 {
     // TODO: Check to see if this is for any of my custom Snoops. Fo shizzle.
 
@@ -185,7 +185,7 @@ bool FFFPV1FlatPanel::ISSnoopDevice(XMLEle *root)
     return INDI::DefaultDevice::ISSnoopDevice(root);
 }
 
-bool FFFPV1FlatPanel::saveConfigItems(FILE *fp)
+bool FFFPFlatPanel::saveConfigItems(FILE *fp)
 {
     //saveLightBoxConfigItems(fp);
 
@@ -194,7 +194,7 @@ bool FFFPV1FlatPanel::saveConfigItems(FILE *fp)
     return INDI::DefaultDevice::saveConfigItems(fp);
 }
 
-bool FFFPV1FlatPanel::Handshake()
+bool FFFPFlatPanel::Handshake()
 {
     if (isSimulation())
     {
@@ -207,7 +207,7 @@ bool FFFPV1FlatPanel::Handshake()
     return true;
 }
 
-void FFFPV1FlatPanel::TimerHit()
+void FFFPFlatPanel::TimerHit()
 {
     if (!isConnected())
         return;
@@ -222,7 +222,7 @@ void FFFPV1FlatPanel::TimerHit()
     SetTimer(POLLMS);
 }
 
-bool FFFPV1FlatPanel::SetLightBoxBrightness(uint16_t value)
+bool FFFPFlatPanel::SetLightBoxBrightness(uint16_t value)
 {
     // TODO: Implement your own code to set the brightness of the lightbox.
     // Be sure to return true if successful, or false otherwise.
@@ -232,7 +232,7 @@ bool FFFPV1FlatPanel::SetLightBoxBrightness(uint16_t value)
     return false;
 }
 
-bool FFFPV1FlatPanel::EnableLightBox(bool enable)
+bool FFFPFlatPanel::EnableLightBox(bool enable)
 {
     // TODO: Implement your own code to turn on/off the lightbox.
     // Be sure to return true if successful, or false otherwise.
@@ -242,14 +242,14 @@ bool FFFPV1FlatPanel::EnableLightBox(bool enable)
     return false;
 }
 
-IPState FFFPV1FlatPanel::ParkCap()
+IPState FFFPFlatPanel::ParkCap()
 {
     // TODO: Implement your own code to close the dust cap.
 
     return IPS_OK;
 }
 
-IPState FFFPV1FlatPanel::UnParkCap()
+IPState FFFPFlatPanel::UnParkCap()
 {
     // TODO: Implement your own code to open the dust cap.
 
