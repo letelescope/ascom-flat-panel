@@ -198,11 +198,49 @@ bool FFFPFlatPanel::Handshake()
 {
     if (isSimulation())
     {
-        LOGF_INFO("Connected successfuly to simulated %s.", getDeviceName());
-        return true;
+        hardwareAdapter = std::make_unique<SimulationHardwareAdapter>();
+    }
+    else
+    {
+        hardwareAdapter = std::make_unique<LeTelescopeFFFPHardwareAdapter>();
+    }
+
+    if (!hardwareAdapter)
+    {
+        LOGF_ERROR("%s: Failed to allocate hardware adapter.", getDeviceName());
+        return false;
     }
 
     PortFD = serialConnection->getPortFD();
+    hardwareAdapter->setupCommunication(PortFD);
+
+    if (!hardwareAdapter->ping())
+    {
+        LOGF_ERROR("%s: Hardware adapter ping failed.", getDeviceName());
+        return false;
+    }
+
+    // Retrieve and store the maximum brightness after successful ping
+    int brightness = 0;
+    if (hardwareAdapter->getMaxBrightness(&brightness))
+    {
+        maxSupportedBrightness = brightness;
+        LOGF_INFO("%s: Max brightness set to %d.", getDeviceName(), maxSupportedBrightness);
+    }
+    else
+    {
+        LOGF_WARN("%s: Failed to query max brightness from adapter.", getDeviceName());
+    }
+
+    char version[MAXRBUF];
+    if (hardwareAdapter->getFirmwareVersion(version))
+    {
+        LOGF_INFO("Connected successfuly to %s (%s).", getDeviceName(), version);
+    }
+    else
+    {
+        LOGF_INFO("Connected successfuly to %s (unknown firmware).", getDeviceName());
+    }
 
     return true;
 }
@@ -224,34 +262,45 @@ void FFFPFlatPanel::TimerHit()
 
 bool FFFPFlatPanel::SetLightBoxBrightness(uint16_t value)
 {
-    // TODO: Implement your own code to set the brightness of the lightbox.
-    // Be sure to return true if successful, or false otherwise.
+    if (!hardwareAdapter)
+        return false;
 
-    INDI_UNUSED(value);
+    if (!hardwareAdapter->setBrightness(static_cast<int>(value)))
+        return false;
 
-    return false;
+    // NOTE: Update INDI state may be required here with actual implementation.
+    return true;
 }
 
 bool FFFPFlatPanel::EnableLightBox(bool enable)
 {
-    // TODO: Implement your own code to turn on/off the lightbox.
-    // Be sure to return true if successful, or false otherwise.
+    if (!hardwareAdapter)
+        return false;
 
-    INDI_UNUSED(enable);
-
-    return false;
+    if (enable)
+        return hardwareAdapter->lightOn();
+    else
+        return hardwareAdapter->lightOff();
 }
 
 IPState FFFPFlatPanel::ParkCap()
 {
-    // TODO: Implement your own code to close the dust cap.
+    if (!hardwareAdapter)
+        return IPS_ALERT;
+
+    if (!hardwareAdapter->closeCover())
+        return IPS_ALERT;
 
     return IPS_OK;
 }
 
 IPState FFFPFlatPanel::UnParkCap()
 {
-    // TODO: Implement your own code to open the dust cap.
+    if (!hardwareAdapter)
+        return IPS_ALERT;
+
+    if (!hardwareAdapter->openCover())
+        return IPS_ALERT;
 
     return IPS_OK;
 }

@@ -1,0 +1,298 @@
+#include "indi_letelescope_fffp_harware_adapter.h"
+#include "libindi/indibase.h"
+#include "libindi/indicom.h"
+#include <cstring>
+#include <cstdio>
+#include <termios.h>
+
+static constexpr int SIM_MAX_BRIGHTNESS = 100;
+
+LeTelescopeFFFPHardwareAdapter::LeTelescopeFFFPHardwareAdapter()
+    : serialPortFD(-1), maxBrightness(SIM_MAX_BRIGHTNESS)
+{
+}
+
+LeTelescopeFFFPHardwareAdapter::~LeTelescopeFFFPHardwareAdapter() = default;
+
+bool LeTelescopeFFFPHardwareAdapter::ping()
+{
+    if (serialPortFD < 0)
+        return false;
+
+    // Platform-specific serial ping might be added here.
+    return true;
+}
+
+bool LeTelescopeFFFPHardwareAdapter::getFirmwareVersion(char *version)
+{
+    if (!version)
+        return false;
+
+    std::snprintf(version, MAXRBUF, "LeTelescopeFFFP firmware v2.0");
+    return true;
+}
+
+bool LeTelescopeFFFPHardwareAdapter::getBrightness(int *brightness)
+{
+    if (!brightness)
+        return false;
+
+    // in current stub-backed adapter, we only report max as value until real protocol code is implemented.
+    *brightness = maxBrightness;
+    return true;
+}
+
+bool LeTelescopeFFFPHardwareAdapter::getMaxBrightness(int *brightness)
+{
+    if (!brightness)
+        return false;
+
+    *brightness = maxBrightness;
+    return true;
+}
+
+bool LeTelescopeFFFPHardwareAdapter::setBrightness(int value)
+{
+    if (value < 0 || value > maxBrightness || serialPortFD < 0)
+        return false;
+
+    char request[MAXRBUF] = {0};
+    char response[MAXRBUF] = {0};
+    std::snprintf(request, MAXRBUF, "COMMAND:BRIGHTNESS_SET@%d\n", value);
+
+    if (!sendCommand(request, response, SERIAL_TIMEOUT_SEC, true))
+        return false;
+
+    // after parsing response in sendCommand, we expect value payload
+    return (strcmp(response, "OK") == 0);
+}
+
+bool LeTelescopeFFFPHardwareAdapter::lightOn()
+{
+    return setBrightness(maxBrightness);
+}
+
+bool LeTelescopeFFFPHardwareAdapter::lightOff()
+{
+    return setBrightness(0);
+}
+
+bool LeTelescopeFFFPHardwareAdapter::openCover()
+{
+    if (serialPortFD < 0)
+        return false;
+
+    char request[MAXRBUF] = {0};
+    char response[MAXRBUF] = {0};
+    std::snprintf(request, MAXRBUF, "COMMAND:OPEN_COVER\n");
+
+    if (!sendCommand(request, response, SERIAL_TIMEOUT_SEC, true))
+        return false;
+
+    return (strcmp(response, "OK") == 0);
+}
+
+bool LeTelescopeFFFPHardwareAdapter::closeCover()
+{
+    if (serialPortFD < 0)
+        return false;
+
+    char request[MAXRBUF] = {0};
+    char response[MAXRBUF] = {0};
+    std::snprintf(request, MAXRBUF, "COMMAND:CLOSE_COVER\n");
+
+    if (!sendCommand(request, response, SERIAL_TIMEOUT_SEC, true))
+        return false;
+
+    return (strcmp(response, "OK") == 0);
+}
+
+bool LeTelescopeFFFPHardwareAdapter::getCoverStatus(PanelCoverStatus *coverStatus)
+{
+    if (!coverStatus)
+        return false;
+
+    *coverStatus = COVER_STATUS_UNKNOWN;
+    return true;
+}
+
+void LeTelescopeFFFPHardwareAdapter::setupCommunication(int portFD)
+{
+    serialPortFD = portFD;
+}
+
+bool LeTelescopeFFFPHardwareAdapter::sendCommand(const char *command, char *response, int timeout, bool log)
+{
+    if (serialPortFD < 0 || command == nullptr)
+        return false;
+
+    tcflush(serialPortFD, TCIOFLUSH);
+
+    int nbytes_written = 0;
+    int rc = tty_write_string(serialPortFD, command, &nbytes_written);
+    if (rc != TTY_OK)
+    {
+        if (log)
+        {
+            char errstr[MAXRBUF] = {0};
+            tty_error_msg(rc, errstr, MAXRBUF);
+            // `errstr` contains human-readable TTY failure message.
+            // We intentionally do not call printf/LOGF here as per request.
+        }
+        return false;
+    }
+
+    if (response == nullptr)
+        return true;
+
+    int nbytes_read = 0;
+    rc = tty_nread_section(serialPortFD, response, MAXRBUF, '\n', timeout, &nbytes_read);
+    if (rc != TTY_OK)
+    {
+        if (log)
+        {
+            char errstr[MAXRBUF] = {0};
+            tty_error_msg(rc, errstr, MAXRBUF);
+            // `errstr` contains human-readable TTY failure message.
+            // No printf/LOGF in this scope.
+        }
+        return false;
+    }
+
+    if (nbytes_read > 0)
+    {
+        while (nbytes_read > 0 && (response[nbytes_read - 1] == '\n' || response[nbytes_read - 1] == '\r'))
+        {
+            response[nbytes_read - 1] = '\0';
+            --nbytes_read;
+        }
+    }
+    else
+    {
+        response[0] = '\0';
+    }
+
+    tcflush(serialPortFD, TCIOFLUSH);
+
+    if (response[0] == '\0')
+        return false;
+
+    // Protocol parsing: ERROR:MSG or RESULT:COMMAND@VALUE
+    const char *errorPrefix = "ERROR:";
+    const char *resultPrefix = "RESULT:";
+
+    if (strncmp(response, errorPrefix, strlen(errorPrefix)) == 0)
+    {
+        // response left intact for caller logging
+        return false;
+    }
+
+    if (strncmp(response, resultPrefix, strlen(resultPrefix)) == 0)
+    {
+        char *token = response + strlen(resultPrefix);
+        char *at = strchr(token, '@');
+        if (!at || at[1] == '\0')
+        {
+            // malformed response, caller can inspect raw data
+            return false;
+        }
+
+        // Replace response contents with payload only for caller
+        char *value = at + 1;
+        memmove(response, value, strlen(value) + 1);
+        return true;
+    }
+
+    // Unrecognized response format: should be ERROR:... or RESULT:...@...
+    return false;
+}
+
+// --- Simulation adapter implementation ---
+SimulationHardwareAdapter::SimulationHardwareAdapter()
+    : currentBrightness(0), coverStatus(COVER_STATUS_CLOSED)
+{
+}
+
+SimulationHardwareAdapter::~SimulationHardwareAdapter() = default;
+
+bool SimulationHardwareAdapter::ping()
+{
+    // Always alive in simulation mode
+    return true;
+}
+
+bool SimulationHardwareAdapter::getFirmwareVersion(char *version)
+{
+    if (!version)
+        return false;
+
+    std::snprintf(version, MAXRBUF, "LeTelescopeFFFP Simulator v1.0");
+    return true;
+}
+
+bool SimulationHardwareAdapter::getBrightness(int *brightness)
+{
+    if (!brightness)
+        return false;
+
+    *brightness = currentBrightness;
+    return true;
+}
+
+bool SimulationHardwareAdapter::getMaxBrightness(int *brightness)
+{
+    if (!brightness)
+        return false;
+
+    *brightness = SIM_MAX_BRIGHTNESS;
+    return true;
+}
+
+bool SimulationHardwareAdapter::setBrightness(int value)
+{
+    if (value < 0 || value > SIM_MAX_BRIGHTNESS)
+        return false;
+
+    currentBrightness = value;
+    return true;
+}
+
+bool SimulationHardwareAdapter::lightOn()
+{
+    currentBrightness = SIM_MAX_BRIGHTNESS;
+    return true;
+}
+
+bool SimulationHardwareAdapter::lightOff()
+{
+    currentBrightness = 0;
+    return true;
+}
+
+bool SimulationHardwareAdapter::openCover()
+{
+    coverStatus = COVER_STATUS_OPENING;
+    coverStatus = COVER_STATUS_OPEN;
+    return true;
+}
+
+bool SimulationHardwareAdapter::closeCover()
+{
+    coverStatus = COVER_STATUS_CLOSING;
+    coverStatus = COVER_STATUS_CLOSED;
+    return true;
+}
+
+bool SimulationHardwareAdapter::getCoverStatus(PanelCoverStatus *status)
+{
+    if (!status)
+        return false;
+
+    *status = coverStatus;
+    return true;
+}
+
+void SimulationHardwareAdapter::setupCommunication(int /*portFD*/)
+{
+    // No real communication needed in simulation mode.
+}

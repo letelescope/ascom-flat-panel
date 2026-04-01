@@ -53,6 +53,7 @@ include(CMakeCommon)
 add_executable(
     indi_letelescope_fffp_flatpanel
     indi_letelescope_fffp_flatpanel.cpp
+    indi_letelescope_fffp_hardware_adapter.cpp
 )
 
 # and link it to these libraries

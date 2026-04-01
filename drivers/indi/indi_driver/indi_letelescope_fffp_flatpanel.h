@@ -55,6 +55,8 @@
 #include "libindi/defaultdevice.h"
 #include "libindi/indilightboxinterface.h"
 #include "libindi/indidustcapinterface.h"
+#include "indi_letelescope_fffp_harware_adapter.h"
+#include <memory>
 
 namespace Connection
 {
@@ -96,6 +98,8 @@ private: // serial connection
     bool Handshake();
     bool sendCommand(const char *cmd);
     int PortFD{-1};
+    int maxSupportedBrightness{0};
 
+    std::unique_ptr<HardwareAdapter> hardwareAdapter;
     Connection::Serial *serialConnection{nullptr};
 };
