@@ -102,4 +102,20 @@ private: // serial connection
 
     std::unique_ptr<HardwareAdapter> hardwareAdapter;
     Connection::Serial *serialConnection{nullptr};
+
+    // Properties for debug and control
+    ITextVectorProperty FirmwareTP;
+    IText FirmwareT[1];
+
+    ITextVectorProperty MaxBrightnessTP;
+    IText MaxBrightnessT[1];
+
+    ISwitchVectorProperty LightSwitchSP;
+    ISwitch LightSwitchS[2];
+
+    INumberVectorProperty BrightnessNP;
+    INumber BrightnessN[1];
+
+    ISwitchVectorProperty CoverSwitchSP;
+    ISwitch CoverSwitchS[2];
 };
