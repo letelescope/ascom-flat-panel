@@ -28,7 +28,56 @@ bool LeTelescopeFFFPHardwareAdapter::getFirmwareVersion(char *version)
     if (!version)
         return false;
 
-    std::snprintf(version, MAXRBUF, "LeTelescopeFFFP firmware v2.0");
+    if (firmwareVersion.empty())
+    {
+        if (!fetchFirmwareVersionFromDevice())
+            return false;
+    }
+
+    std::snprintf(version, MAXRBUF, "%s", firmwareVersion.c_str());
+
+    return true;
+}
+
+bool LeTelescopeFFFPHardwareAdapter::fetchFirmwareVersionFromDevice()
+{
+    if (serialPortFD < 0)
+        return false;
+
+    char request[MAXRBUF] = {0};
+    char response[MAXRBUF] = {0};
+    std::snprintf(request, MAXRBUF, "COMMAND:VERSION\n");
+
+    if (!sendCommand(request, response, SERIAL_TIMEOUT_SEC, true))
+        return false;
+
+    // By protocol, response after parsing must contain version text.
+    if (response[0] == '\0')
+        return false;
+
+    firmwareVersion = response;
+    return true;
+}
+
+bool LeTelescopeFFFPHardwareAdapter::fetchFirmwareMaxBrightnessFromDevice()
+{
+    if (serialPortFD < 0)
+        return false;
+
+    char request[MAXRBUF] = {0};
+    char response[MAXRBUF] = {0};
+    std::snprintf(request, MAXRBUF, "COMMAND:MAX_BRIGHTNESS_GET\n");
+
+    if (!sendCommand(request, response, SERIAL_TIMEOUT_SEC, true))
+        return false;
+
+    // Numeric payload expected
+    char *endptr = nullptr;
+    long value = strtol(response, &endptr, 10);
+    if (endptr == response || *endptr != '\0' || value < 0)
+        return false;
+
+    maxBrightness = static_cast<int>(value);
     return true;
 }
 
@@ -37,8 +86,26 @@ bool LeTelescopeFFFPHardwareAdapter::getBrightness(int *brightness)
     if (!brightness)
         return false;
 
-    // in current stub-backed adapter, we only report max as value until real protocol code is implemented.
-    *brightness = maxBrightness;
+    if (serialPortFD < 0)
+        return false;
+
+    char request[MAXRBUF] = {0};
+    char response[MAXRBUF] = {0};
+    std::snprintf(request, MAXRBUF, "COMMAND:BRIGHTNESS_GET\n");
+
+    if (!sendCommand(request, response, SERIAL_TIMEOUT_SEC, true))
+        return false;
+
+    // Expect numeric payload
+    char *endptr = nullptr;
+    long value = strtol(response, &endptr, 10);
+    if (endptr == response || *endptr != '\0' || value < 0)
+        return false;
+
+    if (value > maxBrightness)
+        return false;
+
+    *brightness = static_cast<int>(value);
     return true;
 }
 
@@ -46,6 +113,11 @@ bool LeTelescopeFFFPHardwareAdapter::getMaxBrightness(int *brightness)
 {
     if (!brightness)
         return false;
+
+    if(maxBrightness < 0)
+    {
+        return false;
+    }
 
     *brightness = maxBrightness;
     return true;
@@ -109,21 +181,50 @@ bool LeTelescopeFFFPHardwareAdapter::closeCover()
 
 bool LeTelescopeFFFPHardwareAdapter::getCoverStatus(PanelCoverStatus *coverStatus)
 {
-    if (!coverStatus)
+    if (!coverStatus || serialPortFD < 0)
         return false;
 
-    *coverStatus = COVER_STATUS_UNKNOWN;
+    char request[MAXRBUF] = {0};
+    char response[MAXRBUF] = {0};
+    std::snprintf(request, MAXRBUF, "COMMAND:COVER_GET_STATE\n");
+
+    if (!sendCommand(request, response, SERIAL_TIMEOUT_SEC, true))
+        return false;
+
+    // Parse the response and map to enum
+    if (std::strcmp(response, "OPEN") == 0)
+        *coverStatus = COVER_STATUS_OPEN;
+    else if (std::strcmp(response, "OPENING") == 0)
+        *coverStatus = COVER_STATUS_OPENING;
+    else if (std::strcmp(response, "CLOSED") == 0)
+        *coverStatus = COVER_STATUS_CLOSED;
+    else if (std::strcmp(response, "CLOSING") == 0)
+        *coverStatus = COVER_STATUS_CLOSING;
+    else
+        *coverStatus = COVER_STATUS_UNKNOWN;
+
     return true;
 }
 
-void LeTelescopeFFFPHardwareAdapter::init(int portFD)
+bool LeTelescopeFFFPHardwareAdapter::init(int portFD)
 {
     serialPortFD = portFD;
+
+    if (!ping())
+        return false;
+
+    if (!fetchFirmwareMaxBrightnessFromDevice())
+        return false;
+
+    if (!fetchFirmwareVersionFromDevice())
+        return false;
+
+    return true;
 }
 
 bool LeTelescopeFFFPHardwareAdapter::sendCommand(const char *command, char *response, int timeout, bool log)
 {
-    if (serialPortFD < 0 || command == nullptr)
+    if (serialPortFD < 0 || command == nullptr || response == nullptr)
         return false;
 
     tcflush(serialPortFD, TCIOFLUSH);
@@ -141,9 +242,6 @@ bool LeTelescopeFFFPHardwareAdapter::sendCommand(const char *command, char *resp
         }
         return false;
     }
-
-    if (response == nullptr)
-        return true;
 
     int nbytes_read = 0;
     rc = tty_nread_section(serialPortFD, response, MAXRBUF, '\n', timeout, &nbytes_read);
@@ -292,7 +390,8 @@ bool SimulationHardwareAdapter::getCoverStatus(PanelCoverStatus *status)
     return true;
 }
 
-void SimulationHardwareAdapter::init(int /*portFD*/)
+bool SimulationHardwareAdapter::init(int /*portFD*/)
 {
     // No real communication needed in simulation mode.
+    return true;
 }

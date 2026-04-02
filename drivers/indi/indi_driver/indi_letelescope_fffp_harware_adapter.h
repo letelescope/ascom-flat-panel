@@ -13,6 +13,7 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
 
 enum PanelCoverStatus
 {
@@ -64,7 +65,7 @@ class HardwareAdapter
          * @brief Set up communication parameters and initialize the hardware adapter. Should be called after establishing the serial connection and before any other operations.
          * @param portFD file descriptor for the serial port
          */
-        virtual void init(int portFD) = 0;
+        virtual bool init(int portFD) = 0;
 
         /**
          * @brief Get the current brightness level
@@ -130,16 +131,30 @@ class LeTelescopeFFFPHardwareAdapter : public HardwareAdapter
         bool openCover() override;
         bool closeCover() override;
         bool getCoverStatus(PanelCoverStatus *coverStatus) override;
-        void init(int portFD) override;
+        bool init(int portFD) override;
 
     private:
-        int serialPortFD; // File descriptor for the serial port connection
-        int maxBrightness; // Maximum brightness level supported by the device
+
+        int serialPortFD {-1}; // File descriptor for the serial port connection
+
+        /**
+         * @brief Retrieve the maximum brightness level supported by the device
+         * @return true if successful, false otherwise
+         */
+        bool fetchFirmwareMaxBrightnessFromDevice();
+        int maxBrightness {-1}; // Cached maximum brightness level supported by the device
+        
+        /**
+         * @brief Retrieve the firmware version string from the device and cache it. Should be called during initialization after a successful ping.
+         * @return true if successful, false otherwise   
+         */
+        bool fetchFirmwareVersionFromDevice();
+        std::string firmwareVersion {""}; // Cached firmware version string
 
         /**
          * @brief Send a command to the device and receive response
-         * @param command command string to send
-         * @param response buffer to store response (can be nullptr if no response expected)
+         * @param command command string to snd
+         * @param response buffer to store response from the device
          * @param timeout timeout in seconds
          * @param log whether to log errors
          * @return true if successful, false otherwise
@@ -164,7 +179,7 @@ class SimulationHardwareAdapter : public HardwareAdapter
         bool openCover() override;
         bool closeCover() override;
         bool getCoverStatus(PanelCoverStatus *coverStatus) override;
-        void init(int portFD) override;
+        bool init(int portFD) override;
 
     private:
         

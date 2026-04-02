@@ -223,6 +223,7 @@ bool FFFPFlatPanel::Handshake()
     char version[MAXRBUF];
     if (hardwareAdapter->getFirmwareVersion(version))
     {
+        firmareVersion = version;
         LOGF_INFO("Connected successfuly to %s (%s).", getDeviceName(), version);
     }
     else
@@ -250,14 +251,7 @@ void FFFPFlatPanel::TimerHit()
 
 bool FFFPFlatPanel::SetLightBoxBrightness(uint16_t value)
 {
-    if (!hardwareAdapter)
-        return false;
-
-    if (!hardwareAdapter->setBrightness(static_cast<int>(value)))
-        return false;
-
-    // NOTE: Update INDI state may be required here with actual implementation.
-    return true;
+    return hardwareAdapter? hardwareAdapter->setBrightness(static_cast<int>(value)) : false;
 }
 
 bool FFFPFlatPanel::EnableLightBox(bool enable)
@@ -279,7 +273,7 @@ IPState FFFPFlatPanel::ParkCap()
     if (!hardwareAdapter->closeCover())
         return IPS_ALERT;
 
-    return IPS_OK;
+    return IPS_BUSY;
 }
 
 IPState FFFPFlatPanel::UnParkCap()
@@ -290,5 +284,5 @@ IPState FFFPFlatPanel::UnParkCap()
     if (!hardwareAdapter->openCover())
         return IPS_ALERT;
 
-    return IPS_OK;
+    return IPS_BUSY;
 }
