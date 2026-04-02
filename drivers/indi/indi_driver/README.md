@@ -7,7 +7,7 @@ A fully functionnal indi driver dev environment c.f. [official documentation](ht
 ## Build and install
 
 ```sh
-mkdir build
+mkdir -p build
 cd build
 cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Debug ../
 make

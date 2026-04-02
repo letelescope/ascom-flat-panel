@@ -78,28 +78,15 @@ bool FFFPFlatPanel::initProperties()
     // initialize the parent's properties first
     INDI::DefaultDevice::initProperties();
 
-    // Initialize helper properties used by the driver client
-    IUFillText(&FirmwareT[0], "FIRMWARE", "Firmware version", "unknown");
-    IUFillTextVector(&FirmwareTP, FirmwareT, 1, getDeviceName(), "FFFP_FIRMWARE", "Firmware version", MAIN_CONTROL_TAB, IP_RO, 0, IPS_OK);
-    IDDefText(&FirmwareTP, nullptr);
+    // Firmware version
+    IUFillText(&FirmwareT[0], "Version", "Version", nullptr);
+    IUFillTextVector(&FirmwareTP, FirmwareT, 1, getDeviceName(), "Firmware", "Firmware", MAIN_CONTROL_TAB, IP_RO, 60, IPS_IDLE);
 
-    IUFillText(&MaxBrightnessT[0], "MAX_BRIGHTNESS", "Max brightness", "0");
-    IUFillTextVector(&MaxBrightnessTP, MaxBrightnessT, 1, getDeviceName(), "FFFP_MAX_BRIGHTNESS", "Max brightness", MAIN_CONTROL_TAB, IP_RO, 0, IPS_OK);
-    IDDefText(&MaxBrightnessTP, nullptr);
-
-    IUFillSwitch(&LightSwitchS[0], "ON", "Light On", ISS_OFF);
-    IUFillSwitch(&LightSwitchS[1], "OFF", "Light Off", ISS_ON);
-    IUFillSwitchVector(&LightSwitchSP, LightSwitchS, 2, getDeviceName(), "FFFP_LIGHT", "Light control", MAIN_CONTROL_TAB, IP_RW, ISR_1OFMANY, 0, IPS_OK);
-    IDDefSwitch(&LightSwitchSP, nullptr);
-
-    IUFillNumber(&BrightnessN[0], "BRIGHTNESS", "Brightness", "%0.0f", 0, 100, 1, 0);
-    IUFillNumberVector(&BrightnessNP, BrightnessN, 1, getDeviceName(), "FFFP_BRIGHTNESS_SET", "Set brightness", MAIN_CONTROL_TAB, IP_RW, 0, IPS_OK);
-    IDDefNumber(&BrightnessNP, nullptr);
-
-    IUFillSwitch(&CoverSwitchS[0], "OPEN", "Open Cover", ISS_OFF);
-    IUFillSwitch(&CoverSwitchS[1], "CLOSE", "Close Cover", ISS_ON);
-    IUFillSwitchVector(&CoverSwitchSP, CoverSwitchS, 2, getDeviceName(), "FFFP_COVER", "Cover control", MAIN_CONTROL_TAB, IP_RW, ISR_1OFMANY, 0, IPS_OK);
-    IDDefSwitch(&CoverSwitchSP, nullptr);
+    DI::initProperties(MAIN_CONTROL_TAB);
+    LI::initProperties(MAIN_CONTROL_TAB, CAN_DIM);
+    
+    LightIntensityNP[0].setMin(0);
+    LightIntensityNP[0].setStep(10);
 
     // Add debug/simulation/etc controls to the driver.
     addAuxControls();
@@ -109,7 +96,6 @@ bool FFFPFlatPanel::initProperties()
     serialConnection = new Connection::Serial(this);
     serialConnection->registerHandshake([&]() { return Handshake(); });
     serialConnection->setDefaultBaudRate(Connection::Serial::B_57600);
-    serialConnection->setDefaultPort("/dev/ttyACM0");
     registerConnection(serialConnection);
 
     return true;
@@ -119,83 +105,28 @@ void FFFPFlatPanel::ISGetProperties(const char *dev)
 {
     INDI::DefaultDevice::ISGetProperties(dev);
 
-    //isGetLightBoxProperties(dev);
+    // Get Light box properties
+    LI::ISGetProperties(dev);
 }
 
 bool FFFPFlatPanel::updateProperties()
 {
     INDI::DefaultDevice::updateProperties();
 
-    //if (!updateLightBoxProperties())
-    //{
-    //    return false;
-    //}
-
     if (isConnected())
     {
-        if (hardwareAdapter)
-        {
-            char version[MAXRBUF] = {0};
-            if (hardwareAdapter->getFirmwareVersion(version))
-            {
-                IUSaveText(&FirmwareT[0], version);
-                IDSetText(&FirmwareTP, nullptr);
-            }
 
-            int maxVal = 0;
-            if (hardwareAdapter->getMaxBrightness(&maxVal))
-            {
-                char maxBrightnessStr[64];
-                snprintf(maxBrightnessStr, sizeof(maxBrightnessStr), "%d", maxVal);
-                IUSaveText(&MaxBrightnessT[0], maxBrightnessStr);
-                IDSetText(&MaxBrightnessTP, nullptr);
-                maxSupportedBrightness = maxVal;
-
-                BrightnessN[0].max = maxVal;
-                IDSetNumber(&BrightnessNP, nullptr);
-            }
-
-            // Keep toggles in sync
-            if (hardwareAdapter->getBrightness(&maxVal))
-            {
-                // `maxVal` returns current brightness.
-                if (maxVal > 0)
-                {
-                    LightSwitchS[0].s = ISS_ON;
-                    LightSwitchS[1].s = ISS_OFF;
-                }
-                else
-                {
-                    LightSwitchS[0].s = ISS_OFF;
-                    LightSwitchS[1].s = ISS_ON;
-                }
-                IDSetSwitch(&LightSwitchSP, nullptr);
-            }
-
-            PanelCoverStatus coverStatus{};
-            if (hardwareAdapter->getCoverStatus(&coverStatus))
-            {
-                if (coverStatus == COVER_STATUS_OPEN || coverStatus == COVER_STATUS_OPENING)
-                {
-                    CoverSwitchS[0].s = ISS_ON;
-                    CoverSwitchS[1].s = ISS_OFF;
-                }
-                else
-                {
-                    CoverSwitchS[0].s = ISS_OFF;
-                    CoverSwitchS[1].s = ISS_ON;
-                }
-                IDSetSwitch(&CoverSwitchSP, nullptr);
-            }
-        }
+        DI::updateProperties();
+        LI::updateProperties();
+        
+        defineProperty(&FirmwareTP);
+        LightIntensityNP[0].setMax(maxSupportedBrightness);
     }
     else
     {
-        IDDelete(getDeviceName(), "FFFP_FIRMWARE", nullptr);
-        IDDelete(getDeviceName(), "FFFP_MAX_BRIGHTNESS", nullptr);
-        IDDelete(getDeviceName(), "FFFP_LIGHT", nullptr);
-        IDDelete(getDeviceName(), "FFFP_BRIGHTNESS_SET", nullptr);
-        IDDelete(getDeviceName(), "FFFP_COVER", nullptr);
+        deleteProperty(FirmwareTP.name);
+        DI::updateProperties();
+        LI::updateProperties();
     }
 
     return true;
@@ -203,91 +134,35 @@ bool FFFPFlatPanel::updateProperties()
 
 bool FFFPFlatPanel::ISNewNumber(const char *dev, const char *name, double values[], char *names[], int n)
 {
-    if (dev != nullptr && strcmp(dev, getDeviceName()) == 0 && name != nullptr && n > 0)
-    {
-        if (strcmp(name, "FFFP_BRIGHTNESS_SET") == 0)
-        {
-            int brightness = static_cast<int>(values[0]);
-            if (hardwareAdapter && hardwareAdapter->setBrightness(brightness))
-            {
-                BrightnessN[0].value = brightness;
-                IDSetNumber(&BrightnessNP, "Brightness set to %d", brightness);
-
-                LightSwitchS[0].s = (brightness > 0) ? ISS_ON : ISS_OFF;
-                LightSwitchS[1].s = (brightness > 0) ? ISS_OFF : ISS_ON;
-                IDSetSwitch(&LightSwitchSP, nullptr);
-                return true;
-            }
-            IDSetNumber(&BrightnessNP, "Failed to set brightness");
-            return false;
-        }
-    }
+    if (LI::processNumber(dev, name, values, names, n))
+        return true;
 
     return INDI::DefaultDevice::ISNewNumber(dev, name, values, names, n);
 }
 
 bool FFFPFlatPanel::ISNewSwitch(const char *dev, const char *name, ISState *states, char *names[], int n)
 {
-    if (dev == nullptr || strncmp(dev, getDeviceName(), MAXINDINAME) != 0 || name == nullptr || states == nullptr || n <= 0)
-        return INDI::DefaultDevice::ISNewSwitch(dev, name, states, names, n);
-
-    if (strcmp(name, "FFFP_LIGHT") == 0 && n == 2)
+    if (dev != nullptr && strcmp(dev, getDeviceName()) == 0)
     {
-        if (states[0] == ISS_ON)
-        {
-            if (hardwareAdapter)
-                hardwareAdapter->lightOn();
-            LightSwitchS[0].s = ISS_ON;
-            LightSwitchS[1].s = ISS_OFF;
-        }
-        else if (states[1] == ISS_ON)
-        {
-            if (hardwareAdapter)
-                hardwareAdapter->lightOff();
-            LightSwitchS[0].s = ISS_OFF;
-            LightSwitchS[1].s = ISS_ON;
-        }
-        IDSetSwitch(&LightSwitchSP, nullptr);
-        return true;
-    }
+        if (DI::processSwitch(dev, name, states, names, n))
+            return true;
 
-    if (strcmp(name, "FFFP_COVER") == 0 && n == 2)
-    {
-        if (states[0] == ISS_ON)
-        {
-            if (hardwareAdapter)
-                hardwareAdapter->openCover();
-            CoverSwitchS[0].s = ISS_ON;
-            CoverSwitchS[1].s = ISS_OFF;
-        }
-        else if (states[1] == ISS_ON)
-        {
-            if (hardwareAdapter)
-                hardwareAdapter->closeCover();
-            CoverSwitchS[0].s = ISS_OFF;
-            CoverSwitchS[1].s = ISS_ON;
-        }
-        IDSetSwitch(&CoverSwitchSP, nullptr);
-        return true;
+        if (LI::processSwitch(dev, name, states, names, n))
+            return true;
     }
 
     return INDI::DefaultDevice::ISNewSwitch(dev, name, states, names, n);
+
 }
 
 bool FFFPFlatPanel::ISNewText(const char *dev, const char *name, char *texts[], char *names[], int n)
 {
-    // Make sure it is for us.
     if (dev != nullptr && strcmp(dev, getDeviceName()) == 0)
     {
-        // TODO: Check to see if this is for any of my custom Text properties.
+        if (LI::processText(dev, name, texts, names, n))
+            return true;
     }
 
-    //if (processLightBoxText(dev, name, texts, names, n))
-    //{
-    //    return true;
-    //}
-
-    // Nobody has claimed this, so let the parent handle it
     return INDI::DefaultDevice::ISNewText(dev, name, texts, names, n);
 }
 
@@ -295,18 +170,16 @@ bool FFFPFlatPanel::ISSnoopDevice(XMLEle *root)
 {
     // TODO: Check to see if this is for any of my custom Snoops. Fo shizzle.
 
-    //snoopLightBox(root);
+    LI::snoop(root);
 
     return INDI::DefaultDevice::ISSnoopDevice(root);
 }
 
 bool FFFPFlatPanel::saveConfigItems(FILE *fp)
 {
-    //saveLightBoxConfigItems(fp);
+    INDI::DefaultDevice::saveConfigItems(fp);
 
-    // TODO: Call IUSaveConfig* for any custom properties I want to save.
-
-    return INDI::DefaultDevice::saveConfigItems(fp);
+    return LI::saveConfigItems(fp);
 }
 
 bool FFFPFlatPanel::Handshake()
@@ -326,7 +199,7 @@ bool FFFPFlatPanel::Handshake()
         return false;
     }
 
-    PortFD = serialConnection->getPortFD();
+    int PortFD = serialConnection->getPortFD();
     hardwareAdapter->setupCommunication(PortFD);
 
     if (!hardwareAdapter->ping())

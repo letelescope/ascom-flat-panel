@@ -97,8 +97,8 @@ protected:
 private: // serial connection
     bool Handshake();
     bool sendCommand(const char *cmd);
-    int PortFD{-1};
-    int maxSupportedBrightness{0};
+    int maxSupportedBrightness{-1};
+    std::string firmareVersion;
 
     std::unique_ptr<HardwareAdapter> hardwareAdapter;
     Connection::Serial *serialConnection{nullptr};
@@ -107,15 +107,4 @@ private: // serial connection
     ITextVectorProperty FirmwareTP;
     IText FirmwareT[1];
 
-    ITextVectorProperty MaxBrightnessTP;
-    IText MaxBrightnessT[1];
-
-    ISwitchVectorProperty LightSwitchSP;
-    ISwitch LightSwitchS[2];
-
-    INumberVectorProperty BrightnessNP;
-    INumber BrightnessN[1];
-
-    ISwitchVectorProperty CoverSwitchSP;
-    ISwitch CoverSwitchS[2];
 };
