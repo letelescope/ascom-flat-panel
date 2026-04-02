@@ -53,6 +53,18 @@ class HardwareAdapter
          */
         virtual bool getFirmwareVersion(char *version) = 0;
 
+        /**
+         * @brief Get the maximum allowed brightness level
+         * @param brightness pointer to store the maximum brightness value
+         * @return true if successful, false otherwise
+         */
+        virtual bool getMaxBrightness(int *brightness) = 0;
+        
+        /**
+         * @brief Set up communication parameters and initialize the hardware adapter. Should be called after establishing the serial connection and before any other operations.
+         * @param portFD file descriptor for the serial port
+         */
+        virtual void init(int portFD) = 0;
 
         /**
          * @brief Get the current brightness level
@@ -61,13 +73,7 @@ class HardwareAdapter
          */
         virtual bool getBrightness(int *brightness) = 0;
 
-        /**
-         * @brief Get the current brightness level
-         * @param brightness pointer to store the brightness value (0-MAX_BRIGHTNESS)
-         * @return true if successful, false otherwise
-         */
-        virtual bool getMaxBrightness(int *brightness) = 0;
-        
+
         /**
          * @brief Set the brightness level
          * @param value brightness value (0-MAX_BRIGHTNESS)
@@ -105,11 +111,6 @@ class HardwareAdapter
          */
         virtual bool getCoverStatus(PanelCoverStatus *coverStatus) = 0;
 
-        /**
-         * @brief Set up communication parameters and initialize the connection to the device
-         * @param portFD file descriptor for the serial port
-         */
-        virtual void setupCommunication(int portFD) = 0;
 };
 
 
@@ -129,7 +130,7 @@ class LeTelescopeFFFPHardwareAdapter : public HardwareAdapter
         bool openCover() override;
         bool closeCover() override;
         bool getCoverStatus(PanelCoverStatus *coverStatus) override;
-        void setupCommunication(int portFD) override;
+        void init(int portFD) override;
 
     private:
         int serialPortFD; // File descriptor for the serial port connection
@@ -163,7 +164,7 @@ class SimulationHardwareAdapter : public HardwareAdapter
         bool openCover() override;
         bool closeCover() override;
         bool getCoverStatus(PanelCoverStatus *coverStatus) override;
-        void setupCommunication(int portFD) override;
+        void init(int portFD) override;
 
     private:
         

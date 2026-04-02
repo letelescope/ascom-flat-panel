@@ -200,7 +200,7 @@ bool FFFPFlatPanel::Handshake()
     }
 
     int PortFD = serialConnection->getPortFD();
-    hardwareAdapter->setupCommunication(PortFD);
+    hardwareAdapter->init(PortFD);
 
     if (!hardwareAdapter->ping())
     {

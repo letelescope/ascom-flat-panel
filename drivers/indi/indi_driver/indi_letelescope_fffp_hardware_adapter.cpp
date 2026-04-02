@@ -116,7 +116,7 @@ bool LeTelescopeFFFPHardwareAdapter::getCoverStatus(PanelCoverStatus *coverStatu
     return true;
 }
 
-void LeTelescopeFFFPHardwareAdapter::setupCommunication(int portFD)
+void LeTelescopeFFFPHardwareAdapter::init(int portFD)
 {
     serialPortFD = portFD;
 }
@@ -292,7 +292,7 @@ bool SimulationHardwareAdapter::getCoverStatus(PanelCoverStatus *status)
     return true;
 }
 
-void SimulationHardwareAdapter::setupCommunication(int /*portFD*/)
+void SimulationHardwareAdapter::init(int /*portFD*/)
 {
     // No real communication needed in simulation mode.
 }
