@@ -66,7 +66,7 @@ bool LeTelescopeFFFPHardwareAdapter::fetchFirmwareMaxBrightnessFromDevice()
 
     char request[MAXRBUF] = {0};
     char response[MAXRBUF] = {0};
-    std::snprintf(request, MAXRBUF, "COMMAND:MAX_BRIGHTNESS_GET\n");
+    std::snprintf(request, MAXRBUF, "COMMAND:MAX_BRIGHTNESS\n");
 
     if (!sendCommand(request, response, SERIAL_TIMEOUT_SEC, true))
         return false;
