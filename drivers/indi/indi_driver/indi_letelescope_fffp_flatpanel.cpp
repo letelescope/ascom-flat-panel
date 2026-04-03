@@ -284,6 +284,17 @@ bool FFFPFlatPanel::SetLightBoxBrightness(uint16_t value)
         // keep the INDI property in sync with the user scale
         LightIntensityNP[0].value = value;
         LightIntensityNP.apply();
+        if (value > 0)
+        {
+            LightSP[0].s = ISS_ON;
+            LightSP[1].s = ISS_OFF;  
+        }
+        else
+        {
+            LightSP[0].s = ISS_OFF;
+            LightSP[1].s = ISS_ON;
+        }
+        LightSP.apply();
         LOGF_INFO("%s: Brightness set to %d (hardware value: %d).", getDeviceName(), value, hwValue);
     } else
     {
@@ -300,9 +311,20 @@ bool FFFPFlatPanel::EnableLightBox(bool enable)
         return false;
 
     if (enable)
-        return hardwareAdapter->lightOn();
+    {
+        int currentBrightness = LightIntensityNP[0].value;
+        return SetLightBoxBrightness(currentBrightness);
+    }
     else
-        return hardwareAdapter->lightOff();
+    {
+        if (!hardwareAdapter->lightOff())
+        {
+            LOGF_ERROR("%s: Failed to turn off the light box.", getDeviceName());
+            return false;
+        }
+        LOGF_INFO("%s: Light box turned off.", getDeviceName());
+        return true;
+    }
 }
 
 IPState FFFPFlatPanel::ParkCap()
