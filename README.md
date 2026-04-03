@@ -667,7 +667,7 @@ The indi driver is in its **really** early developement phase. It should no be u
 in the [indi](./drivers/indi/indi_driver/) directory, from VSCode integrated terminal or anyother terminal run
 
 ``` console
-mkdir build
+mkdir -p build
 cd build
 cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Debug ../
 make
@@ -683,8 +683,8 @@ or
 The output should be something along the lines of:
 
 ``` console
--- The C compiler identification is GNU 11.4.0
--- The CXX compiler identification is GNU 11.4.0
+-- The C compiler identification is GNU 13.3.0
+-- The CXX compiler identification is GNU 13.3.0
 -- Detecting C compiler ABI info
 -- Detecting C compiler ABI info - done
 -- Check for working C compiler: /usr/bin/cc - skipped
@@ -695,33 +695,23 @@ The output should be something along the lines of:
 -- Check for working CXX compiler: /usr/bin/c++ - skipped
 -- Detecting CXX compile features
 -- Detecting CXX compile features - done
-CMake Deprecation Warning at CMakeLists.txt:3 (cmake_minimum_required):
-  Compatibility with CMake < 2.8.12 will be removed from a future version of
-  CMake.
-
-  Update the VERSION argument <min> value or use a ...<max> suffix to tell
-  CMake that the project does not need compatibility with older versions.
-
-
--- Found INDI: /usr/lib/x86_64-linux-gnu/libindidriver.so;/usr/lib/x86_64-linux-gnu/libindiAlignmentDriver.so (found suitable version "2.1.3", minimum required is "1.8")
+-- Found INDI: /usr/lib/x86_64-linux-gnu/libindidriver.so;/usr/lib/x86_64-linux-gnu/libindiAlignmentDriver.so (found version "2.1.9")
 -- Found NOVA: /usr/lib/x86_64-linux-gnu/libnova.so
--- Found ZLIB: /usr/lib/x86_64-linux-gnu/libz.so (found version "1.2.11")
--- Found PkgConfig: /usr/bin/pkg-config (found version "0.29.2")
+-- Found ZLIB: /usr/lib/x86_64-linux-gnu/libz.so (found version "1.3")
 -- Found GSL: /usr/include (found version "2.7.1")
 -- Performing Test COMPATIBLE_FORTIFY_SOURCE
 -- Performing Test COMPATIBLE_FORTIFY_SOURCE - Success
--- Configuring done
--- Generating done
--- Build files have been written to: /home/fgautier/Projects/ascom-flat-panel/drivers/indi/indi_driver/build
-[ 50%] Building CXX object CMakeFiles/indi_fffpv1_flatpanel.dir/indi_fffpv1_flatpanel.cpp.o
-[100%] Linking CXX executable indi_fffpv1_flatpanel
-[100%] Built target indi_fffpv1_flatpanel
-Consolidate compiler generated dependencies of target indi_fffpv1_flatpanel
-[100%] Built target indi_fffpv1_flatpanel
+-- Configuring done (2.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/florian/documents/diy/ascom-flat-panel/drivers/indi/indi_driver/build
+[ 50%] Building CXX object CMakeFiles/indi_letelescope_fffp_flatpanel.dir/indi_letelescope_fffp_flatpanel.cpp.o
+[100%] Linking CXX executable indi_letelescope_fffp_flatpanel
+[100%] Built target indi_letelescope_fffp_flatpanel
+[100%] Built target indi_letelescope_fffp_flatpanel
 Install the project...
 -- Install configuration: "Debug"
--- Installing: /usr/bin/indi_fffpv1_flatpanel
--- Installing: /usr/share/indi/indi_fffpv1_flatpanel.xml
+-- Installing: /usr/bin/indi_letelescope_fffp_flatpanel
+-- Installing: /usr/share/indi/indi_letelescope_fffp_flatpanel.xml
 ```
 
 ## Miscellaneous
