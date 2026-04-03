@@ -326,19 +326,22 @@ bool FFFPFlatPanel::SetLightBoxBrightness(uint16_t value)
     {
         // keep the INDI property in sync with the user scale
         LightIntensityNP[0].value = value;
-        LightIntensityNP.apply();
+        
         if (value > 0)
         {
             LightSP[0].s = ISS_ON;
             LightSP[1].s = ISS_OFF;
+            LightIntensityNP.setState(IPS_OK);
             LightSP.setState(IPS_OK);  
         }
         else
         {
             LightSP[0].s = ISS_OFF;
             LightSP[1].s = ISS_ON;
+            LightIntensityNP.setState(IPS_IDLE);
             LightSP.setState(IPS_IDLE);
         }
+        LightIntensityNP.apply();
         LightSP.apply();
         LOGF_INFO("%s: Brightness set to %d (hardware value: %d).", getDeviceName(), value, hwValue);
     } else
@@ -368,6 +371,9 @@ bool FFFPFlatPanel::EnableLightBox(bool enable)
             return false;
         }
         LightIntensityNP.setState(IPS_IDLE);
+        LightSP.setState(IPS_IDLE);
+        LightIntensityNP.apply();
+        LightSP.apply();
         LOGF_INFO("%s: Light box turned off.", getDeviceName());
         return true;
     }
