@@ -116,12 +116,12 @@ bool FFFPFlatPanel::updateProperties()
     if (isConnected())
     {
 
-        DI::updateProperties();
+        LightIntensityNP[0].setMax(maxSupportedBrightness);
         LI::updateProperties();
         
-        FirmwareT[0].text = const_cast<char*>(firmareVersion.c_str());
-        LightIntensityNP[0].setMax(maxSupportedBrightness);
-        
+        DI::updateProperties();
+    
+        FirmwareT[0].text = const_cast<char*>(firmareVersion.c_str());    
         defineProperty(&FirmwareTP);
     }
     else
