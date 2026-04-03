@@ -82,6 +82,10 @@ bool FFFPFlatPanel::initProperties()
     IUFillText(&FirmwareT[0], "Version", "Version", nullptr);
     IUFillTextVector(&FirmwareTP, FirmwareT, 1, getDeviceName(), "Firmware", "Firmware", CONNECTION_TAB, IP_RO, 60, IPS_IDLE);
 
+    LightIntensityNP[0].setMin(0);
+    LightIntensityNP[0].setMax(255);
+    LightIntensityNP[0].setStep(1);
+    
     DI::initProperties(MAIN_CONTROL_TAB);
     LI::initProperties(MAIN_CONTROL_TAB, CAN_DIM);
 
@@ -109,16 +113,10 @@ void FFFPFlatPanel::ISGetProperties(const char *dev)
 bool FFFPFlatPanel::updateProperties()
 {
     INDI::DefaultDevice::updateProperties();
-
     if (isConnected())
     {
 
-        LightIntensityNP[0].setMin(0);
-        LightIntensityNP[0].setMax(maxSupportedBrightness);
-        LightIntensityNP[0].setStep(10);
-
-        LI::updateProperties();
-        
+        LI::updateProperties();        
         DI::updateProperties();
     
         FirmwareT[0].text = const_cast<char*>(firmareVersion.c_str());    
@@ -219,7 +217,7 @@ bool FFFPFlatPanel::Handshake()
     }
     else
     {
-        LOGF_WARN("%s: Failed to query max brightness from adapter.", getDeviceName());
+        LOGF_WARN("%s: Failed to query max brightness from hardware.", getDeviceName());
     }
 
     char version[MAXRBUF];
@@ -230,7 +228,7 @@ bool FFFPFlatPanel::Handshake()
     }
     else
     {
-        LOGF_INFO("Connected successfuly to %s (unknown firmware).", getDeviceName());
+        LOGF_INFO("%s: Failed to query firmware version from hardware.", getDeviceName());
     }
 
     return true;
@@ -241,19 +239,54 @@ void FFFPFlatPanel::TimerHit()
     if (!isConnected())
         return;
 
-    // TODO: Poll your device if necessary. Otherwise delete this method and it's
-    // declaration in the header file.
-
-    LOG_INFO("timer hit");
 
     // If you don't call SetTimer, we'll never get called again, until we disconnect
     // and reconnect.
     SetTimer(POLLMS);
 }
 
+int FFFPFlatPanel::userToHardwareBrightness(uint16_t userValue) const
+{
+    if (maxSupportedBrightness <= 0)
+        return 0;
+
+    int hw = (static_cast<int>(userValue) * maxSupportedBrightness + USER_BRIGHTNESS_MAX / 2) / USER_BRIGHTNESS_MAX;
+    if (hw < 0)
+        hw = 0;
+    if (hw > maxSupportedBrightness)
+        hw = maxSupportedBrightness;
+    return hw;
+}
+
+uint16_t FFFPFlatPanel::hardwareToUserBrightness(int hardwareValue) const
+{
+    if (maxSupportedBrightness <= 0)
+        return 0;
+
+    int user = (hardwareValue * USER_BRIGHTNESS_MAX + maxSupportedBrightness / 2) / maxSupportedBrightness;
+    if (user < 0)
+        user = 0;
+    if (user > USER_BRIGHTNESS_MAX)
+        user = USER_BRIGHTNESS_MAX;
+    return static_cast<uint16_t>(user);
+}
+
 bool FFFPFlatPanel::SetLightBoxBrightness(uint16_t value)
 {
-    return hardwareAdapter? hardwareAdapter->setBrightness(static_cast<int>(value)) : false;
+    if (!hardwareAdapter || maxSupportedBrightness <= 0)
+        return false;
+
+    int hwValue = userToHardwareBrightness(value);
+    bool result = hardwareAdapter->setBrightness(hwValue);
+
+    if (result)
+    {
+        // keep the INDI property in sync with the user scale
+        LightIntensityNP[0].value = value;
+        LI::updateProperties();
+    }
+
+    return result;
 }
 
 bool FFFPFlatPanel::EnableLightBox(bool enable)

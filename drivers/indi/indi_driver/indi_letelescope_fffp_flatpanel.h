@@ -97,8 +97,13 @@ protected:
 private: // serial connection
     bool Handshake();
     bool sendCommand(const char *cmd);
+
+    static constexpr int USER_BRIGHTNESS_MAX = 255;
     int maxSupportedBrightness{-1};
     std::string firmareVersion;
+
+    int userToHardwareBrightness(uint16_t userValue) const;
+    uint16_t hardwareToUserBrightness(int hardwareValue) const;
 
     std::unique_ptr<HardwareAdapter> hardwareAdapter;
     Connection::Serial *serialConnection{nullptr};
