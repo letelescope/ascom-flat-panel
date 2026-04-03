@@ -330,12 +330,14 @@ bool FFFPFlatPanel::SetLightBoxBrightness(uint16_t value)
         if (value > 0)
         {
             LightSP[0].s = ISS_ON;
-            LightSP[1].s = ISS_OFF;  
+            LightSP[1].s = ISS_OFF;
+            LightSP.setState(IPS_OK);  
         }
         else
         {
             LightSP[0].s = ISS_OFF;
             LightSP[1].s = ISS_ON;
+            LightSP.setState(IPS_IDLE);
         }
         LightSP.apply();
         LOGF_INFO("%s: Brightness set to %d (hardware value: %d).", getDeviceName(), value, hwValue);
@@ -365,6 +367,7 @@ bool FFFPFlatPanel::EnableLightBox(bool enable)
             LOGF_ERROR("%s: Failed to turn off the light box.", getDeviceName());
             return false;
         }
+        LightIntensityNP.setState(IPS_IDLE);
         LOGF_INFO("%s: Light box turned off.", getDeviceName());
         return true;
     }
