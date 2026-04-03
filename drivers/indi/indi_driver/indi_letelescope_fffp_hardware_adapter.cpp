@@ -135,8 +135,13 @@ bool LeTelescopeFFFPHardwareAdapter::setBrightness(int value)
     if (!sendCommand(request, response, SERIAL_TIMEOUT_SEC, true))
         return false;
 
-    // after parsing response in sendCommand, we expect value payload
-    return (strcmp(response, "OK") == 0);
+    // After parsing, response should contain the brightness value set on the panel
+    char *endptr = nullptr;
+    long setValue = strtol(response, &endptr, 10);
+    if (endptr == response || *endptr != '\0' || setValue < 0 || setValue > maxBrightness || setValue != value)
+        return false;
+
+    return true;
 }
 
 bool LeTelescopeFFFPHardwareAdapter::lightOn()
