@@ -84,9 +84,6 @@ bool FFFPFlatPanel::initProperties()
 
     DI::initProperties(MAIN_CONTROL_TAB);
     LI::initProperties(MAIN_CONTROL_TAB, CAN_DIM);
-    
-    LightIntensityNP[0].setMin(0);
-    LightIntensityNP[0].setStep(10);
 
     // Add debug/simulation/etc controls to the driver.
     addAuxControls();
@@ -116,7 +113,10 @@ bool FFFPFlatPanel::updateProperties()
     if (isConnected())
     {
 
+        LightIntensityNP[0].setMin(0);
         LightIntensityNP[0].setMax(maxSupportedBrightness);
+        LightIntensityNP[0].setStep(10);
+
         LI::updateProperties();
         
         DI::updateProperties();
