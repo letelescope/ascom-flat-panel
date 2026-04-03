@@ -45,6 +45,9 @@
 // - https://github.com/jlecomte/ascom-wireless-flat-panel
 // - https://github.com/jlecomte/ascom-telescope-cover-v2
 //
+// The driver architecture is is heavily inspired by the Gemini Adapter for the Gemini Flat Panel (https://github.com/indilib/indi/blob/master/drivers/auxiliary/gemini_flatpanel_adapters.h)
+// as well as the Flip Flat driver (https://github.com/indilib/indi/blob/master/drivers/auxiliary/flip_flat.h)
+//
 // Implements:	INDI::LightBoxInterface, INDI::DustCapInterface
 // Inherits:    INDI::DefaultDevice
 // 

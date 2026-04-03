@@ -1,3 +1,15 @@
+//
+// Hardware adapter implementation for the LeTelescopeFFFP Flat Panel. 
+// 
+// This class is responsible for managing the connection to the flat panel, sending commands and receiving responses.
+//
+// This is heavily inspired by the Gemini Adapter for the Gemini Flat Panel (https://github.com/indilib/indi/blob/master/drivers/auxiliary/gemini_flatpanel_adapters.h)
+//
+// Copyright(C) 2025 - Present, Le Télescope - Ivry sur Seine - All Rights Reserved
+// Licensed under the MIT License. See the accompanying LICENSE file for terms.
+// 
+// Authors:	    Florian Thibaud	
+//              Florian Gautier
 #include "indi_letelescope_fffp_harware_adapter.h"
 #include "libindi/indibase.h"
 #include "libindi/indicom.h"
