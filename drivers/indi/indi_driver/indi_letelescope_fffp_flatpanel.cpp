@@ -239,10 +239,53 @@ void FFFPFlatPanel::TimerHit()
     if (!isConnected())
         return;
 
+    IPState currentCapState = ParkCapSP.getState();
+    if (currentCapState == IPS_BUSY || currentCapState == IPS_ALERT)
+    {
+        PanelCoverStatus currentStatus = COVER_STATUS_UNKNOWN;
+        if (!hardwareAdapter->getCoverStatus(&currentStatus))
+        {
+            ParkCapSP.setState(IPS_ALERT);
+            ParkCapSP.apply();
+            LOGF_ERROR("%s: Failed to get cap status during polling.", getDeviceName());
+            SetTimer(20 * POLLMS);
+            return;
+        }
 
-    // If you don't call SetTimer, we'll never get called again, until we disconnect
-    // and reconnect.
-    SetTimer(POLLMS);
+        if (currentStatus == COVER_STATUS_CLOSED)
+        {
+            ParkCapSP[0].s = ISS_OFF;
+            ParkCapSP[1].s = ISS_ON;
+            ParkCapSP.setState(IPS_OK);
+            ParkCapSP.apply();
+            LOGF_INFO("%s: Cap parked successfully.", getDeviceName());
+        }
+        else if (currentStatus == COVER_STATUS_OPEN)
+        {
+            ParkCapSP[0].s = ISS_ON;
+            ParkCapSP[1].s = ISS_OFF;
+            ParkCapSP.setState(IPS_OK);
+            ParkCapSP.apply();
+            LOGF_INFO("%s: Cap unparked, cap is open.", getDeviceName());
+        }
+        else if(currentStatus == COVER_STATUS_UNKNOWN)
+        {
+            ParkCapSP.setState(IPS_ALERT);
+            ParkCapSP.apply();
+            LOGF_ERROR("%s: Failed to get cap status during parking operation.", getDeviceName());
+        }
+    }
+
+    if(ParkCapSP.getState() == IPS_BUSY)
+    {
+        // If you don't call SetTimer, we'll never get called again, until we disconnect
+        // and reconnect.
+        SetTimer(POLLMS);
+    } else if (ParkCapSP.getState() == IPS_ALERT)
+    {
+        SetTimer(20 * POLLMS); // The harware may be in a dangling state. Wait a bit longer before polling again to avoid spamming the logs if the device is in a bad state.
+    }
+
 }
 
 int FFFPFlatPanel::userToHardwareBrightness(uint16_t userValue) const
@@ -333,8 +376,12 @@ IPState FFFPFlatPanel::ParkCap()
         return IPS_ALERT;
 
     if (!hardwareAdapter->closeCover())
+    {
+        SetTimer(20 * POLLMS); // Start polling to monitor the cover status after failed attempt.   
         return IPS_ALERT;
+    }
 
+    SetTimer(POLLMS); // Start polling to monitor the cover status after sending the close command.
     return IPS_BUSY;
 }
 
@@ -344,7 +391,11 @@ IPState FFFPFlatPanel::UnParkCap()
         return IPS_ALERT;
 
     if (!hardwareAdapter->openCover())
+    {
+        SetTimer(20 * POLLMS); // Start polling to monitor the cover status after failed attempt.
         return IPS_ALERT;
+    }
 
+    SetTimer(POLLMS); // Start polling to monitor the cover status after sending the open command.
     return IPS_BUSY;
 }
