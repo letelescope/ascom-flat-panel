@@ -283,8 +283,13 @@ bool FFFPFlatPanel::SetLightBoxBrightness(uint16_t value)
     {
         // keep the INDI property in sync with the user scale
         LightIntensityNP[0].value = value;
-        LI::updateProperties();
+        LightIntensityNP.apply();
+        LOGF_INFO("%s: Brightness set to %d (hardware value: %d).", getDeviceName(), value, hwValue);
+    } else
+    {
+        LOGF_ERROR("%s: Failed to set brightness to %d (hardware value: %d).", getDeviceName(), value, hwValue);
     }
+
 
     return result;
 }
