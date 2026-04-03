@@ -80,7 +80,7 @@ bool FFFPFlatPanel::initProperties()
 
     // Firmware version
     IUFillText(&FirmwareT[0], "Version", "Version", nullptr);
-    IUFillTextVector(&FirmwareTP, FirmwareT, 1, getDeviceName(), "Firmware", "Firmware", MAIN_CONTROL_TAB, IP_RO, 60, IPS_IDLE);
+    IUFillTextVector(&FirmwareTP, FirmwareT, 1, getDeviceName(), "Firmware", "Firmware", CONNECTION_TAB, IP_RO, 60, IPS_IDLE);
 
     DI::initProperties(MAIN_CONTROL_TAB);
     LI::initProperties(MAIN_CONTROL_TAB, CAN_DIM);
@@ -119,8 +119,10 @@ bool FFFPFlatPanel::updateProperties()
         DI::updateProperties();
         LI::updateProperties();
         
-        defineProperty(&FirmwareTP);
+        FirmwareT[0].text = const_cast<char*>(firmareVersion.c_str());
         LightIntensityNP[0].setMax(maxSupportedBrightness);
+        
+        defineProperty(&FirmwareTP);
     }
     else
     {
