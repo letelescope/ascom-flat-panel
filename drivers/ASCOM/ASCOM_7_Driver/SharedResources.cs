@@ -119,7 +119,7 @@ namespace ASCOM.LocalServer
             var line_message = message.EndsWith(MESSAGE_TERMINATOR) ? message : message + MESSAGE_TERMINATOR;
             lock (lockObject)
             {
-                SharedSerial.Transmit(message);
+                SharedSerial.Transmit(line_message);
                 return SharedSerial.ReceiveTerminated(MESSAGE_TERMINATOR);
             }
         }
