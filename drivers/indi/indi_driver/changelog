@@ -1,0 +1,5 @@
+indi-letelescope-fffp-flatpanel (2.0.1-1) unstable; urgency=medium
+
+  * Initial release (version 2.0.1)
+
+ -- Florian Gautier <fgautier.mail@gmail.com>  $(date -R)
