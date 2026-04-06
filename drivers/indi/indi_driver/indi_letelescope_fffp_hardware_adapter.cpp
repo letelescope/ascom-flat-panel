@@ -173,7 +173,7 @@ bool LeTelescopeFFFPHardwareAdapter::openCover()
 
     char request[MAXRBUF] = {0};
     char response[MAXRBUF] = {0};
-    std::snprintf(request, MAXRBUF, "COMMAND:OPEN_COVER\n");
+    std::snprintf(request, MAXRBUF, "COMMAND:COVER_OPEN\n");
 
     if (!sendCommand(request, response, SERIAL_TIMEOUT_SEC, true))
         return false;
@@ -188,7 +188,7 @@ bool LeTelescopeFFFPHardwareAdapter::closeCover()
 
     char request[MAXRBUF] = {0};
     char response[MAXRBUF] = {0};
-    std::snprintf(request, MAXRBUF, "COMMAND:CLOSE_COVER\n");
+    std::snprintf(request, MAXRBUF, "COMMAND:COVER_CLOSE\n");
 
     if (!sendCommand(request, response, SERIAL_TIMEOUT_SEC, true))
         return false;
