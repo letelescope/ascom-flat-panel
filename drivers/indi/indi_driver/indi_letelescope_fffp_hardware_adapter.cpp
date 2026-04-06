@@ -156,11 +156,6 @@ bool LeTelescopeFFFPHardwareAdapter::setBrightness(int value)
     return true;
 }
 
-bool LeTelescopeFFFPHardwareAdapter::lightOn()
-{
-    return setBrightness(maxBrightness);
-}
-
 bool LeTelescopeFFFPHardwareAdapter::lightOff()
 {
     return setBrightness(0);
@@ -369,12 +364,6 @@ bool SimulationHardwareAdapter::setBrightness(int value)
         return false;
 
     currentBrightness = value;
-    return true;
-}
-
-bool SimulationHardwareAdapter::lightOn()
-{
-    currentBrightness = SIM_MAX_BRIGHTNESS;
     return true;
 }
 

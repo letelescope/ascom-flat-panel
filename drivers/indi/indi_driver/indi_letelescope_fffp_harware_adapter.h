@@ -83,12 +83,6 @@ class HardwareAdapter
         virtual bool setBrightness(int value) = 0;
 
         /**
-         * @brief Turn the light on
-         * @return true if successful, false otherwise
-         */
-        virtual bool lightOn() = 0;
-
-        /**
          * @brief Turn the light off
          * @return true if successful, false otherwise
          */
@@ -126,7 +120,6 @@ class LeTelescopeFFFPHardwareAdapter : public HardwareAdapter
         bool getBrightness(int *brightness) override;
         bool getMaxBrightness(int *brightness) override;
         bool setBrightness(int value) override;
-        bool lightOn() override;
         bool lightOff() override;
         bool openCover() override;
         bool closeCover() override;
@@ -174,7 +167,6 @@ class SimulationHardwareAdapter : public HardwareAdapter
         bool getBrightness(int *brightness) override;
         bool getMaxBrightness(int *brightness) override;
         bool setBrightness(int value) override;
-        bool lightOn() override;
         bool lightOff() override;
         bool openCover() override;
         bool closeCover() override;
