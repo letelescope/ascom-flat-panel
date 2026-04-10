@@ -51,6 +51,7 @@ sheet = doc.getObjectsByLabel(sheetname)[0]
 Rmax = sheet.get('spiral_Rmax')
 turns = sheet.get('spiral_turns')
 pipe_thickness = sheet.get('pipe_thickness')
+pipe_width = sheet.get('pipe_width')
 rotateX = sheet.get('spiral_rotation')
 translateX = sheet.get('panel_body_thickness') - sheet.get('panel_bottom_thickness')
 print("translateX", translateX)
@@ -134,10 +135,15 @@ sketch = body.newObject('Sketcher::SketchObject','GrooveProfile')
 sketch.AttachmentSupport = [(binder, "Edge1")]
 sketch.MapMode = "NormalToEdge"
 s = pipe_thickness
-sketch.addGeometry(Part.LineSegment(App.Vector(-s,-s/2,0),App.Vector(s,-s/2,0)))
-sketch.addGeometry(Part.LineSegment(App.Vector(s,-s/2,0),App.Vector(s,s/2,0)))
-sketch.addGeometry(Part.LineSegment(App.Vector(s,s/2,0),App.Vector(-s,s/2,0)))
-sketch.addGeometry(Part.LineSegment(App.Vector(-s,s/2,0),App.Vector(-s,-s/2,0)))
+w = pipe_width
+#sketch.addGeometry(Part.LineSegment(App.Vector(-s,-s/2,0),App.Vector(s,-s/2,0)))
+#sketch.addGeometry(Part.LineSegment(App.Vector(s,-s/2,0),App.Vector(s,s/2,0)))
+#sketch.addGeometry(Part.LineSegment(App.Vector(s,s/2,0),App.Vector(-s,s/2,0)))
+#sketch.addGeometry(Part.LineSegment(App.Vector(-s,s/2,0),App.Vector(-s,-s/2,0)))
+sketch.addGeometry(Part.LineSegment(App.Vector(-s,-w/2,0),App.Vector(s,-w/2,0)))
+sketch.addGeometry(Part.LineSegment(App.Vector(s,-w/2,0),App.Vector(s,w/2,0)))
+sketch.addGeometry(Part.LineSegment(App.Vector(s,w/2,0),App.Vector(-s,w/2,0)))
+sketch.addGeometry(Part.LineSegment(App.Vector(-s,w/2,0),App.Vector(-s,-w/2,0)))
 #recalcul du modèle
 doc.recompute()
 
