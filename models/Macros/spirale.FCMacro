@@ -162,6 +162,51 @@ sketch.ViewObject.Visibility = False
 #recalcul du modèle
 doc.recompute()
 
+# =========================================================
+# Chambre centrale pour faciliter le passage du fil
+# =========================================================
+
+center_radius = Rmax * 0.05
+
+center_sketch = body.newObject('Sketcher::SketchObject', 'CenterPocket')
+
+# même orientation que la spirale
+center_sketch.MapMode = "Deactivated"
+
+# placement identique aux transformations appliquées au wire
+rotY = App.Rotation(App.Vector(0,1,0), rotateY if rotateY else 0)
+rotX = App.Rotation(App.Vector(1,0,0), rotateX if rotateX else 0)
+
+placement = App.Placement(
+    App.Vector(translateX if translateX else 0, 0, 0),
+    rotX.multiply(rotY)
+)
+
+center_sketch.Placement = placement
+
+# cercle central
+circle = Part.Circle(
+    App.Vector(0,0,0),
+    App.Vector(0,0,1),
+    center_radius
+)
+
+center_sketch.addGeometry(circle)
+
+doc.recompute()
+
+# pocket circulaire
+center_pocket = body.newObject('PartDesign::Pocket', 'CenterPocketCut')
+
+center_pocket.Profile = center_sketch
+center_pocket.Length = pipe_thickness
+center_pocket.Type = "Length"
+
+doc.recompute()
+
+# cacher l'esquisse technique
+center_sketch.ViewObject.Visibility = False
+
 print("Recap : ")
 V=12 #V
 R_per_m = sheet.get('wire_resistivity')  # Ω/m

@@ -6,7 +6,9 @@ for name in [
     "SpiralPath",
     "SpiralBinder",
     "GrooveProfile",
-    "SpiralGroove"
+    "SpiralGroove",
+    "CenterPocket",
+    "CenterPocketCut"
 ]:
     obj = doc.getObject(name)
     if obj:
