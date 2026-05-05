@@ -61,7 +61,9 @@ for name in [
     "SpiralPath",
     "SpiralBinder",
     "GrooveProfile",
-    "SpiralGroove"
+    "SpiralGroove",
+    "CenterPocket",
+    "CenterPocketCut"
 ]:
     obj = doc.getObject(name)
     if obj:
@@ -166,7 +168,8 @@ doc.recompute()
 # Chambre centrale pour faciliter le passage du fil
 # =========================================================
 
-center_radius = Rmax * 0.05
+# center_radius = Rmax * 0.05
+center_radius = 0.5 * pitch
 
 center_sketch = body.newObject('Sketcher::SketchObject', 'CenterPocket')
 
