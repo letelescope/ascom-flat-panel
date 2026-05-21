@@ -1,0 +1,28 @@
+import FreeCAD as App
+import os
+
+doc = App.ActiveDocument
+
+# dossier du fichier FCStd
+project_dir = os.path.dirname(doc.FileName)
+
+# chemin vers les polices
+fonts_dir = os.path.join(project_dir, "Fonts")
+
+for obj in doc.Objects:
+
+    if obj.TypeId == "Part::Part2DObjectPython":
+
+        if hasattr(obj, "FontFile"):
+
+            font_name = os.path.basename(obj.FontFile)
+
+            new_path = os.path.join(fonts_dir, font_name).replace("\\", "/")
+			
+
+            if os.path.exists(new_path):
+
+                print(f"Relink font: {obj.Label}")
+                obj.FontFile = new_path
+
+doc.recompute()

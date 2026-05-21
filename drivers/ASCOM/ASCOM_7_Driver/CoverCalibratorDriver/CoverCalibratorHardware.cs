@@ -39,7 +39,12 @@ namespace ASCOM.LeTelescopeFFFP.CoverCalibrator
         internal const string comPortDefault = "COM1";
         internal const string traceStateProfileName = "Trace Level";
         internal const string traceStateDefault = "true";
-
+        internal const string firmwareInfoProfileName = "Firmware info";
+        internal const string firmwareInfoDefault = "-";
+        internal const string firmwareVersionProfileName = "Firmware version";
+        internal const string firmwareVersionDefault = "-";
+        internal const string maxBrightnessProfileName = "Maximum brightness";
+        internal const string maxBrightnessDefault = "-1";
         // Constants related to message structure as per our protocol
         // A Message is TYPE:MESSAGE
         // This driver will
@@ -54,9 +59,12 @@ namespace ASCOM.LeTelescopeFFFP.CoverCalibrator
         private const string EMPTY_ARGS = "";
         // Command Names
         private const string CMD_PING = "PING";
+        internal const string CMD_INFO = "INFO";
+        internal const string CMD_VERSION = "VERSION";
         private const string CMD_COVER_GET = "COVER_GET_STATE";
         private const string CMD_COVER_OPEN = "COVER_OPEN";
         private const string CMD_COVER_CLOSE = "COVER_CLOSE";
+        internal const string CMD_MAX_BRIGHTNESS = "MAX_BRIGHTNESS";
         private const string CMD_BRIGHTNESS_GET = "BRIGHTNESS_GET";
         private const string CMD_BRIGHTNESS_SET = "BRIGHTNESS_SET";
         private const string CMD_BRIGHTNESS_RESET = "BRIGHTNESS_RESET";
@@ -64,13 +72,15 @@ namespace ASCOM.LeTelescopeFFFP.CoverCalibrator
         // Expected restults
         private const string GENERIC_RSLT_OK = "OK";
         private const string PING_RSLT_PONG = "PONG";
-        private const int MAX_BRIGHTNESS = 2047; // Maybe could be given by the hardware for better flexibility
         private const int MIN_BRIGNTESS = 0;
 
 
         private static string DriverProgId = ""; // ASCOM DeviceID (COM ProgID) for this driver, the value is set by the driver's class initialiser.
         private static string DriverDescription = ""; // The value is set by the driver's class initialiser.
         internal static string comPort; // COM port name (if required)
+        internal static string firmwareInfo;
+        internal static string firmwareVersion;
+        internal static int panelMaxBrightness =-1;
         private static bool connectedState; // Local server's connected state
         private static bool runOnce = false; // Flag to enable "one-off" activities only to run once.
         internal static TraceLogger tl; // Local server's trace logger object for diagnostic log with information that you specify
@@ -403,7 +413,7 @@ namespace ASCOM.LeTelescopeFFFP.CoverCalibrator
             {
                 Version version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
                 // TODO customise this driver description if required
-                string driverInfo = $"Le Telescope FFFP ASCOM CoverCalibrator driver . Version: {version.Major}.{version.Minor}";
+                string driverInfo = $"Le Telescope FFFP ASCOM CoverCalibrator driver.\nVersion: {version.Major}.{version.Minor}. Firmware version: {firmwareVersion}";
                 LogMessage("DriverInfo Get", driverInfo);
                 return driverInfo;
             }
@@ -604,7 +614,7 @@ namespace ASCOM.LeTelescopeFFFP.CoverCalibrator
                     throw new InvalidOperationException($"Invalid response {response} from device. Hardware may be in a weird state");
                 }
 
-                if (brightness < MIN_BRIGNTESS || brightness > MAX_BRIGHTNESS)
+                if (brightness < MIN_BRIGNTESS || brightness > panelMaxBrightness)
                 {
                     LogMessage(identifier, $"Invalid response {response} from device. Hardware may be in a weird state");
                     throw new InvalidOperationException($"Invalid response {response} from device. Hardware may be in a weird state");
@@ -621,8 +631,8 @@ namespace ASCOM.LeTelescopeFFFP.CoverCalibrator
         {
             get
             {
-                LogMessage("MaxBrightness Get", $"{MAX_BRIGHTNESS}");
-                return MAX_BRIGHTNESS;
+                LogMessage("MaxBrightness Get", $"{panelMaxBrightness}");
+                return panelMaxBrightness;
             }
         }
 
@@ -634,10 +644,10 @@ namespace ASCOM.LeTelescopeFFFP.CoverCalibrator
         {
             var identifier = "CalibratorOn";
 
-            if (Brightness < MIN_BRIGNTESS && Brightness > MAX_BRIGHTNESS)
+            if (Brightness < MIN_BRIGNTESS && Brightness > panelMaxBrightness)
             {
-                LogMessage(identifier, $"Invalid brightness {Brightness}. Should be an int ranging from {MIN_BRIGNTESS} to {MAX_BRIGHTNESS}");
-                throw new InvalidOperationException($"Invalid brightness {Brightness}. Should be an int ranging from {MIN_BRIGNTESS} to {MAX_BRIGHTNESS}");
+                LogMessage(identifier, $"Invalid brightness {Brightness}. Should be an int ranging from {MIN_BRIGNTESS} to {panelMaxBrightness}");
+                throw new InvalidOperationException($"Invalid brightness {Brightness}. Should be an int ranging from {MIN_BRIGNTESS} to {panelMaxBrightness}");
 
             }
 
@@ -676,6 +686,48 @@ namespace ASCOM.LeTelescopeFFFP.CoverCalibrator
 
         // Useful methods that can be used as required to help with driver development
 
+        internal static string FirmwareVersionFromDevice()
+        {
+            var identifier = "FirmwareVersionFromDevice";
+
+            string response = SendCommand(identifier: identifier, command: CMD_VERSION);
+
+            LogMessage(identifier, response);
+            return response;
+        }
+
+        internal static string FirmwareInfoFromDevice()
+        {
+            var identifier = "FirmwareInfoce";
+
+            string response = SendCommand(identifier: identifier, command: CMD_INFO);
+
+            LogMessage(identifier, response);
+            return response;
+        }
+
+        internal static int FirmwareMaxBrightnessFromDevice()
+        {
+            var identifier = "MaxBrightnessFromDevice";
+
+            string response = SendCommand(identifier: identifier, command: CMD_MAX_BRIGHTNESS);
+
+            int brightness = -1;
+            try
+            {
+                brightness = int.Parse(response);
+            }
+            catch
+            {
+                LogMessage(identifier, $"Invalid response {response} from device. Hardware may be in a weird state");
+                throw new InvalidOperationException($"Invalid response {response} from device. Hardware may be in a weird state");
+            }
+
+            LogMessage(identifier, response);
+            return brightness;
+        }
+
+
         /// <summary>
         /// Send a command via Serial and wait for the firmware response
         /// </summary>
@@ -705,12 +757,12 @@ namespace ASCOM.LeTelescopeFFFP.CoverCalibrator
             return cmd_result.Trim();
         }
 
-        private static string ExpectedResultPrefixBuilder(string command)
+        internal static string ExpectedResultPrefixBuilder(string command)
         {
             return $"{RESULT_TYPE}{TYPE_COMMAND_SEPARATOR}{command}{COMMAND_ARGS_SEPARATOR}";
         }
 
-        private static string CommandBuilder(string command, string args = EMPTY_ARGS)
+        internal static string CommandBuilder(string command, string args = EMPTY_ARGS)
         {
             string message = $"{COMMAND_TYPE}{TYPE_COMMAND_SEPARATOR}{command}";
             message = string.IsNullOrWhiteSpace(args) ? message : $"{message}{COMMAND_ARGS_SEPARATOR}{args}";
@@ -781,13 +833,17 @@ namespace ASCOM.LeTelescopeFFFP.CoverCalibrator
         /// <summary>
         /// Read the device configuration from the ASCOM Profile store
         /// </summary>
-        internal static void ReadProfile()
+        internal static void  ReadProfile()
         {
             using (Profile driverProfile = new Profile())
             {
                 driverProfile.DeviceType = "CoverCalibrator";
                 tl.Enabled = Convert.ToBoolean(driverProfile.GetValue(DriverProgId, traceStateProfileName, string.Empty, traceStateDefault));
                 comPort = driverProfile.GetValue(DriverProgId, comPortProfileName, string.Empty, comPortDefault);
+                firmwareInfo = driverProfile.GetValue(DriverProgId, firmwareInfoProfileName, string.Empty, firmwareInfoDefault);
+                firmwareVersion = driverProfile.GetValue(DriverProgId,firmwareVersionProfileName, string.Empty, firmwareVersionDefault);
+                Int32.TryParse(driverProfile.GetValue(DriverProgId, maxBrightnessProfileName, string.Empty, maxBrightnessDefault), out panelMaxBrightness);
+                
             }
         }
 
@@ -801,6 +857,9 @@ namespace ASCOM.LeTelescopeFFFP.CoverCalibrator
                 driverProfile.DeviceType = "CoverCalibrator";
                 driverProfile.WriteValue(DriverProgId, traceStateProfileName, tl.Enabled.ToString());
                 driverProfile.WriteValue(DriverProgId, comPortProfileName, comPort.ToString());
+                driverProfile.WriteValue(DriverProgId, firmwareInfoProfileName, firmwareInfo.ToString());
+                driverProfile.WriteValue(DriverProgId, firmwareVersionProfileName, firmwareVersion.ToString());
+                driverProfile.WriteValue(DriverProgId, maxBrightnessProfileName, panelMaxBrightness.ToString());
             }
         }
 

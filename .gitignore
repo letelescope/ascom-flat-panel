@@ -413,3 +413,6 @@ firmware/fffp_firmware/.vscode/.browse.c_cpp.db*
 firmware/fffp_firmware/.vscode/c_cpp_properties.json
 firmware/fffp_firmware/.vscode/launch.json
 firmware/fffp_firmware/.vscode/ipch
+
+#Kicad
+electronics/*/*/*-backups

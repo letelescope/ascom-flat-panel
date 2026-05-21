@@ -65,6 +65,10 @@
 #include <Samd21_PulseWidthModulation.h>
 #include <FF_FlatPanel.h>
 
+#if !defined FFFP_TYPE_EL_PANEL && !defined FFFP_TYPE_LED_PANEL 
+    #error "Light panel type undefined. FFFP_TYPE_LED_PANEL or FFFP_TYPE_EL_PANEL must be set in the build settings"
+#endif
+
 /************************************************
  *     Types, Objects, and data structures      *
  ***********************************************/
@@ -114,6 +118,21 @@ typedef struct
 /*
  * Messages parser related constants
  */
+
+#if ! defined FFFP_FIRMWARE_VERSION
+#error "FFFP_FIRMWARE_VERSION not defined"
+#endif
+#if ! defined FFFP_GIT_REV
+#error "FFFP_GIT_REV not defined"
+#endif
+#if defined FFFP_TYPE_EL_PANEL
+constexpr auto FFFP_PANEL_TYPE = ".el_panel-";
+#elif defined FFFP_TYPE_LED_PANEL 
+constexpr auto FFFP_PANEL_TYPE = ".led_panel-";
+#else
+#error "Light panel type undefined. FFFP_TYPE_LED_PANEL or FFFP_TYPE_EL_PANEL must be set in the build settings"
+#endif
+
 constexpr auto MESSAGE_END_DELIMITER = "\n";
 constexpr auto TYPE_COMMAND_SEPARATOR = ":";
 constexpr auto COMMAND_ARGS_SEPARATOR = "@";
@@ -129,8 +148,17 @@ constexpr auto COMMAND_PING = "PING";
 constexpr auto RESULT_PING = "PONG";
 
 constexpr auto COMMAND_INFO = "INFO";
-constexpr auto RESULT_INFO = "Le Telescope - Ivry sur Seine - Flat Panel Firmware v2.0";
+constexpr auto RESULT_INFO_MSG_START = "Le Telescope - Ivry sur Seine - Flat Panel Firmware v";
+#if defined FFFP_TYPE_EL_PANEL
+constexpr auto RESULT_INFO_MSG_MIDDLE_PART = ". Built for an EL panel. Git Revision: ";
+#elif defined FFFP_TYPE_LED_PANEL 
+constexpr auto RESULT_INFO_MSG_MIDDLE_PART = ". Built for an LED panel. Git Revision: ";
+#else
+#error "Light panel type undefined. FFFP_TYPE_LED_PANEL or FFFP_TYPE_EL_PANEL must be set in the build settings"
+#endif
 
+constexpr auto COMMAND_VERSION = "VERSION";
+constexpr auto COMMAND_MAX_BRIGHTNESS = "MAX_BRIGHTNESS";
 constexpr auto COMMAND_BRIGHTNESS_GET = "BRIGHTNESS_GET";
 constexpr auto COMMAND_BRIGHTNESS_SET = "BRIGHTNESS_SET";
 constexpr auto COMMAND_BRIGHTNESS_RESET = "BRIGHTNESS_RESET";
@@ -160,13 +188,22 @@ constexpr auto ERROR_INVALID_COMMAND = "INVALID_COMMAND@Allowed commands PING, I
 constexpr auto ERROR_WANTED_BRIGHTNESS_MSG_START = "INVALID_BRIGHTNESS@Wanted brightness {";
 constexpr auto ERROR_WANTED_BRIGHTNESS_NAN_MSG_END = "} is not a number.";
 constexpr auto ERROR_WANTED_BRIGHTNESS_NEGATIVE_MSG_END = "} is negative.";
-constexpr auto ERROR_WANTED_BRIGHTNESS_TOO_BIG_MSG_END = "} is bigger than max allowed value 2047";
+#if defined FFFP_TYPE_EL_PANEL
+constexpr auto ERROR_WANTED_BRIGHTNESS_TOO_BIG_MSG_END = "} is bigger than max allowed value 1023.";
+#elif defined FFFP_TYPE_LED_PANEL 
+constexpr auto ERROR_WANTED_BRIGHTNESS_TOO_BIG_MSG_END = "} is bigger than max allowed value 2047.";
+#else
+#error "Light panel type undefined. FFFP_TYPE_LED_PANEL or FFFP_TYPE_EL_PANEL must be set in the build settings"
+#endif
+
 constexpr auto ERROR_SERVO_NOT_CALIBRATED = "SERVO_NOT_CALIBRATED@Run command COVER_CALIBRATION_RUN first";
 
-#define NB_COMMANDS 11
+#define NB_COMMANDS 13
 // Keeps the record of allowed/known commands
 const command_t allowed_cmds[NB_COMMANDS] = {{COMMAND_PING, &cmd_ping},
                                                  {COMMAND_INFO, &cmd_info},
+                                                 {COMMAND_VERSION, &cmd_version},
+                                                 {COMMAND_MAX_BRIGHTNESS, &cmd_max_brightness},
                                                  {COMMAND_BRIGHTNESS_GET, &cmd_brightness_get},
                                                  {COMMAND_BRIGHTNESS_SET, &cmd_brightness_set},
                                                  {COMMAND_BRIGHTNESS_RESET, &cmd_brightness_reset},
@@ -181,12 +218,21 @@ const command_t allowed_cmds[NB_COMMANDS] = {{COMMAND_PING, &cmd_ping},
  * Light panel related constants
  */
 constexpr uint32_t MIN_BRIGHTNESS = 0;
+#if defined FFFP_TYPE_EL_PANEL
+// Seeeduino Xiao DAC max resolution is 10 bit. hence we set max brightness to 2^10-1 = 1023
+constexpr uint32_t MAX_BRIGHTNESS = 1023;
+constexpr float DAC_RESOLUTION_BITS = 10;
+#elif defined FFFP_TYPE_LED_PANEL
 // Eventhough we use 16bits register counters for PWM at 20 000 Hz the actual resolution is more 2^11.
 // The rationale being that the CPU clock frequency (48 MHz) is the limiting factor here.
 // For exemple at 20kHz pwm, there is arout 2500 cpu cycle during a full period. Hence effectively the resolution is at most something aroun 11bit.
 // This was validated experimentally. The effective rsolution is just shy aboce 11bit in this case. To be conservative we choose 11bit.
 constexpr uint32_t MAX_BRIGHTNESS = 2047;
 constexpr float PWM_FREQ = 20000.0f;
+#else
+#error "Light panel type undefined. FFFP_TYPE_LED_PANEL or FFFP_TYPE_EL_PANEL must be set in the build settings"
+#endif
+
 
 /*
  * DSS-M15S Servo with analog feedback related constants
@@ -207,7 +253,14 @@ constexpr uint32_t SERVO_MAX_PW = 2500;
  * Pins assignment. Must be set according to the exact actual wiring.
  * Check KiCad shcematics to check the correct pins
  */
+
+#if defined FFFP_TYPE_EL_PANEL
+constexpr unsigned int EL_PANEL_DAC_PIN = A0;
+#elif defined FFFP_TYPE_LED_PANEL
 constexpr unsigned int LEDSTRIP_PIN = 8;
+#else
+#error "Light panel type undefined. FFFP_TYPE_LED_PANEL or FFFP_TYPE_EL_PANEL must be set in the build settings"
+#endif
 
 constexpr unsigned int SERVO_POWER_PIN = 4;
 constexpr unsigned int SERVO_POS_CONTROL_PIN = 5;
@@ -237,9 +290,11 @@ panel_state_t panel;
 // Client used to interact with the servo motor.
 Servo servo;
 
+#if defined FFFP_TYPE_LED_PANEL
 // Controller to set led brightness
 //  We choose PIN 8 as its timer counter is TCC1 wich is a 16bit register that will allow us for the fast PWM and stil above par resolution.
 SAMD21_PWM pwm_controller = {LEDSTRIP_PIN, PWM_FREQ, 0};
+#endif
 
 // Defines "nvm_store", the actual Flash sotrage where the calibration data will be stored/retrieved
 FlashStorage(nvm_store, servo_cal_state_t);
@@ -261,6 +316,20 @@ FlashStorage(nvm_store, servo_cal_state_t);
  */
 void setup()
 {
+  // Make sure everything is off. 
+  // Reset all pins values
+  analogWrite(A0, 0);
+  analogWrite(A1, 0);
+  analogWrite(A2, 0);
+  analogWrite(A3, 0);
+  analogWrite(A4, 0);
+  analogWrite(A5, 0);
+  analogWrite(A6, 0);
+  analogWrite(A7, 0);
+  analogWrite(A8, 0);
+  analogWrite(A9, 0);
+  analogWrite(A10, 0);
+  
   // Make sure the RX, TX, and built-in LEDs don't turn on, they are very bright!
   // Even though the board is inside an enclosure, the light can be seen shining
   // through the small opening for the USB connector! Unfortunately, it is not
@@ -274,6 +343,22 @@ void setup()
   pinMode(SERVO_FEEDBACK_PIN, INPUT);
   pinMode(SERVO_POS_CONTROL_PIN, OUTPUT);
 
+#if defined FFFP_TYPE_EL_PANEL
+  analogWriteResolution(10); // Set DAC resolution to 10 bits
+#endif
+
+  // initializing panel brig
+  panel.brightness = 0;
+  set_brightness();
+
+  panel.servo_position = 0;
+  panel.position_convergence_counter = 0;
+  panel.last_step_time = 0L;
+  panel.last_cal_check_time = 0L;
+
+  // Read servo calibration data oin Flash storage:
+  panel.calibration = nvm_store.read();
+
   // start serial port at 57600 bps:
   Serial.begin(57600);
   // Let's wait for an actual connection on the serial port.
@@ -285,19 +370,10 @@ void setup()
 
   digitalWrite(LED_BUILTIN, HIGH);
 
+#if defined FFFP_TYPE_LED_PANEL
   // Start pwm
   pwm_controller.startPWM();
-
-  // initializing panel
-  panel.brightness = 0;
-  set_brightness();
-  panel.servo_position = 0;
-  panel.position_convergence_counter = 0;
-  panel.last_step_time = 0L;
-  panel.last_cal_check_time = 0L;
-
-  // Read servo calibration data oin Flash storage:
-  panel.calibration = nvm_store.read();
+#endif
 
   // When there is no calibration data yet, we have to assume that the cover is closed...
   if (!is_panel_calibrated())
@@ -533,9 +609,40 @@ void cmd_ping(const String args)
  */
 void cmd_info(const String args)
 {
-  serialize_result(COMMAND_INFO, RESULT_INFO);
+  String result_info_msg = String(RESULT_INFO_MSG_START) + full_version() + RESULT_INFO_MSG_MIDDLE_PART + FFFP_GIT_REV;
+  serialize_result(COMMAND_INFO, result_info_msg);
 }
 
+/*
+ * Info command handler.
+ *
+ * This command answers with the version info of the firmware to a COMMAND:INFO message.
+ *
+ * Incoming message : COMMAND:VERSION
+ * Args             : Ignored
+ * Serial response  : RESULT:VERSION@x.y.z.{el_panel|led_panel}.<Git Revision>.
+ * Serial error     : Never
+ */
+void cmd_version(const String args)
+{
+  serialize_result(COMMAND_VERSION, full_version());
+}
+
+/*
+ * "Get Max Brightness" command handler.
+ *
+ * This command answers with the maximum brightness value to a COMMAND:MAX_BRIGHTNESS message.
+ *
+ * Incoming message : COMMAND:MAX_BRIGHTNESS
+ * Args             : Ignored
+ * Serial response  : RESULT:MAX_BRIGHTNESS@{MAX_BRIGHTNESS}, where {MAX_BRIGHTNESS} is the
+ *                    constant defined in this file. This depends on the panel type (definition is behind preprocessor directives)
+ * Serial error     : Never
+ */
+void cmd_max_brightness(const String args)
+{
+  serialize_result(COMMAND_MAX_BRIGHTNESS, String(MAX_BRIGHTNESS));
+}
 /*
  * "Get Brightness" command handler.
  *
@@ -932,6 +1039,12 @@ command_t get_command_from_payload(const msg_cmd_payload input)
   return command_t{COMMAND_UNKNOWN, &cmd_unknown};
 }
 
+// Construct the full version from the Main version, the panel type and the GIT revision
+String full_version(){
+  String version = String(FFFP_FIRMWARE_VERSION) + FFFP_PANEL_TYPE +  FFFP_GIT_REV;
+  return version;
+}
+
 // The serial message will be
 // RESULT:{command}@{message}
 void serialize_result(String command, String message)
@@ -989,11 +1102,18 @@ bool has_only_zeros(String num)
 
 void set_brightness()
 {
+#if defined FFFP_TYPE_EL_PANEL
+  // Set DAC output to the wanted brightness level
+  analogWrite(EL_PANEL_DAC_PIN, panel.brightness);
+#elif defined FFFP_TYPE_LED_PANEL
   // This is ripped almost as is from https://github.com/jlecomte/ascom-flat-panel all credits to him.
   // The effective rsolution is just shy above 11bit in this case. Hence the brightness setting is something in between 0 an 2^11-1 (MAX_BRIGHTNESS)/
   // The Pin 8 uses a 16 bit register TCC1. Hence we map the brightness setting from the range 0<->2^11 -1 to the "register" range 0 <-> 2^16 -1
   uint16_t actual_duty_cycle = map(panel.brightness, 0, MAX_BRIGHTNESS, 0, MAX_16BIT);
   pwm_controller.setPWM(LEDSTRIP_PIN, PWM_FREQ, actual_duty_cycle);
+#else
+#error "Light panel type undefined. FFFP_TYPE_LED_PANEL or FFFP_TYPE_EL_PANEL must be set in the build settings"
+#endif
 }
 
 // Energize and attach servo.

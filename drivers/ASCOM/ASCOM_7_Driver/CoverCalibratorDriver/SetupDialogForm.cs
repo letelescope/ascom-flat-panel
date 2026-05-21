@@ -11,11 +11,13 @@
 //   - Florian Thibaud
 //   - Florian Gautier		
 //
+using ASCOM.LocalServer;
+using ASCOM.Utilities;
 using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
+using System.Runtime.Remoting.Messaging;
 using System.Windows.Forms;
-using ASCOM.Utilities;
 
 namespace ASCOM.LeTelescopeFFFP.CoverCalibrator
 {
@@ -23,6 +25,8 @@ namespace ASCOM.LeTelescopeFFFP.CoverCalibrator
     public partial class SetupDialogForm : Form
     {
         const string NO_PORTS_MESSAGE = "No COM ports found";
+        const string DEFAULT_LABEL_VALUE = "-";
+        static Guid Guid = Guid.NewGuid();
         TraceLogger tl; // Holder for a reference to the driver's trace logger
 
         public SetupDialogForm(TraceLogger tlDriver)
@@ -34,6 +38,7 @@ namespace ASCOM.LeTelescopeFFFP.CoverCalibrator
 
             // Initialise current values of user settings from the ASCOM Profile
             InitUI();
+
         }
 
         private void CmdOK_Click(object sender, EventArgs e) // OK button event handler
@@ -41,6 +46,8 @@ namespace ASCOM.LeTelescopeFFFP.CoverCalibrator
             // Place any validation constraint checks here and update the state variables with results from the dialogue
 
             tl.Enabled = chkTrace.Checked;
+
+            int wannabeeBrightness = -1;
 
             // Update the COM port variable if one has been selected
             if (comboBoxComPort.SelectedItem is null) // No COM port selected
@@ -51,11 +58,32 @@ namespace ASCOM.LeTelescopeFFFP.CoverCalibrator
             {
                 tl.LogMessage("Setup OK", $"New configuration values - NO COM ports detected on this PC.");
             }
-            else // A valid COM port has been selected
+            else if (info_rslt_lbl.Text.Equals(DEFAULT_LABEL_VALUE))
+            {
+                tl.LogMessage("Setup OK", $"New configuration values - Driver did not send infos.");
+            }
+            else if (version_rslt_lbl.Text.Equals(DEFAULT_LABEL_VALUE))
+            {
+                tl.LogMessage("Setup OK", $"New configuration values - Driver did not send version.");
+            }
+            else if (!Int32.TryParse(maxbrightness_rslt_lbl.Text, out wannabeeBrightness))
+            {
+                tl.LogMessage("Setup OK", $"New configuration values - Driver did not send max brightness.");
+            }
+            else if (wannabeeBrightness <= 0)
+            {
+                tl.LogMessage("Setup OK", $"New configuration values - Maw brightness was negative.");
+            }
+            else // Everything looks good
             {
                 CoverCalibratorHardware.comPort = (string)comboBoxComPort.SelectedItem;
-                tl.LogMessage("Setup OK", $"New configuration values - COM Port: {comboBoxComPort.SelectedItem}");
+                CoverCalibratorHardware.firmwareInfo = info_rslt_lbl.Text;
+                CoverCalibratorHardware.firmwareVersion = version_rslt_lbl.Text;
+                CoverCalibratorHardware.panelMaxBrightness = wannabeeBrightness;
+                tl.LogMessage("Setup OK", $"New configuration values - ;COM Port: {comboBoxComPort.SelectedItem}; Driver info: {info_rslt_lbl.Text}; Driver version: {version_rslt_lbl.Text}; Max brightness: {wannabeeBrightness}");
             }
+
+
         }
 
         private void CmdCancel_Click(object sender, EventArgs e) // Cancel button event handler
@@ -120,6 +148,28 @@ namespace ASCOM.LeTelescopeFFFP.CoverCalibrator
                 comboBoxComPort.SelectedItem = CoverCalibratorHardware.comPort;
             }
 
+            if (CoverCalibratorHardware.panelMaxBrightness > 0)
+            {
+                maxbrightness_rslt_lbl.Text = "" + CoverCalibratorHardware.panelMaxBrightness;
+            }
+
+            if (CoverCalibratorHardware.firmwareInfo != null && !String.Empty.Equals(CoverCalibratorHardware.firmwareInfo))
+            {
+                info_rslt_lbl.Text = CoverCalibratorHardware.firmwareInfo;
+            }
+
+            if (CoverCalibratorHardware.firmwareVersion != null && !String.Empty.Equals(CoverCalibratorHardware.firmwareVersion))
+            {
+                version_rslt_lbl.Text = CoverCalibratorHardware.firmwareVersion;
+            }
+
+            if (comboBoxComPort.SelectedItem is null || comboBoxComPort.SelectedItem.ToString() == NO_PORTS_MESSAGE) // No COM port selected
+            {
+                buttonCheck.Enabled = false;
+            }
+
+            checkEnableOk();
+
             tl.LogMessage("InitUI", $"Set UI controls to Trace: {chkTrace.Checked}, COM Port: {comboBoxComPort.SelectedItem}");
         }
 
@@ -134,6 +184,112 @@ namespace ASCOM.LeTelescopeFFFP.CoverCalibrator
                 Focus();
                 BringToFront();
                 TopMost = false;
+            }
+        }
+
+        private void buttonCheck_Click(object sender, EventArgs e)
+        {
+
+            if (comboBoxComPort.SelectedItem is null || comboBoxComPort.SelectedItem.ToString() == NO_PORTS_MESSAGE) // No COM port selected
+            {
+                return;
+            }
+
+            string old_port = CoverCalibratorHardware.comPort;
+
+            try
+            {
+
+                progress.Visible = true;
+                buttonCheck.Enabled = false;
+                CoverCalibratorHardware.comPort = (string)comboBoxComPort.SelectedItem;
+                CoverCalibratorHardware.SetConnected(Guid, true);
+                progress.PerformStep();
+                string device_firmware_info;
+                string device_firmware_version;
+                int device_firmware_max_brightness;
+
+                device_firmware_info = CoverCalibratorHardware.FirmwareInfoFromDevice();
+                progress.PerformStep();
+                device_firmware_version = CoverCalibratorHardware.FirmwareVersionFromDevice();
+                progress.PerformStep();
+                device_firmware_max_brightness = CoverCalibratorHardware.FirmwareMaxBrightnessFromDevice();
+                progress.PerformStep();
+                info_rslt_lbl.Text = device_firmware_info.Replace(". Buil", ".\nBuil");
+                version_rslt_lbl.Text = device_firmware_version;
+                maxbrightness_rslt_lbl.Text = "" + device_firmware_max_brightness;
+
+
+                if (!checkEnableOk())
+                {
+                    CoverCalibratorHardware.comPort = old_port;
+                }
+                progress.PerformStep();
+            }
+            catch (Exception ex)
+            {
+                tl.LogMessage("Check device", $"Sending info requests to device failed {ex}");
+                MessageBox.Show($"Sending information requests to device failed {ex}");
+                CoverCalibratorHardware.comPort = old_port;
+            }
+            finally
+            {
+                buttonCheck.Enabled = true; 
+                try
+                {
+                    CoverCalibratorHardware.SetConnected(Guid, false);
+                    progress.PerformStep();
+                }
+                catch (Exception ex)
+                {
+                    tl.LogMessage("Check device", $"Failed disconnecting from device {ex}");
+                }
+                progress.Value = 0;
+                progress.Visible = false;
+            }
+
+        }
+        private bool checkEnableOk()
+        {
+            int current_brighthess;
+
+            if (comboBoxComPort.SelectedItem is null)
+            {
+                cmdOK.Enabled = false;
+            }
+            else if (comboBoxComPort.SelectedItem.ToString() == NO_PORTS_MESSAGE)
+            {
+                cmdOK.Enabled = false;
+            }
+            else if (info_rslt_lbl.Text.ToString().Equals("-"))
+            {
+                cmdOK.Enabled = false;
+            }
+            else if (version_rslt_lbl.Text.ToString().Equals("-"))
+            {
+                cmdOK.Enabled = false;
+            }
+            else if (!Int32.TryParse(maxbrightness_rslt_lbl.Text, out current_brighthess))
+            {
+                cmdOK.Enabled = false;
+            }
+            else
+            {
+                cmdOK.Enabled = true;
+            }
+
+            return cmdOK.Enabled;
+        }
+
+        private void comboBoxComPort_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (comboBoxComPort.SelectedItem is null || comboBoxComPort.SelectedItem.ToString() == NO_PORTS_MESSAGE) // No COM port selected
+            {
+                buttonCheck.Enabled = false;
+            }
+            else
+            {
+                buttonCheck.Enabled = true;
             }
         }
     }

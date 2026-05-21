@@ -1,5 +1,5 @@
 //
-// Indi AuxDevice, LightBox and DustCap driver for LeTelescopeFFFPV1
+// Indi AuxDevice, LightBox and DustCap driver for LeTelescopeFFFP
 //
 // Copyright(C) 2025 - Present, Le Télescope - Ivry sur Seine - All Rights Reserved
 // Licensed under the MIT License. See the accompanying LICENSE file for terms.
@@ -45,6 +45,9 @@
 // - https://github.com/jlecomte/ascom-wireless-flat-panel
 // - https://github.com/jlecomte/ascom-telescope-cover-v2
 //
+// The driver architecture is is heavily inspired by the Gemini Adapter for the Gemini Flat Panel (https://github.com/indilib/indi/blob/master/drivers/auxiliary/gemini_flatpanel_adapters.h)
+// as well as the Flip Flat driver (https://github.com/indilib/indi/blob/master/drivers/auxiliary/flip_flat.h)
+//
 // Implements:	INDI::LightBoxInterface, INDI::DustCapInterface
 // Inherits:    INDI::DefaultDevice
 // 
@@ -55,17 +58,19 @@
 #include "libindi/defaultdevice.h"
 #include "libindi/indilightboxinterface.h"
 #include "libindi/indidustcapinterface.h"
+#include "indi_letelescope_fffp_harware_adapter.h"
+#include <memory>
 
 namespace Connection
 {
     class Serial;
 }
 
-class FFFPV1FlatPanel : public INDI::DefaultDevice, public INDI::LightBoxInterface, public INDI::DustCapInterface
+class FFFPFlatPanel : public INDI::DefaultDevice, public INDI::LightBoxInterface, public INDI::DustCapInterface
 {
 public:
-    FFFPV1FlatPanel();
-    virtual ~FFFPV1FlatPanel() = default;
+    FFFPFlatPanel();
+    virtual ~FFFPFlatPanel() = default;
 
     virtual const char *getDefaultName() override;
 
@@ -95,7 +100,19 @@ protected:
 private: // serial connection
     bool Handshake();
     bool sendCommand(const char *cmd);
-    int PortFD{-1};
 
+    static constexpr int USER_BRIGHTNESS_MAX = 255;
+    int maxSupportedBrightness{-1};
+    std::string firmareVersion;
+
+    int userToHardwareBrightness(uint16_t userValue) const;
+    uint16_t hardwareToUserBrightness(int hardwareValue) const;
+
+    std::unique_ptr<HardwareAdapter> hardwareAdapter;
     Connection::Serial *serialConnection{nullptr};
+
+    // Properties for debug and control
+    ITextVectorProperty FirmwareTP;
+    IText FirmwareT[1];
+
 };

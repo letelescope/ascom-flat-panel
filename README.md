@@ -42,6 +42,8 @@ The Pulse Width Modulation (PWM), used to control the panel brightness, implemen
 
 Kudos to him too.
 
+Finally te INDI driver architecture follows very closely the official [Gemini Flat Panel](https://github.com/indilib/indi/blob/master/drivers/auxiliary/gemini_flatpanel.h) as well as teh [Flip Flat](https://github.com/indilib/indi/blob/master/drivers/auxiliary/flip_flat.h) implemtentations. 
+
 ----
 
 ## Construction
@@ -52,11 +54,16 @@ In this scenario a flat panel is made of two things
 - A light panel with variable brightness
 - A motorized cover
 
-The cover is motorized using a servo motor and held in open/close positions using simple magnets. The lightpanel is made using LEDs and the variable brightness is achieved via pulse width modulation (PWM). This "electronico-mechanical" assembly is controlled via a SAMD21 based board with a custom firmware within a custom PCB. The SAMD21 is particullarly suited because:
+The cover is motorized using a servo motor and held in open/close positions using simple magnets. The lightpanel is made 
+- either using LEDs and the variable brightness is achieved via pulse width modulation (PWM). 
+- or eusing a EL panel and the variable brightness is achived usi a DAC (Digital to Analog Converter) coupled to an OA (Operation Amplifier) in non-inverting amplifier mode. 
+
+This "electronico-mechanical" assembly is controlled via a SAMD21 based board with a custom firmware within a custom PCB. The SAMD21 is particullarly suited because:
 
 - it can output 5V, that is needed to power the servo.
 - it can output +3V3 and allow us to choose between 3V and 5V to power the LEDs.
 - it has 16 bits timer counters necessary to achieve fast PWM. We do not want flickering flats...
+- it has a real DAC output pin to alow "easy" dimming of a flat panel.
 
 One can connect and send commands to the flat-panel using Serial (COM Port) over USB. When plugged in the device will be recognized by windows/linux as a COM device. 
 
@@ -108,7 +115,43 @@ In the same spirit, we do not recommend you use the "head" of the main branch (o
 
 ### Electronic circuit
 
-We provide two options for the electronic circuit. The difference is made on the tension value used to power the LEDs: either +3V3 or +5V. But appart from that the two circuits share the same principles:
+We provide three options for the electronic circuit. The difference is made on wether you want to use a led panel or a EL panel (You may not have the choice, as LED panels are restricted to smaller diameters). 
+
+#### EL Panel option
+
+This is certainely the "go to" solution, as this allows for a slicker and ligther mechanical assembly. Ans the electronics are not that much more difficut. 
+
+- The The Pin "AO" (DAC) of the Seeeduino XIAO is used to control the LED brightness:
+  - Is is directly connected to the non-invervint pin of ta TLC272 Op.Amp. The Ration of R1/R2 controls the amplifying contant (R = 1 + R1/R2) 
+  - The output of the TLC272 is connected to the base of a  darlington transistor. Such that more current can flow to the EL Driver without worring too much about the life expectency of the TLC272
+  -  The +12v needed for the Op Amp and the Driver is obtained using a DC/DC regulator
+
+> ⚠ **WARNING**  
+> The choice of Pin AO for DAC is not random. This is the only one on the Seeeduino XIAO (and SAM-D21 chips) capable to produce proper DAC. Please [see](https://ww1.microchip.com/downloads/en/DeviceDoc/SAM_D21_DA1_Family_DataSheet_DS40001882F.pdf). 
+
+
+- The Pins "5,6,7"  of the Seeeduino XIAO are used for power control, position control and servo feedback:
+  - Power control is connected, via a voltage divider bridge, to the gate of a IRLZ34N MOSFET.
+  - Feedback is directly connected to the feedback pin of the servo.
+  - Position control is directly connected to the position control pin of the servo.
+  
+- Servo VCC and Servo ground are decoupled using diodes.
+
+- +12V and +5V are decoupled from ground using 10μF capacitors. It acts both as
+  - an energy storage for a stable +5V/+12V output.
+  - a "wire" for very high frequency spurious oscillations and effectively ground them. 
+
+#### LED Panel schematics
+
+This should be the go solution for most setups. Yet if you setup si particularly slow you may want to check the led versions. 
+
+Here is the schematics for this option
+
+![Circuit with EL panel](./.static/EL-panel-circuit-schematics.png)
+
+#### LED panel option
+
+There are two options regarding the tension value used to power the LEDs: either +3V3 or +5V. But appart from that the two circuits share the same principles:
 
 - The Pin "8"  of the Seeeduino XIAO is used to control the LED brightness:
   + It is connected, via a voltage divider bridge, to the gate of a IRLZ34N MOSFET.
@@ -132,8 +175,7 @@ We provide two options for the electronic circuit. The difference is made on the
   - an energy storage for a stable +5V/+3V3 output.
   - a "wire" for very high frequency spurious oscillations and effectively ground them. 
 
-
-#### The +3V3 output for LEDs
+##### The +3V3 output for LEDs
 
 This is best suited for small refractors using fewer LEDs and/or fast optics. 
 
@@ -141,7 +183,7 @@ Here is the schematics for this option
 
 ![Circuit with +3V3 output for LEDs](./.static/+3V3-LEDs-circuit-schematics.png)
 
-#### The +5V output for LEDs
+##### The +5V output for LEDs
 
 This is best suited for bigger tubes using a larger number of LEDs drawing more current. 
 
@@ -667,7 +709,7 @@ The indi driver is in its **really** early developement phase. It should no be u
 in the [indi](./drivers/indi/indi_driver/) directory, from VSCode integrated terminal or anyother terminal run
 
 ``` console
-mkdir build
+mkdir -p build
 cd build
 cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Debug ../
 make
@@ -683,8 +725,8 @@ or
 The output should be something along the lines of:
 
 ``` console
--- The C compiler identification is GNU 11.4.0
--- The CXX compiler identification is GNU 11.4.0
+-- The C compiler identification is GNU 13.3.0
+-- The CXX compiler identification is GNU 13.3.0
 -- Detecting C compiler ABI info
 -- Detecting C compiler ABI info - done
 -- Check for working C compiler: /usr/bin/cc - skipped
@@ -695,33 +737,23 @@ The output should be something along the lines of:
 -- Check for working CXX compiler: /usr/bin/c++ - skipped
 -- Detecting CXX compile features
 -- Detecting CXX compile features - done
-CMake Deprecation Warning at CMakeLists.txt:3 (cmake_minimum_required):
-  Compatibility with CMake < 2.8.12 will be removed from a future version of
-  CMake.
-
-  Update the VERSION argument <min> value or use a ...<max> suffix to tell
-  CMake that the project does not need compatibility with older versions.
-
-
--- Found INDI: /usr/lib/x86_64-linux-gnu/libindidriver.so;/usr/lib/x86_64-linux-gnu/libindiAlignmentDriver.so (found suitable version "2.1.3", minimum required is "1.8")
+-- Found INDI: /usr/lib/x86_64-linux-gnu/libindidriver.so;/usr/lib/x86_64-linux-gnu/libindiAlignmentDriver.so (found version "2.1.9")
 -- Found NOVA: /usr/lib/x86_64-linux-gnu/libnova.so
--- Found ZLIB: /usr/lib/x86_64-linux-gnu/libz.so (found version "1.2.11")
--- Found PkgConfig: /usr/bin/pkg-config (found version "0.29.2")
+-- Found ZLIB: /usr/lib/x86_64-linux-gnu/libz.so (found version "1.3")
 -- Found GSL: /usr/include (found version "2.7.1")
 -- Performing Test COMPATIBLE_FORTIFY_SOURCE
 -- Performing Test COMPATIBLE_FORTIFY_SOURCE - Success
--- Configuring done
--- Generating done
--- Build files have been written to: /home/fgautier/Projects/ascom-flat-panel/drivers/indi/indi_driver/build
-[ 50%] Building CXX object CMakeFiles/indi_fffpv1_flatpanel.dir/indi_fffpv1_flatpanel.cpp.o
-[100%] Linking CXX executable indi_fffpv1_flatpanel
-[100%] Built target indi_fffpv1_flatpanel
-Consolidate compiler generated dependencies of target indi_fffpv1_flatpanel
-[100%] Built target indi_fffpv1_flatpanel
+-- Configuring done (2.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/florian/documents/diy/ascom-flat-panel/drivers/indi/indi_driver/build
+[ 50%] Building CXX object CMakeFiles/indi_letelescope_fffp_flatpanel.dir/indi_letelescope_fffp_flatpanel.cpp.o
+[100%] Linking CXX executable indi_letelescope_fffp_flatpanel
+[100%] Built target indi_letelescope_fffp_flatpanel
+[100%] Built target indi_letelescope_fffp_flatpanel
 Install the project...
 -- Install configuration: "Debug"
--- Installing: /usr/bin/indi_fffpv1_flatpanel
--- Installing: /usr/share/indi/indi_fffpv1_flatpanel.xml
+-- Installing: /usr/bin/indi_letelescope_fffp_flatpanel
+-- Installing: /usr/share/indi/indi_letelescope_fffp_flatpanel.xml
 ```
 
 ## Miscellaneous

@@ -1,0 +1,218 @@
+import FreeCAD as App
+import Part
+import math
+
+def make_spiral(Rmax, turns, points, phase=0, offset=0) :
+    """
+    Génère une spirale d'archimède
+    Rmax = rayon final
+    turns = nombre de tours
+    points = nombre de points (avant interpolation)
+    phase = déphasage (p ex phase = math.pi décale d'un demi tour par rapport à phase=0)
+    offset = décalage de la fin de la spirale (p ex offset = math.pi arrete la spirale un demi tour avant qu'elle atteigne Rmax)
+    """
+    pitch=Rmax/turns
+    b = pitch/(2*math.pi)
+    theta_max = 2 * math.pi * turns - offset
+    print("turns", turns)
+    print("theta_max", theta_max)
+    print("pitch", pitch)
+    pts=[]
+    for i in range(points):
+        t = theta_max * i/(points-1)
+        r = b*t
+        x = r*math.cos(t+phase)
+        y = r*math.sin(t+phase)
+        pts.append(App.Vector(x,y,0))
+    curve = Part.BSplineCurve()
+    curve.interpolate(pts)
+    return curve.toShape(), pts, pitch    
+
+##main
+
+bodyname="Panel_body" #nom du corps dans lequel creuser la tranchée
+sheetname="parametres" #spreadsheet dans laquelle sont les parametres
+rotateY=-90 #rotation appliquée car la spirale est définie dans (x,y) mais on veut l'appliquer dans (y,z)
+# translateX=3.2 #translation suivant x pour se positionner sur la surface dans laquelle creuser la tranchée
+# rotateX=25 #rotation d'ajustement final dans (y, z)
+points = 100 #nombre de points définissant une spirale
+
+### tests
+# bodyname="Corps"
+# sheetname="Spreadsheet"
+# rotateY=False
+# translateX=False
+
+#déclaration du document de travail
+doc = App.ActiveDocument
+
+#récupération des paramètres dans la spreadsheet
+sheet = doc.getObjectsByLabel(sheetname)[0]
+Rmax = sheet.get('spiral_Rmax')
+turns = sheet.get('spiral_turns')
+pipe_thickness = sheet.get('pipe_thickness')
+pipe_width = sheet.get('pipe_width')
+rotateX = sheet.get('spiral_rotation')
+translateX = sheet.get('panel_body_thickness') - sheet.get('panel_bottom_thickness')
+print("translateX", translateX)
+
+#suppression des objets en cas d'une précédente exécution
+for name in [
+    "SpiralPath",
+    "SpiralBinder",
+    "GrooveProfile",
+    "SpiralGroove",
+    "CenterPocket",
+    "CenterPocketCut"
+]:
+    obj = doc.getObject(name)
+    if obj:
+        doc.removeObject(name)
+
+#génération de la première spirale
+spiral1, pts1, pitch = make_spiral(Rmax, turns, points, phase=0, offset=0)
+#génération de la deuxième spirale, décalée d'un demi tour
+spiral2, pts2, pitch = make_spiral(Rmax, turns, points, phase=math.pi, offset=math.pi)
+
+#fermeture par arcs de cercle
+p1 = pts1[-1]
+p2 = pts2[-1]
+v1 = App.Vector(p1.x, p1.y, 0)
+v1.normalize()
+v2 = App.Vector(p2.x, p2.y, 0)
+v2.normalize()
+c1 = p1 + v1*(pitch/2)
+c2 = p2 + v2*(pitch)
+circle1 = Part.Circle(c1, App.Vector(0,0,-1), pitch/2)
+arc1 = Part.ArcOfCircle(circle1, 0, math.pi*0.5).toShape()
+circle2 = Part.Circle(c1, App.Vector(0,0,-1), pitch)
+arc2 = Part.ArcOfCircle(circle2, 0, math.pi*0.5).toShape()
+
+#assemblage des éléments pour obtenir la forme complète
+wire = Part.Wire([
+    arc1,
+    spiral1,
+    spiral2,
+    arc2,
+])
+
+#application des transformation pour passer de l'espace de conception à l'espace d'application
+if rotateY :
+    wire.rotate(
+        App.Vector(0,0,0),   # centre
+        App.Vector(0,1,0),   # axe Y
+        rotateY                  # angle
+    )
+if rotateX :
+    wire.rotate(
+        App.Vector(0,0,0),   # centre
+        App.Vector(1,0,0),   # axe X
+        rotateX                  # angle
+    )
+if translateX :
+    wire.translate(App.Vector(translateX, 0, 0))
+
+#création de la part de base dans le modèle
+spine = doc.addObject("Part::Feature", "SpiralPath")
+spine.Shape = wire
+#recalcul du modèle
+doc.recompute()
+
+#identification du corps dans lequel creuser la spirale
+body = doc.getObjectsByLabel(bodyname)[0]
+
+# création d'un binder vers la spirale dans ce corps
+binder = body.newObject('PartDesign::ShapeBinder','SpiralBinder')
+binder.Support = spine
+# binder.Support = [(spine), ""]
+# binder.Support = [(spine), "Edge1"]
+binder.TraceSupport = False
+#recalcul du modèle
+doc.recompute()
+binder.recompute()
+doc.recompute()
+
+#création du profil de la tranchée (esquisse)
+sketch = body.newObject('Sketcher::SketchObject','GrooveProfile')
+sketch.AttachmentSupport = [(binder, "Edge1")]
+sketch.MapMode = "NormalToEdge"
+s = pipe_thickness
+w = pipe_width
+#sketch.addGeometry(Part.LineSegment(App.Vector(-s,-s/2,0),App.Vector(s,-s/2,0)))
+#sketch.addGeometry(Part.LineSegment(App.Vector(s,-s/2,0),App.Vector(s,s/2,0)))
+#sketch.addGeometry(Part.LineSegment(App.Vector(s,s/2,0),App.Vector(-s,s/2,0)))
+#sketch.addGeometry(Part.LineSegment(App.Vector(-s,s/2,0),App.Vector(-s,-s/2,0)))
+sketch.addGeometry(Part.LineSegment(App.Vector(-s,-w/2,0),App.Vector(s,-w/2,0)))
+sketch.addGeometry(Part.LineSegment(App.Vector(s,-w/2,0),App.Vector(s,w/2,0)))
+sketch.addGeometry(Part.LineSegment(App.Vector(s,w/2,0),App.Vector(-s,w/2,0)))
+sketch.addGeometry(Part.LineSegment(App.Vector(-s,w/2,0),App.Vector(-s,-w/2,0)))
+#recalcul du modèle
+doc.recompute()
+
+#création du substrative pipe : profil = esquisse, chemin = binder vers spirale
+pipe = body.newObject('PartDesign::SubtractivePipe','SpiralGroove')
+pipe.Profile = sketch
+pipe.Spine = binder
+pipe.Mode = "Frenet"
+pipe.Transition = "Transformed"
+
+# cacher les objets techniques
+spine.ViewObject.Visibility = False
+binder.ViewObject.Visibility = False
+sketch.ViewObject.Visibility = False
+
+#recalcul du modèle
+doc.recompute()
+
+# =========================================================
+# Chambre centrale pour faciliter le passage du fil
+# =========================================================
+
+# center_radius = Rmax * 0.05
+center_radius = 0.5 * pitch
+
+center_sketch = body.newObject('Sketcher::SketchObject', 'CenterPocket')
+
+# même orientation que la spirale
+center_sketch.MapMode = "Deactivated"
+
+# placement identique aux transformations appliquées au wire
+rotY = App.Rotation(App.Vector(0,1,0), rotateY if rotateY else 0)
+rotX = App.Rotation(App.Vector(1,0,0), rotateX if rotateX else 0)
+
+placement = App.Placement(
+    App.Vector(translateX if translateX else 0, 0, 0),
+    rotX.multiply(rotY)
+)
+
+center_sketch.Placement = placement
+
+# cercle central
+circle = Part.Circle(
+    App.Vector(0,0,0),
+    App.Vector(0,0,1),
+    center_radius
+)
+
+center_sketch.addGeometry(circle)
+
+doc.recompute()
+
+# pocket circulaire
+center_pocket = body.newObject('PartDesign::Pocket', 'CenterPocketCut')
+
+center_pocket.Profile = center_sketch
+center_pocket.Length = pipe_thickness
+center_pocket.Type = "Length"
+
+doc.recompute()
+
+# cacher l'esquisse technique
+center_sketch.ViewObject.Visibility = False
+
+print("Recap : ")
+V=12 #V
+R_per_m = sheet.get('wire_resistivity')  # Ω/m
+L = (spiral1.Length + spiral2.Length) / 1000
+R = R_per_m * L
+print(f"L={L:.2f} m | R={R:.1f} Ω | P={V**2 / R:.1f} W")
