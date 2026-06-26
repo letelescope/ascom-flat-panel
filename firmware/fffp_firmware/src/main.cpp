@@ -513,7 +513,9 @@ void update_panel_cover()
   panel.last_step_time = now;
 
   // Ramping up "slowly" target position
-  if (panel.cover == OPENING)
+  // It's the counter intuitive but it's right
+  // On the v2 the servo being on the left arm spins backwars
+  if (panel.cover == CLOSING)
   {
     panel.servo_position++;
     if (panel.servo_position >= SERVO_MAX_ANGLE)
@@ -521,7 +523,7 @@ void update_panel_cover()
       panel.servo_position = SERVO_MAX_ANGLE;
     }
   }
-  else if (panel.cover == CLOSING)
+  else if (panel.cover == OPENING)
   {
     panel.servo_position--;
     if (panel.servo_position <= SERVO_MIN_ANGLE)
@@ -532,7 +534,7 @@ void update_panel_cover()
 
   servo.write(panel.servo_position);
 
-  // servo targets "open" position. Check if we are really there
+  // servo targets "Closed" position. Check if we are really there
   if (panel.servo_position == SERVO_MAX_ANGLE)
   {
 
@@ -543,7 +545,7 @@ void update_panel_cover()
 
     if (has_reached_target || too_manmy_retries)
     {
-      panel.cover = OPEN;
+      panel.cover = CLOSED;
       panel.position_convergence_counter = 0;
     }
     else
@@ -552,7 +554,7 @@ void update_panel_cover()
     }
   }
 
-  // servo targets "closed" position. Check if we are really there
+  // servo targets "open" position. Check if we are really there
   if (panel.servo_position == SERVO_MIN_ANGLE)
   {
 
@@ -563,7 +565,7 @@ void update_panel_cover()
 
     if (has_reached_target || too_manmy_retries)
     {
-      panel.cover = CLOSED;
+      panel.cover = OPEN;
       panel.position_convergence_counter = 0;
     }
     else
