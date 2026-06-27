@@ -36,6 +36,8 @@ In a nutshell
 Allowed commands are:
 - `COMMAND:PING`
 - `COMMAND:INFO`
+- `COMMAND:VERSION`
+- `COMMAND:MAX_BRIGHTNESS`
 - `COMMAND:BRIGHTNESS_GET`
 - `COMMAND:BRIGHTNESS_SET@{(int) DESIRED_VALUE}`
 - `COMMAND:BRIGHTNESS_RESET`
@@ -44,6 +46,7 @@ Allowed commands are:
 - `COMMAND:COVER_CLOSE`
 - `COMMAND:COVER_CALIBRATION_RUN`
 - `COMMAND:COVER_CALIBRATION_GET`
+- `COMMAND:DISCONNECT`
 
 ## Command Details 
 
@@ -58,7 +61,21 @@ Allowed commands are:
 
 - Incoming message : `COMMAND:INFO`
 - Args             : Ignored
-- Serial response  : `RESULT:INFO@{RESULT_INFO}`, where {RESULT_INFO} is the value of the firmware informations ex Le Télescope - Ivry sur Seine - Flat Panel Firmware v1.0.
+- Serial response  : `RESULT:INFO@{RESULT_INFO}`, where {RESULT_INFO} is the value of the firmware information, e.g. `Le Télescope - Ivry sur Seine - Flat Panel Firmware v1.0`.
+- Serial error     : Never 
+
+### Version
+
+- Incoming message : `COMMAND:VERSION`
+- Args             :  Ignored
+- Serial response  : `RESULT:VERSION@{full_version}`, where {full_version} is the firmware semantic version including panel type and git revision, e.g. `1.0.0.el_panel.<Git Revision>` or `1.0.0.led_panel.<Git Revision>`.
+- Serial error     : Never 
+
+### Get Max Brightness
+
+- Incoming message : `COMMAND:MAX_BRIGHTNESS`
+- Args             :  Ignored
+- Serial response  : `RESULT:MAX_BRIGHTNESS@{MAX_BRIGHTNESS}`, where {MAX_BRIGHTNESS} is the maximum brightness supported by the panel type.
 - Serial error     : Never 
 
 ### Get Brightness
@@ -89,7 +106,7 @@ Allowed commands are:
 
 - Incoming message : `COMMAND:COVER_GET_STATE`
 - Args             : Ignored
-- Serial response  : `RESULT:COVER_GET@{panel.cover}`, where panel.cover is string human readable translation of the current cover state. Possible values are in [**OPEN**, **OPENING**, **CLOSING**, **CLOSED**]
+- Serial response  : `RESULT:COVER_GET_STATE@{panel.cover}`, where panel.cover is string human readable translation of the current cover state. Possible values are in [**OPEN**, **OPENING**, **CLOSING**, **CLOSED**]
 - Serial error     : Never
 
 ### Open cover
@@ -97,7 +114,7 @@ Allowed commands are:
 - Incoming message : `COMMAND:COVER_OPEN`
 - Args             : Ignored
 - Serial response  : `RESULT:COVER_OPEN@OK`
-- Serial error     : If panel is not calibrated => `ERROR:SERVO_NO_CALIBRATED@Run command COVER_CALIBRATION_RUN first`
+- Serial error     : If panel is not calibrated => `ERROR:SERVO_NOT_CALIBRATED@Run command COVER_CALIBRATION_RUN first`
 
 
 ### Close cover
@@ -105,34 +122,32 @@ Allowed commands are:
 - Incoming message : `COMMAND:COVER_CLOSE`
 - Args             : Ignored
 - Serial response  : `RESULT:COVER_CLOSE@OK`
-- Serial error     : If panel is not calibrated => `SERVO_NO_CALIBRATED@Run command COVER_CALIBRATION_RUN first`
+- Serial error     : If panel is not calibrated => `ERROR:SERVO_NOT_CALIBRATED@Run command COVER_CALIBRATION_RUN first`
 
 
 
 ### Run calibration
 
-- Incoming message : `COMMAND:CALIBRATION_RUN`
-- Args             : Ignored
-- Serial response  : `RESULT:CALIBRATION_RUN@OK`
-- Serial error     : Never
+- Incoming message : `COMMAND:COVER_CALIBRATION_RUN`
+- Args             :  Ignored
+- Serial response  : `RESULT:COVER_CALIBRATION_RUN@OK`
+- Serial error     : Never 
 
-WARNING: Disconect the right arm from the servo before runing the calibration
+WARNING: Disconnect the right arm from the servo before running the calibration
 
 ### Get calibration
 
-- Incoming message : `COMMAND:CALIBRATION_GET`
-- Args             : Ignored
-- Serial response  : `RESULT:CALIBRATION_GET@slope={panel.calibration.slope} - intercept={panel.calibration.intercept}`
-- Serial error     : if panel is not calibrated => `SERVO_NO_CALIBRATED@Run command COVER_CALIBRATION_RUN first`
+- Incoming message : `COMMAND:COVER_CALIBRATION_GET`
+- Args             :  Ignored
+- Serial response  : `RESULT:COVER_CALIBRATION_GET@slope={panel.calibration.slope} - intercept={panel.calibration.intercept}`
+- Serial error     : if panel is not calibrated => `ERROR:SERVO_NOT_CALIBRATED@Run command COVER_CALIBRATION_RUN first`
 
 ### Disconnect
 
-
 - Incoming message : `COMMAND:DISCONNECT`
-- Args             : Ignored
+- Args             :  Ignored
 - Serial response  : `RESULT:DISCONNECT@OK`
-- Serial error     : never
-
+- Serial error     : Never
 
 ### Unknown commands
 
@@ -141,7 +156,7 @@ This one is a special command that is not meant to be called. It is in fact the 
 - Incoming message : Any message not in the previously mentionned ones.
 - Args             : Ignored
 - Serial response  : Never
-- Serial error     : `ERROR:INVALID_COMMAND@Allowed commands PING, INFO, BRIGHTNESS_GET, BRIGHTNESS_SET, BRIGHTNESS_RESET, COVER_GET_STATE, COVER_OPEN, COVER_CLOSE, COVER_CALIBRATION_RUN, COVER_CALIBRATION_GET` (always)
+- Serial error     : `ERROR:INVALID_COMMAND@Allowed commands PING, INFO, VERSION, MAX_BRIGHTNESS, BRIGHTNESS_GET, BRIGHTNESS_SET, BRIGHTNESS_RESET, COVER_GET_STATE, COVER_OPEN, COVER_CLOSE, COVER_CALIBRATION_RUN, COVER_CALIBRATION_GET, DISCONNECT` (always)
 
 ## Specific error cases
 
@@ -151,4 +166,4 @@ The firmware may emit error message not related to a specific command.
 
 - If the driver/client emmits a valid message that is not a command, the firmware should respon with `ERROR:INVALID_INCOMING_MESSAGE_TYPE@Allowed types COMMAND`
 
-- If the driver/client emmits an unknown command, ie not one in this list, the firmware shoudl respond with `ERROR:INVALID_COMMAND@Allowed commands PING, INFO, BRIGHTNESS_GET, BRIGHTNESS_SET, BRIGHTNESS_RESET, COVER_GET_STATE, COVER_OPEN, COVER_CLOSE, COVER_CALIBRATION_RUN, COVER_CALIBRATION_GET`, c.f. [unknow "commands"](#unknown-commands) above
+- If the driver/client emmits an unknown command, ie not one in this list, the firmware should respond with `ERROR:INVALID_COMMAND@Allowed commands PING, INFO, VERSION, MAX_BRIGHTNESS, BRIGHTNESS_GET, BRIGHTNESS_SET, BRIGHTNESS_RESET, COVER_GET_STATE, COVER_OPEN, COVER_CLOSE, COVER_CALIBRATION_RUN, COVER_CALIBRATION_GET, DISCONNECT`, c.f. [unknown "commands"](#unknown-commands) above
