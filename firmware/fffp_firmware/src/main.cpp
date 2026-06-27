@@ -513,9 +513,14 @@ void update_panel_cover()
   panel.last_step_time = now;
 
   // Ramping up "slowly" target position
-  // It's the counter intuitive but it's right
-  // On the v2 the servo being on the left arm spins backwars
+  // If LED_PANEL type, panel should seek to reach Max angle when opening.
+  // Contrary wise for EL_Panel builds,the servo is on the other arm hence
+  // it should seek to reach min angle when opening.
+#if defined FFFP_TYPE_EL_PANEL
   if (panel.cover == CLOSING)
+#elif defined FFFP_TYPE_LED_PANEL
+  if (panel.cover == OPENING)
+#endif
   {
     panel.servo_position++;
     if (panel.servo_position >= SERVO_MAX_ANGLE)
@@ -523,7 +528,11 @@ void update_panel_cover()
       panel.servo_position = SERVO_MAX_ANGLE;
     }
   }
+#if defined FFFP_TYPE_EL_PANEL
   else if (panel.cover == OPENING)
+#elif defined FFFP_TYPE_LED_PANEL
+  else if (panel.cover == CLOSING)
+#endif
   {
     panel.servo_position--;
     if (panel.servo_position <= SERVO_MIN_ANGLE)
@@ -534,7 +543,9 @@ void update_panel_cover()
 
   servo.write(panel.servo_position);
 
-  // servo targets "Closed" position. Check if we are really there
+  // MAX angle maens servo targets "Closed" position for EL panel type
+  // MAX angle means servo targets "Open" position for LED panel type. 
+  // Check if we are really there
   if (panel.servo_position == SERVO_MAX_ANGLE)
   {
 
@@ -545,7 +556,11 @@ void update_panel_cover()
 
     if (has_reached_target || too_manmy_retries)
     {
+#if defined FFFP_TYPE_EL_PANEL
       panel.cover = CLOSED;
+#elif defined FFFP_TYPE_LED_PANEL
+      panel.cover = OPEN;
+#endif
       panel.position_convergence_counter = 0;
     }
     else
@@ -554,7 +569,9 @@ void update_panel_cover()
     }
   }
 
-  // servo targets "open" position. Check if we are really there
+  // MIN Angle mean servo targets "open" position for EL panle type.
+  // Min Angle means servo targets "close" position for Led panel type.
+  // Check if we are really there
   if (panel.servo_position == SERVO_MIN_ANGLE)
   {
 
@@ -565,7 +582,11 @@ void update_panel_cover()
 
     if (has_reached_target || too_manmy_retries)
     {
+#if defined FFFP_TYPE_EL_PANEL
       panel.cover = OPEN;
+#elif defined FFFP_TYPE_LED_PANEL
+      panel.cover = CLOSED;
+#endif
       panel.position_convergence_counter = 0;
     }
     else
