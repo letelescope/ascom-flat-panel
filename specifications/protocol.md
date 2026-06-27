@@ -8,19 +8,19 @@ The firmware updates the state of the flat panel upon instructions of the (ASCOM
 
 ## Messages 
 
-The protocol is thus "message" based. 
-- Both the driver and the flat panel (the firmware) exchange single line messages; ie terminated by '\n'.
-- A message is structured as TYPE:MESSAGE, where TYPE is in "COMMAND, RESULT, ERROR" and MESSAGE is alaphanumerical with spaces and "@"
+The protocol is thus message based.
+- Both the driver and the flat panel (the firmware) exchange single-line messages terminated by '\n'.
+- A message is structured as `TYPE:PAYLOAD`, where `TYPE` is one of `COMMAND`, `RESULT`, or `ERROR`, and `PAYLOAD` may include alphanumeric characters, spaces, and `@` separators.
 
-The **driver emmits** and the **firmware handles** the incoming "COMMAND" messages. This kind of message is stuctured as 
+The **driver emits** and the **firmware handles** incoming `COMMAND` messages. A command message is structured as:
 
 - `COMMAND:NAME[@ARGS]` 
 
-where NAME is [A-Z_]+ and ARGS may be optional or mandatory and their nature may depend on the command. For instance for a `COMMAND:BRIGHTNESS_SET@ARGS` message the ARGS are mandatory and should consists of a single "int"
+where `NAME` is `[A-Z_]+` and `ARGS` may be optional or mandatory depending on the command. For example, in `COMMAND:BRIGHTNESS_SET@ARGS` the `ARGS` are required and represent a single integer value.
 
-The firmware then responds with 
-- either a `RESULT:CMD_NAME@VALUE`   if operation succeeded
-- or an `ERROR:ERR_MESSAGE@DETAILS` if anything went wrong
+The firmware then responds with:
+- `RESULT:CMD_NAME@VALUE` when the operation succeeds
+- `ERROR:ERR_MESSAGE@DETAILS` when the operation fails
 
 In a nutshell
 
@@ -33,20 +33,26 @@ In a nutshell
                                 or
                         ERROR:ERR_MESSAGE@DETAILS
 
+### Command summary
 Allowed commands are:
-- `COMMAND:PING`
-- `COMMAND:INFO`
-- `COMMAND:VERSION`
-- `COMMAND:MAX_BRIGHTNESS`
-- `COMMAND:BRIGHTNESS_GET`
-- `COMMAND:BRIGHTNESS_SET@{(int) DESIRED_VALUE}`
-- `COMMAND:BRIGHTNESS_RESET`
-- `COMMAND:COVER_GET_STATE`
-- `COMMAND:COVER_OPEN`
-- `COMMAND:COVER_CLOSE`
-- `COMMAND:COVER_CALIBRATION_RUN`
-- `COMMAND:COVER_CALIBRATION_GET`
-- `COMMAND:DISCONNECT`
+- `COMMAND:PING` — no args, responds with `RESULT:PING@PONG`
+- `COMMAND:INFO` — no args, responds with firmware info string
+- `COMMAND:VERSION` — no args, responds with firmware version string
+- `COMMAND:MAX_BRIGHTNESS` — no args, responds with maximum brightness value
+- `COMMAND:BRIGHTNESS_GET` — no args, responds with current brightness value
+- `COMMAND:BRIGHTNESS_SET@{value}` — sets brightness and responds with the new value
+- `COMMAND:BRIGHTNESS_RESET` — resets brightness to 0
+- `COMMAND:COVER_GET_STATE` — returns current cover state
+- `COMMAND:COVER_OPEN` — opens the cover
+- `COMMAND:COVER_CLOSE` — closes the cover
+- `COMMAND:COVER_CALIBRATION_RUN` — runs servo calibration
+- `COMMAND:COVER_CALIBRATION_GET` — returns calibration parameters
+- `COMMAND:DISCONNECT` — acknowledges disconnection
+
+### Examples
+- `COMMAND:PING` → `RESULT:PING@PONG`
+- `COMMAND:BRIGHTNESS_SET@100` → `RESULT:BRIGHTNESS_SET@100`
+- `COMMAND:COVER_GET_STATE` → `RESULT:COVER_GET_STATE@OPEN`
 
 ## Command Details 
 
@@ -151,19 +157,19 @@ WARNING: Disconnect the right arm from the servo before running the calibration
 
 ### Unknown commands
 
-This one is a special command that is not meant to be called. It is in fact the result of an unknow command sent to the firmware.
+This one is a special command that is not meant to be called. It is in fact the result of an unknown command sent to the firmware.
 
-- Incoming message : Any message not in the previously mentionned ones.
+- Incoming message : Any message not in the previously mentioned ones.
 - Args             : Ignored
 - Serial response  : Never
 - Serial error     : `ERROR:INVALID_COMMAND@Allowed commands PING, INFO, VERSION, MAX_BRIGHTNESS, BRIGHTNESS_GET, BRIGHTNESS_SET, BRIGHTNESS_RESET, COVER_GET_STATE, COVER_OPEN, COVER_CLOSE, COVER_CALIBRATION_RUN, COVER_CALIBRATION_GET, DISCONNECT` (always)
 
 ## Specific error cases
 
-The firmware may emit error message not related to a specific command. 
+The firmware may emit error messages not related to a specific command.
 
-- If the driver/client serialise a string  that is not parsable as a *message*, as understood in this context, the firmware should respon with `ERROR:INVALID_INCOMING_MESSAGE@Allowed messages are TYPE:MESSAGE`
+- If the driver/client serializes a string that is not parsable as a message, the firmware should respond with `ERROR:INVALID_INCOMING_MESSAGE@Allowed messages are TYPE:MESSAGE`
 
-- If the driver/client emmits a valid message that is not a command, the firmware should respon with `ERROR:INVALID_INCOMING_MESSAGE_TYPE@Allowed types COMMAND`
+- If the driver/client emits a valid message that is not a command, the firmware should respond with `ERROR:INVALID_INCOMING_MESSAGE_TYPE@Allowed types COMMAND`
 
-- If the driver/client emmits an unknown command, ie not one in this list, the firmware should respond with `ERROR:INVALID_COMMAND@Allowed commands PING, INFO, VERSION, MAX_BRIGHTNESS, BRIGHTNESS_GET, BRIGHTNESS_SET, BRIGHTNESS_RESET, COVER_GET_STATE, COVER_OPEN, COVER_CLOSE, COVER_CALIBRATION_RUN, COVER_CALIBRATION_GET, DISCONNECT`, c.f. [unknown "commands"](#unknown-commands) above
+- If the driver/client emits an unknown command, i.e. one not in this list, the firmware should respond with `ERROR:INVALID_COMMAND@Allowed commands PING, INFO, VERSION, MAX_BRIGHTNESS, BRIGHTNESS_GET, BRIGHTNESS_SET, BRIGHTNESS_RESET, COVER_GET_STATE, COVER_OPEN, COVER_CLOSE, COVER_CALIBRATION_RUN, COVER_CALIBRATION_GET, DISCONNECT`, c.f. [unknown "commands"](#unknown-commands) above
